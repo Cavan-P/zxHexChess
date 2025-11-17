@@ -1,15 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta name = "viewport" content = "width=device-width">
+
     <title>ZXChess - Hexagonal Chess</title>
+
+    <link href="./css/style.css" rel="stylesheet" type="text/css" />
   </head>
 
   <body>
+    <canvas id="canvas" width="0" height="0"></canvas>
 
+    <img id="pieces" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Chess_Pieces_Sprite.svg/1200px-Chess_Pieces_Sprite.svg.png" hidden/>
+
+    <div id="chat">
+      <div id="chat-box"></div>
+      <form id="chat-form">
+        <input id="chat-input" type="text" placeholder="Type a message">
+        <button type="submit">Send</button>
+      </form>
+    </div>
+
+    
+    <script type="module" src="js/main.js"></script>
   </body>
-
-  <script src="js/main.js"></script>
-
-  
 </html>
