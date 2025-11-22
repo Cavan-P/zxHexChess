@@ -1,6 +1,10 @@
 import { drawHexagon, getHexagonPoints } from './hexagon.js'
+import { Cell } from './cell.js'
+import { Piece } from './piece.js'
 
-export const drawBoard = (hexSize, colors, stroke, strokeWeight, ctx) => {
+export let cells = []
+
+export const drawBoard = (hexSize, colors, stroke, strokeWeight, ctx, populateCells) => {
     let cellNum = 0
 
     const centerX = window.innerWidth / 2
@@ -116,7 +120,18 @@ export const drawBoard = (hexSize, colors, stroke, strokeWeight, ctx) => {
         for(let col = 0; col < numCols; col++){
             drawHexagon(x, y, hexSize, colors[colorIndex], stroke, strokeWeight, ctx)
 
-            //Add cells here
+            if(populateCells){
+
+                let q = coordinates[cellNum][0]
+                let r = coordinates[cellNum][1]
+                let s = coordinates[cellNum][2]
+
+                //Add cells here
+                cells.push(
+                    new Cell(x, y, cellNum, q, r, s, hexSize, ctx)
+                )
+
+            }
 
             x += columnOffset
             cellNum++
@@ -124,5 +139,27 @@ export const drawBoard = (hexSize, colors, stroke, strokeWeight, ctx) => {
 
         y+= rowOffset
         colorIndex = (++colorIndex) % 3
+    }
+}
+
+export const populateBoardFromFen = (fen, cells, pieces, ctx) => {
+    let cellIndex = 0
+
+    for(let i = 0; i < fen.length; i++){
+        const char = fen[i]
+
+        if(/\d/.test(char)){
+            cellIndex += +char
+            continue
+        }
+
+        const cell = cells[cellIndex]
+
+        pieces.push(
+            new Piece(char, cell.x, cell.y, ctx)
+        )
+
+        cell.occupiedBy = char
+        cellIndex++
     }
 }
