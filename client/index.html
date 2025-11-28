@@ -10,19 +10,25 @@
   </head>
 
   <body>
-    <canvas id="canvas" width="0" height="0"></canvas>
-
-    <img id="pieces" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Chess_Pieces_Sprite.svg/1200px-Chess_Pieces_Sprite.svg.png" hidden/>
-
-    <div id="chat">
-      <div id="chat-box"></div>
-      <form id="chat-form">
-        <input id="chat-input" type="text" placeholder="Type a message">
-        <button type="submit">Send</button>
-      </form>
+    <div id="layout">
+      <canvas id="canvas"></canvas>
+  
+      <img id="pieces" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Chess_Pieces_Sprite.svg/1200px-Chess_Pieces_Sprite.svg.png" hidden/>
+  
+      <div id="chat">
+        <div id="chat-title">Chat</div>
+        <div id="chat-box"></div>
+        <form id="chat-form">
+          <input id="chat-input" type="text" placeholder="Type a message">
+          <button type="submit">Send</button>
+        </form>
+      </div>
     </div>
-
-    
+  
     <script type="module" src="js/main.js"></script>
   </body>
+  
+  
+  
+  
 </html>

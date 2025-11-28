@@ -1,3 +1,6 @@
+import { pointInHexagon } from "./utils.js"
+import { drawHexagon } from "./hexagon.js"
+
 export class Cell {
     constructor(x, y, num, q, r, s, size, ctx){
 
@@ -15,14 +18,30 @@ export class Cell {
 
         this.landable = false
 
+        this.hovering = false
+
         this.ctx = ctx
         this.size = size
 
     }
 
-    update(pieces){
-        this.ocupied = false
+    checkMouseHover(mx, my){
+        return pointInHexagon({x: mx, y: my}, {x: this.x, y: this.y}, this.size)
+    }
+
+    update(pieces, mx, my){
+        this.hovering = this.checkMouseHover(mx, my)
+
+        this.occupied = false
         this.occupiedBy = ''
+
+        for(const piece of pieces){
+            if(piece.currentCell?.num == this.num){
+                this.occupied = true
+                this.occupiedBy = piece.piece
+                break
+            }
+        }
     }
 
     display(showCellNumbers, showCoords, showOccupiedBy, colorPerspective){
@@ -55,6 +74,10 @@ export class Cell {
             this.ctx.fillStyle = '#000'
             this.ctx.font = '10px sans-serif'
             this.ctx.fillText(this.occupiedBy, this.x, this.y + this.size / 1.6)
+        }
+        if(this.hovering && this.occupied){
+            canvas.style.cursor = 'pointer'
+            drawHexagon(this.x, this.y, this.size, '#00611FAA', false, 0, this.ctx)
         }
 
         this.ctx.restore()

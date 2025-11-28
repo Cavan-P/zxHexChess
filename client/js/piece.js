@@ -1,27 +1,35 @@
-import { pointInHexagon } from './utils'
+import { pointInHexagon } from "./utils.js"
 
 export let pieces = []
 
 export class Piece {
-    constructor(piece, x, y, ctx){
+    constructor(piece, x, y, cellSize, ctx){
         this.piece = piece
 
         this.x = x
         this.y = y
 
         this.size = 60
+        this.cellSize = cellSize
+
+        this.hovering = false
 
         this.isDragging = false
         this.offsetX = 0
         this.offsetY = 0
 
         this.originalCell = null
+        this.currentCell = null
 
         this.ctx = ctx
     }
 
     containsPoint(mx, my){
-        return pointInHexagon({ x: mx, y: my}, { x: this.x, y: this.y }, 60)
+        return pointInHexagon({ x: mx, y: my}, { x: this.x, y: this.y }, this.cellSize)
+    }
+
+    update(cells){
+
     }
 
     display(showCurrentCell, img, colorPerspective){
@@ -53,7 +61,7 @@ export class Piece {
         if(showCurrentCell){
             this.ctx.fillStyle = '#A00'
             this.ctx.font = '15px sans-serif'
-            this.ctx.fillText(this.currentCell.num, this.x - cellSize / 2, this.y - cellSize / 2.8)
+            this.ctx.fillText(this.currentCell?.num, this.x - this.cellSize / 2, this.y - this.cellSize / 2.8)
         }
 
         this.ctx.restore()

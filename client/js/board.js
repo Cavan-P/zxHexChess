@@ -130,6 +130,7 @@ export const drawBoard = (hexSize, colors, stroke, strokeWeight, ctx, populateCe
                 cells.push(
                     new Cell(x, y, cellNum, q, r, s, hexSize, ctx)
                 )
+                
 
             }
 
@@ -142,7 +143,7 @@ export const drawBoard = (hexSize, colors, stroke, strokeWeight, ctx, populateCe
     }
 }
 
-export const populateBoardFromFen = (fen, cells, pieces, ctx) => {
+export const populateBoardFromFen = (hexSize, fen, cells, pieces, ctx) => {
     let cellIndex = 0
 
     for(let i = 0; i < fen.length; i++){
@@ -156,10 +157,12 @@ export const populateBoardFromFen = (fen, cells, pieces, ctx) => {
         const cell = cells[cellIndex]
 
         pieces.push(
-            new Piece(char, cell.x, cell.y, ctx)
+            new Piece(char, cell.x, cell.y, hexSize, ctx)
         )
+        pieces[pieces.length - 1].currentCell = cell
 
         cell.occupiedBy = char
+        cell.occupied = true
         cellIndex++
     }
 }

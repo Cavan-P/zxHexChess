@@ -1,24 +1,189 @@
-body {
-    border: 0px;
-    padding: 0px;
-    margin: 0px;
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+
+    /* Very dark warm brown */
+    background: #1a120d; 
+    font-family: sans-serif;
+}
+
+/* LAYOUT */
+#layout {
+    display: grid;
+    grid-template-columns: 1fr 300px; /* main area + chat sidebar */
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* GAME CANVAS -------------------------------- */
+#canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+
+    /* Subtle warm-black to help board black outline stand out */
+    background: #0f0c0a;
+}
+
+/* CHAT SIDEBAR -------------------------------- */
 #chat {
-    position: fixed;
-    right: 10px;
-    bottom: 10px;
-    width: 250px;
-    height: 300px;
-    border: 1px solid black;
-    background: white;
     display: flex;
     flex-direction: column;
-  }
-  
-  #chat-box {
+    overflow: hidden;
+
+    /* deep warm charcoal */
+    background: #1c1410;
+
+    /* slight warm separator line */
+    border-left: 1px solid rgba(255, 206, 158, 0.10); /* light cell tone */
+
+    padding: 10px;
+    color: #f6e7d6; /* warm parchment text */
+}
+
+/* Chat title */
+#chat-title {
+    font-size: 16px;
+    font-weight: bold;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+
+    border-bottom: 1px solid rgba(255, 206, 158, 0.15);
+
+    text-align: center;
+    letter-spacing: 0.5px;
+
+    color: #ffce9e; /* light cell tone */
+}
+
+/* Scrollable chat messages */
+#chat-box {
     flex: 1;
     overflow-y: auto;
-    padding: 5px;
-  }
-  
+    min-height: 0;
+    padding-right: 4px;
+}
+
+/* SCROLLBAR (WebKit browsers: Chrome, Edge, Safari) */
+#chat-box::-webkit-scrollbar {
+    width: 10px;
+}
+
+#chat-box::-webkit-scrollbar-track {
+    background: #1c1410; /* same as sidebar background */
+    border-left: 1px solid rgba(255, 206, 158, 0.08);
+}
+
+#chat-box::-webkit-scrollbar-thumb {
+    background: #d18b47; /* dark-cell color */
+    border-radius: 10px;
+    border: 2px solid #1c1410; /* inset effect */
+}
+
+#chat-box::-webkit-scrollbar-thumb:hover {
+    background: #e8ab6f; /* mid-cell color */
+}
+
+/* Firefox scrollbar */
+#chat-box {
+    scrollbar-width: thin;
+    scrollbar-color: #d18b47 #1c1410;
+}
+
+
+/* Chat bubble system */
+.msg {
+    max-width: 90%;
+    padding: 8px 10px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    line-height: 1.3;
+
+    display: flex;
+    flex-direction: column;
+    word-wrap: break-word;
+}
+
+/* Username */
+.msg .username {
+    font-size: 11px;
+    opacity: 0.7;
+    margin-bottom: 3px;
+}
+
+/* Message text */
+.msg .text {
+    font-size: 14px;
+}
+
+/* MY messages -------------------------------- */
+.msg.user {
+    align-self: flex-end;
+
+    /* warm highlight tone matching mid cell */
+    background: #e8ab6f; 
+    color: #3b1f0e;
+
+    border-bottom-right-radius: 2px;
+}
+
+/* OTHER messages -------------------------------- */
+.msg.other {
+    align-self: flex-start;
+
+    /* darker warm midtone bubble */
+    background: #3b2a1f; 
+    color: #f3e0c6;
+
+    border-bottom-left-radius: 2px;
+}
+
+/* Form */
+#chat-form {
+    display: flex;
+    margin-top: 10px;
+}
+
+/* Input */
+#chat-input {
+    flex: 1;
+    padding: 8px;
+
+    background: #110c09; /* deep warm black */
+    border: 1px solid rgba(209, 139, 71, 0.25); /* dark cell tone */
+    color: #ffe8c8;
+
+    border-radius: 6px 0 0 6px;
+}
+
+#chat-input::placeholder {
+    color: #8b6a55;
+}
+
+/* Send button */
+#chat-form button {
+    padding: 8px 12px;
+
+    /* warm gold accent matching light/mid cell mix */
+    background: #d18b47;
+    color: #fff;
+
+    border: none;
+    border-radius: 0 6px 6px 0;
+    cursor: pointer;
+    font-weight: bold;
+
+    transition: background 0.2s;
+}
+
+#chat-form button:hover {
+    background: #e8ab6f; /* mid cell */
+}
