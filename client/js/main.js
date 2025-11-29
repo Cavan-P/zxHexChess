@@ -1,6 +1,7 @@
 // ------ IMPORTS ------
 
 import { Game } from './game.js'
+import { setupRoomMenu } from './roomMenu.js'
 import { setupInput } from './setupInput.js'
 import { setupNetwork, sendChatMessage } from './network.js'
 import { drawBoard, populateBoardFromFen} from './board.js'
@@ -20,8 +21,16 @@ Game.canvas.height = Game.canvas.clientHeight
 Game.ctx.textBaseline = 'middle'
 Game.ctx.textAlign = 'center'
 
+setupRoomMenu()
 setupInput()
 setupNetwork(populateBoardFromFen)
+
+window.addEventListener('resize', _ => {
+    if(!Game.canvas) return
+
+    Game.canvas.width = Game.canvas.clientWidth
+    Game.canvas.height = Game.canvas.clientHeight
+})
 
 document.getElementById('chat-form').addEventListener('submit', e => {
     e.preventDefault()

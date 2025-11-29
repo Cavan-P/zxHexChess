@@ -10,12 +10,36 @@
   </head>
 
   <body>
+
+    <div id="room-menu">
+      <h2>ZXChess</h2>
+      <h5>Play online against a friend</h5>
+    
+      <button id="create-room-btn">Create Room</button>
+    
+      <div id="join-room-container">
+        <input id="join-room-input" type="text" maxlength="5" placeholder="Room Code">
+        <button id="join-room-btn">Join Room</button>
+      </div>
+    
+      <div id="room-status"></div>
+    </div>
+    
+
     <div id="layout">
+
       <canvas id="canvas"></canvas>
   
       <img id="pieces" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Chess_Pieces_Sprite.svg/1200px-Chess_Pieces_Sprite.svg.png" hidden/>
   
       <div id="chat">
+
+        <div id="room-info">
+          <span id="room-display">Room: ----</span>
+          <button id="copy-room-btn" title="Copy code">📋</button>
+        </div>
+        
+
         <div id="chat-title">Chat</div>
         <div id="chat-box"></div>
         <form id="chat-form">

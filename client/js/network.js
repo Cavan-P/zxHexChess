@@ -12,9 +12,28 @@ export const setupNetwork = onFenInit => {
         const data = JSON.parse(msg.data)
 
         switch(data.type){
+            case 'roomCreated':
+                Game.onRoomCreated?.(data.code)
+                setRoomCodeDisplay(data.code)
+                return
+            
+            case 'roomJoined':
+                Game.onRoomJoined?.()
+                if(data.code) setRoomCodeDisplay(data.code)
+                return
+            
+            case 'error':
+                Game.onRoomError?.(data.message)
+                return
+            
             case 'init': return onFenInit(data.fen)
-            case 'assignColor': return Game.playerColor = data.color
+
+            case 'assignColor':
+                Game.playerColor = data.color
+                return
+
             case 'chat': return addChatMessage(data.username, data.payload, false)
+
             case 'move': return console.log('Move detected')
         }
     }
@@ -22,6 +41,19 @@ export const setupNetwork = onFenInit => {
     Game.socket.onclose = _ => {
         console.log('Disconnected from server')
     }
+}
+
+export const sendRoomCreate = _ => {
+    Game.socket.send(JSON.stringify({
+        type: 'createRoom'
+    }))
+}
+
+export const sendRoomJoin = code => {
+    Game.socket.send(JSON.stringify({
+        type: 'joinRoom',
+        code
+    }))
 }
 
 export const sendChatMessage = msg => {
@@ -34,4 +66,9 @@ export const sendChatMessage = msg => {
     }))
 
     addChatMessage(Game.username, msg, true)
+}
+
+export const setRoomCodeDisplay = code => {
+    const el = document.getElementById("room-display")
+    if (el) el.textContent = "Room: " + code
 }
