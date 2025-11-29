@@ -1,11 +1,13 @@
-import { drawHexagon, getHexagonPoints } from './hexagon.js'
+import { Game } from './game.js'
+import { drawHexagon } from './hexagon.js'
 import { Cell } from './cell.js'
 import { Piece } from './piece.js'
 
 export let cells = []
 
-export const drawBoard = (hexSize, colors, stroke, strokeWeight, ctx, populateCells) => {
+export const drawBoard = (colors, stroke, strokeWeight, populateCells) => {
     let cellNum = 0
+    const hexSize = Game.cellSize
 
     const centerX = window.innerWidth / 2
     const centerY = window.innerHeight / 2
@@ -118,7 +120,7 @@ export const drawBoard = (hexSize, colors, stroke, strokeWeight, ctx, populateCe
         let x = centerX - ((numCols - 1) * columnOffset) / 2
 
         for(let col = 0; col < numCols; col++){
-            drawHexagon(x, y, hexSize, colors[colorIndex], stroke, strokeWeight, ctx)
+            drawHexagon(x, y, hexSize, colors[colorIndex], stroke, strokeWeight, Game.ctx)
 
             if(populateCells){
 
@@ -127,8 +129,8 @@ export const drawBoard = (hexSize, colors, stroke, strokeWeight, ctx, populateCe
                 let s = coordinates[cellNum][2]
 
                 //Add cells here
-                cells.push(
-                    new Cell(x, y, cellNum, q, r, s, hexSize, ctx)
+                Game.cells.push(
+                    new Cell(x, y, cellNum, q, r, s, hexSize, Game.ctx)
                 )
                 
 
@@ -143,23 +145,22 @@ export const drawBoard = (hexSize, colors, stroke, strokeWeight, ctx, populateCe
     }
 }
 
-export const populateBoardFromFen = (hexSize, fen, cells, pieces, ctx) => {
+export const populateBoardFromFen = fen => {
+    Game.pieces.length = 0
     let cellIndex = 0
 
-    for(let i = 0; i < fen.length; i++){
-        const char = fen[i]
-
+    for(let char of fen){
         if(/\d/.test(char)){
             cellIndex += +char
             continue
         }
 
-        const cell = cells[cellIndex]
+        const cell = Game.cells[cellIndex]
 
-        pieces.push(
-            new Piece(char, cell.x, cell.y, hexSize, ctx)
+        Game.pieces.push(
+            new Piece(char, cell.x, cell.y, Game.cellSize, Game.ctx)
         )
-        pieces[pieces.length - 1].currentCell = cell
+        Game.pieces[Game.pieces.length - 1].currentCell = cell
 
         cell.occupiedBy = char
         cell.occupied = true

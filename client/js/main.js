@@ -1,138 +1,80 @@
 // ------ IMPORTS ------
 
-import { drawBoard, populateBoardFromFen, cells } from './board.js'
+import { Game } from './game.js'
+import { setupInput } from './setupInput.js'
+import { setupNetwork, sendChatMessage } from './network.js'
+import { drawBoard, populateBoardFromFen} from './board.js'
 import { Cell } from './cell.js'
-import { Piece, pieces } from './piece.js'
+import { Piece } from './piece.js'
 
 // ------ GLOBALS ------
 
-const canvas = document.getElementById('canvas')
-const ctx = canvas.getContext('2d')
-let myColor
+Game.canvas = document.getElementById('canvas')
+Game.ctx = Game.canvas.getContext('2d')
 
-canvas.width = canvas.clientWidth
-canvas.height = canvas.clientHeight
+Game.pieceSprite = document.getElementById('pieces')
 
+Game.canvas.width = Game.canvas.clientWidth
+Game.canvas.height = Game.canvas.clientHeight
 
-ctx.textBaseline = 'middle'
-ctx.textAlign = 'center'
+Game.ctx.textBaseline = 'middle'
+Game.ctx.textAlign = 'center'
 
-const cellSize = 45
-const username = `User${Math.floor(Math.random()*1000)}`
-
-let mouseX, mouseY, pressed
-
-document.onmousemove = e => {
-    const rect = canvas.getBoundingClientRect();
-    mouseX = (e.clientX - rect.left);
-    mouseY = (e.clientY - rect.top);
-
-}
-document.onmousedown = e => {
-    pressed = true
-}
-document.onmouseup = e => {
-    pressed = false
-}
-
-
-// ------ SERVER CONNECTION STUFF ------
-
-const socket = new WebSocket('ws://localhost:8000')
-
-socket.onopen = _ => {
-    console.log('Connected to server')
-}
-
-socket.onmessage = raw => handleServerMessage(JSON.parse(raw.data))
-
-const handleServerMessage = data => {
-    switch(data.type){
-        case 'init': return handleInit(data.fen)
-        case 'move': return handleMove(data.payload)
-        case 'assignColor': return handleColorAssign(data.color)
-        case 'chat': return handleChat(data)
-    }
-}
-
-const handleInit = fen => {
-    console.log('populating?')
-    populateBoardFromFen(cellSize, fen, cells, pieces, ctx)
-}
-
-const handleMove = payload => {
-    console.log('Opponent moves: ', payload)
-}
-
-const handleChat = data => {
-    const chatBox = document.getElementById('chat-box')
-
-    const isMe = data.username == username
-
-    const el = document.createElement('div')
-    el.className = `msg ${isMe ? 'user' : 'other'}`
-    el.innerHTML = `
-        <span class="username">${data.username}</span>
-        <span class="text">${data.payload}</span>
-    `
-
-    chatBox.appendChild(el)
-
-    chatBox.scrollTop = chatBox.scrollHeight
-}
-
-const handleColorAssign = color => {
-    myColor = color
-}
-
-// ------ END SERVER STUFF ------
-
-window.myColor = myColor
-
-const sendChat = msg => {
-    socket.send(JSON.stringify({ type: 'chat', username: username, payload: msg }))
-}
+setupInput()
+setupNetwork(populateBoardFromFen)
 
 document.getElementById('chat-form').addEventListener('submit', e => {
     e.preventDefault()
 
     const input = document.getElementById('chat-input')
-    sendChat(input.value)
+    const text = input.value.trim()
+
+    if(!text.length) return
+
+    sendChatMessage(text)
+
     input.value = ''
 })
 
 //Populate the cells array
-drawBoard(cellSize, 0, 1, 5, ctx, true)
+drawBoard(0, 1, 5, true)
 
+Game.boardCenter = {
+    x: Math.min(...Game.cells.map(cell => cell.x)) +
+      (Math.max(...Game.cells.map(cell => cell.x)) - Math.min(...Game.cells.map(cell => cell.x))) / 2,
+
+    y: Math.min(...Game.cells.map(cell => cell.y)) +
+      (Math.max(...Game.cells.map(cell => cell.y)) - Math.min(...Game.cells.map(cell => cell.y))) / 2
+}
 
 const render = _ => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    Game.ctx.clearRect(0, 0, Game.canvas.width, Game.canvas.height)
 
-    drawBoard(cellSize, 0, 1, 5, ctx)
+    Game.ctx.save()
 
-    if(myColor == 'black'){
-        ctx.save()
-        ctx.translate(canvas.width / 2, canvas.height / 2)
-        ctx.rotate(Math.PI)
-        ctx.translate(-canvas.width / 2, -canvas.height / 2)
+    drawBoard(0, 1, 5)
+
+    if(Game.playerColor == 'black'){
+        Game.ctx.translate(Game.boardCenter.x, Game.boardCenter.y)
+        Game.ctx.rotate(Math.PI)
+        Game.ctx.translate(-Game.boardCenter.x, -Game.boardCenter.y)
     }
 
-    drawBoard(cellSize, [
+    drawBoard([
         '#D18B47FF',     /*  Dark cell    */
         '#E8AB6FFF',     /*  Middle cell  */
         '#FFCE9EFF'],    /*  Light cell   */
-        0, 0, ctx)
+        0, 0)
     
-    cells.forEach(cell => cell.update(pieces, mouseX, mouseY))
+    Game.cells.forEach(cell => cell.update())
 
-    const hoveredOccupied = cells.some(cell => cell.hovering && cell.occupied)
+    const hoveredOccupied = Game.cells.some(cell => cell.hovering && cell.occupied)
+    Game.canvas.style.cursor = hoveredOccupied ? 'pointer' : 'default'
 
-    canvas.style.cursor = hoveredOccupied ? 'pointer' : 'default'
+    Game.cells.forEach(cell => cell.display(!true, !true, !true, Game.playerColor))
+    Game.pieces.forEach(piece => piece.display(!true, Game.playerColor))
 
-    cells.forEach(cell => cell.display(!true, !true, !true, myColor))
-    pieces.forEach(piece => piece.display(!true, document.getElementById('pieces'), myColor))
-
-    ctx.restore()
+    Game.ctx.restore()
 }
 
 const init = _ => {

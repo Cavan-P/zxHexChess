@@ -1,6 +1,6 @@
-import { pointInHexagon } from "./utils.js"
 
-export let pieces = []
+import { Game } from "./game.js"
+import { pointInHexagon } from "./utils.js"
 
 export class Piece {
     constructor(piece, x, y, cellSize, ctx){
@@ -32,7 +32,7 @@ export class Piece {
 
     }
 
-    display(showCurrentCell, img, colorPerspective){
+    display(showCurrentCell, colorPerspective){
         this.ctx.save()
 
         if(colorPerspective == 'black'){
@@ -52,7 +52,7 @@ export class Piece {
 
         const [sx, sy] = map[this.piece]
         this.ctx.drawImage(
-            img, sx, sy, 200,200,
+            Game.pieceSprite, sx, sy, 200,200,
             this.x - this.size/2,
             this.y - this.size/2,
             this.size, this.size

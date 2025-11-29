@@ -1,3 +1,4 @@
+import { Game } from "./game.js"
 import { pointInHexagon } from "./utils.js"
 import { drawHexagon } from "./hexagon.js"
 
@@ -25,15 +26,17 @@ export class Cell {
 
     }
 
-    checkMouseHover(mx, my){
-        return pointInHexagon({x: mx, y: my}, {x: this.x, y: this.y}, this.size)
+    checkMouseHover(){
+        return pointInHexagon(Game.mouse, this, this.size)
     }
 
-    update(pieces, mx, my){
-        this.hovering = this.checkMouseHover(mx, my)
+    update(){
+        this.hovering = this.checkMouseHover()
 
         this.occupied = false
         this.occupiedBy = ''
+
+        /*
 
         for(const piece of pieces){
             if(piece.currentCell?.num == this.num){
@@ -42,6 +45,7 @@ export class Cell {
                 break
             }
         }
+            */
     }
 
     display(showCellNumbers, showCoords, showOccupiedBy, colorPerspective){
