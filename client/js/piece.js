@@ -1,6 +1,6 @@
 
 import { Game } from "./game.js"
-import { pointInHexagon } from "./utils.js"
+import { pointInHexagon, Smooth } from "./utils.js"
 
 export class Piece {
     constructor(piece, x, y, cellSize, ctx){
@@ -8,13 +8,20 @@ export class Piece {
 
         this.x = x
         this.y = y
+        this.startX = x
+        this.startY = y
 
-        this.size = 60
+        this.defaultSize = 60
+        this.dragSize = 75
+        this.size = this.defaultSize
+        this.targetSize = this.defaultSize
+        this.scaleSpeed = 3
+
         this.cellSize = cellSize
 
         this.hovering = false
-
         this.isDragging = false
+
         this.offsetX = 0
         this.offsetY = 0
 
@@ -24,12 +31,83 @@ export class Piece {
         this.ctx = ctx
     }
 
-    containsPoint(mx, my){
-        return pointInHexagon({ x: mx, y: my}, { x: this.x, y: this.y }, this.cellSize)
+    checkMouseHover(){
+        return pointInHexagon(Game.mouse, this, this.size)
     }
 
-    update(cells){
+    isMyPiece(myColor){
+        return (this.piece == this.piece.toUpperCase()) == (myColor == 'white')
+    }
 
+    drop(){
+        this.isDragging = false
+        Game.draggedPiece = null
+        this.targetSize = this.defaultSize
+
+        let dropCell = null
+        for(const cell of Game.cells){
+            if(cell.checkMouseHover()){
+                dropCell = cell
+                break
+            }
+        }
+
+        if(!dropCell){
+            this.snapBack()
+            return
+        }
+
+        Game.socket.send(JSON.stringify({
+            type: 'attemptMove',
+            from: this.originalCell.num,
+            to: dropCell.num,
+            color: Game.playerColor
+        }))
+
+        this.snapBack()
+    }
+
+    snapBack(){
+        this.x = this.startX
+        this.y = this.startY
+        this.currentCell = this.originalCell
+    }
+
+    update(){
+        this.hovering = this.checkMouseHover()
+        this.size += Smooth(this.size, this.targetSize, this.scaleSpeed)
+
+        if(Game.draggedPiece && Game.draggedPiece != this) return
+
+        if(!this.isDragging && this.hovering && Game.mouse.pressed){
+            if(this.isMyPiece(Game.playerColor)){
+
+                Game.draggedPiece = this
+
+                this.isDragging = true
+                this.startX = this.x
+                this.startY = this.y
+
+                this.originalCell = this.currentCell
+
+                Game.socket.send(JSON.stringify({
+                    type: 'requestLegalMoves',
+                    from: this.originalCell.num
+                }))
+            }
+        }
+
+        if(this.isDragging){
+            if(Game.mouse.pressed){
+                
+                this.targetSize = this.dragSize
+                this.x = Game.mouse.x
+                this.y = Game.mouse.y
+            }
+            else {
+                this.drop()
+            }
+        }
     }
 
     display(showCurrentCell, colorPerspective){
@@ -52,7 +130,7 @@ export class Piece {
 
         const [sx, sy] = map[this.piece]
         this.ctx.drawImage(
-            Game.pieceSprite, sx, sy, 200,200,
+            Game.pieceSprite, sx, sy, 200, 200,
             this.x - this.size/2,
             this.y - this.size/2,
             this.size, this.size

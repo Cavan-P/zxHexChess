@@ -15,6 +15,8 @@ export const Game = {
         pressed: false
     },
 
+    draggedPiece: null,
+
     socket: null,
 
     pieceSprite: null

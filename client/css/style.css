@@ -23,9 +23,20 @@ html, body {
 }
 
 #room-menu {
-    width: 340px;
-    margin: 90px auto 0;
-    padding: 30px;
+    position: fixed;
+    inset: 0;
+    background: #1a120d;
+    z-index: 50;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    animation: fadeIn 0.25s ease;
+}
+
+#room-menu > div {
+    width: 360px;
+    padding: 32px 28px;
 
     background: #1c1410;
     border: 1px solid rgba(255, 206, 158, 0.18);
@@ -33,12 +44,12 @@ html, body {
 
     text-align: center;
 
-    box-shadow: 0 0 25px rgba(0,0,0,0.35);
-    animation: fadeIn 0.4s ease;
-
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 20px;
+
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.35);
+    animation: fadeIn 0.4s ease;
 }
 
 #room-menu h2 {
@@ -48,9 +59,16 @@ html, body {
     text-shadow: 0 0 6px rgba(255, 206, 158, 0.25);
 }
 
+#room-menu h5 {
+    color: #e8ab6f;
+    font-weight: 400;
+    margin-top: -10px;
+    opacity: 0.9;
+    letter-spacing: 0.6px;
+}
+
 #room-menu button {
     padding: 10px 16px;
-
     background: #d18b47;
     border: none;
     border-radius: 8px;
@@ -84,27 +102,22 @@ html, body {
     font-size: 14px;
 }
 
-#join-room-input::placeholder {
-    color: #8b6a55;
-}
-
 #room-status {
     font-size: 0.9rem;
     color: #ffce9e;
     min-height: 20px;
 }
 
-
 #layout {
-    display: none;
     height: 100vh;
 
     display: grid;
     grid-template-columns: 1fr 300px;
 
     animation: fadeIn 0.35s ease;
-}
 
+    display: none;
+}
 
 #canvas {
     width: 100%;
@@ -113,7 +126,6 @@ html, body {
 
     background: #0f0c0a;
 }
-
 
 #chat {
     display: flex;
@@ -168,7 +180,6 @@ html, body {
     background: #e8ab6f;
 }
 
-/* Firefox */
 #chat-box {
     scrollbar-width: thin;
     scrollbar-color: #d18b47 #1c1410;
@@ -211,7 +222,6 @@ html, body {
     color: #f3e0c6;
     border-bottom-left-radius: 2px;
 }
-
 
 #chat-form {
     display: flex;

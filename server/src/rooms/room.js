@@ -1,4 +1,5 @@
 const { randomUUID } = require('crypto')
+const { generateLegalMoves, isMoveLegal, parseFen } = require('../game/moves.js')
 
 class Room {
     constructor(id){
@@ -77,6 +78,27 @@ class Room {
                 payload: data.payload,
                 self: false
             })
+        }
+        if(data.type == 'requestLegalMoves'){
+            if(socket.color != 'white' && socket.color != 'black'){
+                socket.send(JSON.stringify({
+                    type: 'legalMoves',
+                    from: data.from,
+                    moves: []
+                }))
+                return
+            }
+
+            const board = parseFen(this.gameState.fen)
+            const legal = generateLegalMoves(board, data.from)
+
+            socket.send(JSON.stringify({
+                type: 'legalMoves',
+                from: data.from,
+                moves: legal
+            }))
+
+            return
         }
     }
 }

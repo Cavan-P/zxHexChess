@@ -45,6 +45,7 @@ document.getElementById('chat-form').addEventListener('submit', e => {
     input.value = ''
 })
 
+
 //Populate the cells array
 drawBoard(0, 1, 5, true)
 
@@ -74,13 +75,16 @@ const render = _ => {
         '#E8AB6FFF',     /*  Middle cell  */
         '#FFCE9EFF'],    /*  Light cell   */
         0, 0)
+
+    Game.pieces.sort((a, b) => a.isDragging)
     
     Game.cells.forEach(cell => cell.update())
 
-    const hoveredOccupied = Game.cells.some(cell => cell.hovering && cell.occupied)
+    const hoveredOccupied = Game.cells.some(cell => cell.hovering && cell.occupied && cell.occupiedByMyColor(Game.playerColor))
     Game.canvas.style.cursor = hoveredOccupied ? 'pointer' : 'default'
 
-    Game.cells.forEach(cell => cell.display(!true, !true, !true, Game.playerColor))
+    Game.cells.forEach(cell => cell.display(true, !true, true, Game.playerColor))
+    Game.pieces.forEach(piece => piece.update())
     Game.pieces.forEach(piece => piece.display(!true, Game.playerColor))
 
     Game.ctx.restore()

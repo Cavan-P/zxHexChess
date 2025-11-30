@@ -11,3 +11,7 @@ export const pointInHexagon = (point, center, size) => {
            -sqrt3 * dx + sqrt3 > dy &&
            -sqrt3 * dx - sqrt3 < dy
 }
+
+export const Smooth = (pos, dest, time) => {
+    return (dest - pos) / time
+}

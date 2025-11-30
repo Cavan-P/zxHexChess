@@ -30,26 +30,28 @@ export class Cell {
         return pointInHexagon(Game.mouse, this, this.size)
     }
 
+    occupiedByMyColor(myColor){
+        return (this.occupiedBy == this.occupiedBy.toUpperCase()) == (myColor == 'white')
+    }
+
     update(){
         this.hovering = this.checkMouseHover()
 
         this.occupied = false
         this.occupiedBy = ''
 
-        /*
-
-        for(const piece of pieces){
+        for(const piece of Game.pieces){
             if(piece.currentCell?.num == this.num){
                 this.occupied = true
                 this.occupiedBy = piece.piece
                 break
             }
-        }
-            */
+        } 
     }
 
     display(showCellNumbers, showCoords, showOccupiedBy, colorPerspective){
 
+        //Apply rotation
         if(colorPerspective == 'black'){
             this.ctx.save()
             this.ctx.translate(this.x, this.y)
@@ -57,6 +59,13 @@ export class Cell {
             this.ctx.translate(-this.x, -this.y)
         }
 
+        
+        if(this.hovering && this.occupied && this.occupiedByMyColor(colorPerspective)){
+            drawHexagon(this.x, this.y, this.size, '#00611FAA', false, 0, this.ctx)
+        }
+
+        
+        //Debug
         if(showCellNumbers){
             this.ctx.fillStyle = '#000'
             this.ctx.font = '20px sans-serif'
@@ -79,11 +88,7 @@ export class Cell {
             this.ctx.font = '10px sans-serif'
             this.ctx.fillText(this.occupiedBy, this.x, this.y + this.size / 1.6)
         }
-        if(this.hovering && this.occupied){
-            canvas.style.cursor = 'pointer'
-            drawHexagon(this.x, this.y, this.size, '#00611FAA', false, 0, this.ctx)
-        }
 
-        this.ctx.restore()
+        if(colorPerspective == 'black') this.ctx.restore()
     }
 }
