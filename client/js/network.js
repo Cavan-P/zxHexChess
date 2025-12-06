@@ -34,7 +34,45 @@ export const setupNetwork = onFenInit => {
 
             case 'chat': return addChatMessage(data.username, data.payload, false)
 
-            case 'move': return console.log('Move detected')
+            case 'move': 
+                const { from, to, fen} = data
+
+                const piece = Game.pieces.find(p => p.currentCell.num == from)
+                if(!piece){
+                    console.error('Could not find piece for move', data)
+                    return
+                }
+
+                const targetCell = Game.cells.find(c => c.num == to)
+                if(!targetCell){
+                    console.error('Target cell not found', to)
+                    return
+                }
+
+                piece.currentCell.occupied = false
+                piece.currentCell.occupiedBy = ''
+
+                targetCell.occupied = true
+                targetCell.occupiedBy = piece.piece
+
+                piece.x = targetCell.x
+                piece.y = targetCell.y
+                piece.currentCell = targetCell
+
+                Game.fen = fen
+
+                Game.draggedPiece = null
+                Game.cells.forEach(cell => cell.isLegalTarget = false)
+
+                return
+
+            case 'legalMoves': return Game.onLegalMoves?.(data.from, data.moves)
+
+            case 'illegalMove': 
+                console.log('Illegal move detected')
+                Game.cells.forEach(cell => cell.isLegalTarget = false)
+                Game.draggedPiece = null
+                return
         }
     }
 

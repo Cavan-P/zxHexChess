@@ -42,6 +42,7 @@ export class Piece {
     drop(){
         this.isDragging = false
         Game.draggedPiece = null
+        Game.cells.forEach(cell => cell.isLegalTarget = false)
         this.targetSize = this.defaultSize
 
         let dropCell = null

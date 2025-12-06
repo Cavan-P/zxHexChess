@@ -17,7 +17,7 @@ export class Cell {
         this.occupied = false
         this.occupiedBy = ''
 
-        this.landable = false
+        this.isLegalTarget = false
 
         this.hovering = false
 
@@ -62,6 +62,12 @@ export class Cell {
         
         if(this.hovering && this.occupied && this.occupiedByMyColor(colorPerspective)){
             drawHexagon(this.x, this.y, this.size, '#00611FAA', false, 0, this.ctx)
+        }
+
+        if(this.isLegalTarget){
+            if(!this.occupied){
+                drawHexagon(this.x, this.y, this.size, '#00611FAA', false, 0, this.ctx)
+            }
         }
 
         

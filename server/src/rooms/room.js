@@ -1,6 +1,38 @@
 const { randomUUID } = require('crypto')
 const { generateLegalMoves, isMoveLegal, parseFen } = require('../game/moves.js')
 
+const boardToFen = board => {
+    let fen = ''
+    let emptyCount = 0
+
+    const flushEmpty = _ => {
+        while(emptyCount > 9){
+            fen += '9'
+            emptyCount -= 9
+        }
+        if(emptyCount > 0){
+            fen += String(emptyCount)
+            emptyCount = 0
+        }
+    }
+
+    for(let i = 0; i < board.length; i++){
+        const cell = board[i]
+
+        const isEmpty = !cell || !cell.piece || cell.piece == ''
+
+        if(isEmpty) emptyCount ++
+        else {
+            if(emptyCount > 0) flushEmpty
+            fen += cell.piece
+        }
+    }
+
+    if(emptyCount > 0) flushEmpty()
+
+        return fen
+}
+
 class Room {
     constructor(id){
         this.id = id || randomUUID.slice(0, 6).toUpperCase()
@@ -96,6 +128,55 @@ class Room {
                 type: 'legalMoves',
                 from: data.from,
                 moves: legal
+            }))
+
+            return
+        }
+        if(data.type == 'attemptMove'){
+            if(socket.color != 'white' && socket.color != 'black'){
+                socket.send(JSON.stringify({
+                    type: 'illegalMove'
+                }))
+                return
+            }
+
+            const board = parseFen(this.gameState.fen)
+            const legal = generateLegalMoves(board, data.from)
+
+            const isLegal = legal.includes(data.to)
+
+            if(!isLegal){
+                socket.send(JSON.stringify({
+                    type: 'illegalMove'
+                }))
+                return
+            }
+
+            const movingPiece = board[data.from]
+            board[data.to] = movingPiece
+            board[data.from] = {
+                piece: '',
+                color: '',
+                cell: data.from,
+                coords: board[data.from].coords
+            }
+            movingPiece.cell = data.to
+
+            const newFen = boardToFen(board)
+            this.gameState.fen = newFen
+
+            this.broadcastExcept(socket, {
+                type: 'move',
+                fen: newFen,
+                from: data.from,
+                to: data.to
+            })
+
+            socket.send(JSON.stringify({
+                type: 'move',
+                fen: newFen,
+                from: data.from,
+                to: data.to
             }))
 
             return

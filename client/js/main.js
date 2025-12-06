@@ -21,6 +21,14 @@ Game.canvas.height = Game.canvas.clientHeight
 Game.ctx.textBaseline = 'middle'
 Game.ctx.textAlign = 'center'
 
+Game.onLegalMoves = (from, moves) => {
+    console.log('Legal moves for', from, moves)
+
+    Game.cells.forEach(cell => {
+        cell.isLegalTarget = moves.includes(cell.num)
+    })
+}
+
 setupRoomMenu()
 setupInput()
 setupNetwork(populateBoardFromFen)
