@@ -23,7 +23,7 @@ const boardToFen = board => {
 
         if(isEmpty) emptyCount ++
         else {
-            if(emptyCount > 0) flushEmpty
+            if(emptyCount > 0) flushEmpty()
             fen += cell.piece
         }
     }
@@ -103,6 +103,8 @@ class Room {
                 payload: data.payload
             })
         }
+
+
         if(data.type == 'chat'){
             this.broadcastExcept(socket, {
                 type: 'chat',
@@ -111,6 +113,8 @@ class Room {
                 self: false
             })
         }
+
+
         if(data.type == 'requestLegalMoves'){
             if(socket.color != 'white' && socket.color != 'black'){
                 socket.send(JSON.stringify({
@@ -122,7 +126,7 @@ class Room {
             }
 
             const board = parseFen(this.gameState.fen)
-            const legal = generateLegalMoves(board, data.from)
+            const legal = generateLegalMoves(board, data.from, socket.color)
 
             socket.send(JSON.stringify({
                 type: 'legalMoves',
@@ -132,51 +136,81 @@ class Room {
 
             return
         }
+
+
         if(data.type == 'attemptMove'){
             if(socket.color != 'white' && socket.color != 'black'){
                 socket.send(JSON.stringify({
-                    type: 'illegalMove'
+                    type: 'illegalMove',
+                    reason: 'Spectators cannot make moves'
                 }))
+                return
+            }
+
+            const from = +data.from
+            const to = +data.to
+            if(Number.isNaN(from) || Number.isNaN(to)){
+                socket.send(JSON.stringify({ type: 'illegalMove', reason: 'Bad cell index' }))
                 return
             }
 
             const board = parseFen(this.gameState.fen)
-            const legal = generateLegalMoves(board, data.from)
+            const legal = generateLegalMoves(board, from, socket.color)
 
-            const isLegal = legal.includes(data.to)
+            console.log('legal for', from, legal)
 
-            if(!isLegal){
-                socket.send(JSON.stringify({
-                    type: 'illegalMove'
-                }))
+            if(!Array.isArray(legal) || !legal.some(m => +m == to)){
+                socket.send(JSON.stringify({ type: 'illegalMove', from, to }))
                 return
             }
 
-            const movingPiece = board[data.from]
-            board[data.to] = movingPiece
-            board[data.from] = {
+            const movingPiece = board[from]
+
+            if(!movingPiece || !movingPiece.piece){
+                socket.send(JSON.stringify({ type: 'illegalMove', reason: 'No piece at from' }))
+                return
+            }
+
+            const newPieceObj = {
+                piece: movingPiece.piece,
+                color: movingPiece.color,
+                cell: to,
+                coords: Array.isArray(movingPiece.coords) ? [movingPiece.coords] : movingPiece.coords
+            }
+
+            const capturedPiece = board[to]?.piece || ''
+
+            board[to] = newPieceObj
+            board[from] = {
                 piece: '',
                 color: '',
-                cell: data.from,
-                coords: board[data.from].coords
+                cell: from,
+                coords: Array.isArray(board[from]?.coords) ? [...board[from].coords] : board[from]?.coords
             }
-            movingPiece.cell = data.to
 
             const newFen = boardToFen(board)
             this.gameState.fen = newFen
 
+            const verify = parseFen(newFen)
+
+            if(!verify[to] || !verify[to].piece){
+                console.error('[room] FEN roundtrip failed: destination empty after boardToFen')
+            }
+
             this.broadcastExcept(socket, {
                 type: 'move',
                 fen: newFen,
-                from: data.from,
-                to: data.to
+                from,
+                to,
+                captured: capturedPiece || null
             })
 
             socket.send(JSON.stringify({
                 type: 'move',
                 fen: newFen,
-                from: data.from,
-                to: data.to
+                from,
+                to,
+                captured: capturedPiece || null
             }))
 
             return

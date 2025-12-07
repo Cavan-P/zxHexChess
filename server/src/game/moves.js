@@ -94,7 +94,6 @@ const coordinates = [
 
 const coordIndexMap = {}
 
-
 const parseFen = fen => {
     //bqknbnr2rp1b1p1p2p2p1p3pp4p993P4PP3P1P2P2P1P1B1PR2RNBNQKB
 
@@ -134,6 +133,7 @@ const parseFen = fen => {
     }
 
     //console.log(pieces, 'ParseFen Function!')
+    //console.log(pieces[63])
 
     return pieces
 }
@@ -175,12 +175,29 @@ function knightMoves(board, cell, color){
     const moves = []
 
     const offsets = [
-        [1, -3, 2], [-1, -2, 3],
-        [1, 2, -3], [-1, 3, -2],
-        [2, -3, 1], [3, -2, -1],
-        [3, -1, -2], [2, 1, -3],
-        [-2, -1, 3], [-3, 1, 2],
-        [-3, 2, 1], [-2, 3, -1]
+        //Forward
+        [1, -3, 2],//Right
+        [-1, -2, 3],//Left
+        
+        //Backward
+        [1, 2, -3],//Right
+        [-1, 3, -2],//Left
+        
+        //Upper right diagonal
+        [2, -3, 1],//Up
+        [3, -2, -1],//Down
+        
+        //Bottom right diagonal
+        [3, -1, -2],//Up
+        [2, 1, -3],//Down
+        
+        //Upper left diagonal
+        [-2, -1, 3],//Up
+        [-3, 1, 2],//Down
+        
+        //Bottom left diagonal
+        [-3, 2, 1],//Up
+        [-2, 3, -1]//Down
     ]
 
     const from = board[cell]
@@ -213,20 +230,140 @@ function knightMoves(board, cell, color){
 function bishopMoves(board, cell, color){
     const moves = []
 
+    const from = board[cell]
+    const [q, r, s] = from.coords
+
+    const directions = [
+        [ 1, -2,  1],
+        [ 2, -1, -1], 
+        [ 1,  1, -2],
+        [-1,  2, -1],
+        [-2,  1,  1],
+        [-1, -1,  2]
+    ]
+
+    for(const [dq, dr, ds] of directions){
+        let nq = q
+        let nr = r
+        let ns = s
+
+        while(true){
+            nq += dq
+            nr += dr
+            ns += ds
+
+            const key = `${nq},${nr},${ns}`
+            const targetIndex = coordIndexMap[key]
+
+            if(targetIndex == undefined) break //Off the board
+            const target = board[targetIndex]
+
+            if(!target.piece){
+                moves.push(targetIndex)
+                continue
+            }
+
+            if(target.color != color){
+                moves.push(targetIndex)
+            }
+
+            break
+        }
+    }
+
     return moves
 }
 function rookMoves(board, cell, color){
     const moves = []
 
+    const from = board[cell]
+    const [q, r, s] = from.coords
+
+    const directions = [
+        [ 1, -1, 0],
+        [-1, 1,  0], 
+        [ 1, 0, -1],
+        [-1, 0,  1],
+        [ 0, 1, -1],
+        [ 0, -1, 1]
+    ]
+
+    for(const [dq, dr, ds] of directions){
+        let nq = q
+        let nr = r
+        let ns = s
+
+        while(true){
+            nq += dq
+            nr += dr
+            ns += ds
+
+            const key = `${nq},${nr},${ns}`
+            const targetIndex = coordIndexMap[key]
+
+            if(targetIndex == undefined) break //Off the board
+            const target = board[targetIndex]
+
+            if(!target.piece){
+                moves.push(targetIndex)
+                continue
+            }
+
+            if(target.color != color){
+                moves.push(targetIndex)
+            }
+
+            break
+        }
+    }
+
     return moves
 }
-
 function queenMoves(board, cell, color){
     return [...rookMoves(board, cell, color), ...bishopMoves(board, cell, color)]
 }
-
 function kingMoves(board, cell, color){
     const moves = []
+
+    const offsets = [
+        [0, -1, 1],    //Forward
+        [0, 1, -1],    //Backward
+        [1, -1, 0],    //Upper right
+        [1, 0, -1],    //Lower right
+        [-1, 0, 1],    //Upper left
+        [-1, 1, 0],    //Lower left
+        [-1, -1, 2],   //Upper left diagonal
+        [1, -2, 1],    //Upper right diagonal
+        [2, -1, -1],   //Right diagonal
+        [1, 1, -2],    //Lower right diagonal
+        [-1, 2, -1],   //Lower left diagonal
+        [-2, 1, 1],    //Left diagonal
+    ]
+
+    const from = board[cell]
+    const [q, r, s] = from.coords
+
+    for(const [dq, dr, ds] of offsets){
+        const nq = q + dq
+        const nr = r + dr
+        const ns = s + ds
+
+        const key = `${nq},${nr},${ns}`
+        const targetIndex = coordIndexMap[key]
+
+        if(targetIndex == undefined) continue //Off the board
+        const target = board[targetIndex]
+
+        if(!target.piece){
+            moves.push(targetIndex)
+            continue
+        }
+
+        if(target.color != color){
+            moves.push(targetIndex)
+        }
+    }
+
 
     return moves
 }

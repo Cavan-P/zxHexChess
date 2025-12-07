@@ -53,7 +53,7 @@ export class Piece {
             }
         }
 
-        if(!dropCell){
+        if(!dropCell || !Game.legalMoves.includes(dropCell.num)){
             this.snapBack()
             return
         }
@@ -65,7 +65,17 @@ export class Piece {
             color: Game.playerColor
         }))
 
-        this.snapBack()
+        Game.pendingMove = {
+            piece: this,
+            from: this.originalCell.num,
+            to: dropCell.num,
+            originalX: this.startX,
+            originalY: this.startY
+        }
+
+        //this.snapBack()
+        this.x = dropCell.x
+        this.y = dropCell.y
     }
 
     snapBack(){

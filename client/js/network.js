@@ -35,6 +35,7 @@ export const setupNetwork = onFenInit => {
             case 'chat': return addChatMessage(data.username, data.payload, false)
 
             case 'move': 
+                Game.pendingMove = null
                 const { from, to, fen} = data
 
                 const piece = Game.pieces.find(p => p.currentCell.num == from)
@@ -47,6 +48,21 @@ export const setupNetwork = onFenInit => {
                 if(!targetCell){
                     console.error('Target cell not found', to)
                     return
+                }
+
+                if(data.captured){
+
+                    const capturedColor = data.captured == data.captured.toUpperCase() ? 'white' : 'black'
+
+                    Game.pieces = Game.pieces.filter(p => {
+                        const pieceColor = p.piece.toUpperCase() == p.piece ? 'white' : 'black'
+
+                        const isSameCell = p.currentCell.num == data.to
+                        const isSameType = p.piece.toLowerCase() == data.captured.toLowerCase()
+                        const isSameColor = pieceColor == capturedColor
+
+                        return !(isSameCell && isSameType && isSameColor)
+                    })
                 }
 
                 piece.currentCell.occupied = false
@@ -63,14 +79,27 @@ export const setupNetwork = onFenInit => {
 
                 Game.draggedPiece = null
                 Game.cells.forEach(cell => cell.isLegalTarget = false)
+                Game.legalMoves = []
 
                 return
 
-            case 'legalMoves': return Game.onLegalMoves?.(data.from, data.moves)
+            case 'legalMoves': 
+                Game.legalMoves = data.moves
+                return Game.onLegalMoves?.(data.from, data.moves)
 
             case 'illegalMove': 
-                console.log('Illegal move detected')
+                console.log('Illegal move detected', data?.reason)
+
+                if(Game.pendingMove){
+                    const { piece, originalX, originalY } = Game.pendingMove
+                    piece.x = originalX
+                    piece.y = originalY
+                    piece.currentCell = piece.originalCell
+                }
+
+                Game.pendingMove = null
                 Game.cells.forEach(cell => cell.isLegalTarget = false)
+                Game.legalMoves = []
                 Game.draggedPiece = null
                 return
         }

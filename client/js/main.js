@@ -91,7 +91,7 @@ const render = _ => {
     const hoveredOccupied = Game.cells.some(cell => cell.hovering && cell.occupied && cell.occupiedByMyColor(Game.playerColor))
     Game.canvas.style.cursor = hoveredOccupied ? 'pointer' : 'default'
 
-    Game.cells.forEach(cell => cell.display(true, !true, true, Game.playerColor))
+    Game.cells.forEach(cell => cell.display(!true, !true, !true, Game.playerColor))
     Game.pieces.forEach(piece => piece.update())
     Game.pieces.forEach(piece => piece.display(!true, Game.playerColor))
 
