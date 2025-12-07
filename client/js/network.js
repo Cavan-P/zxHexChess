@@ -53,11 +53,12 @@ export const setupNetwork = onFenInit => {
                 if(data.captured){
 
                     const capturedColor = data.captured == data.captured.toUpperCase() ? 'white' : 'black'
+                    const capturedCell = data.capturedCell
 
                     Game.pieces = Game.pieces.filter(p => {
                         const pieceColor = p.piece.toUpperCase() == p.piece ? 'white' : 'black'
 
-                        const isSameCell = p.currentCell.num == data.to
+                        const isSameCell = p.currentCell.num == capturedCell
                         const isSameType = p.piece.toLowerCase() == data.captured.toLowerCase()
                         const isSameColor = pieceColor == capturedColor
 

@@ -1,5 +1,5 @@
 const { randomUUID } = require('crypto')
-const { generateLegalMoves, isMoveLegal, parseFen } = require('../game/moves.js')
+const { generateLegalMoves, coordToIndex, parseFen } = require('../game/moves.js')
 
 const boardToFen = board => {
     let fen = ''
@@ -39,7 +39,8 @@ class Room {
         this.players = []
         this.spectators = []
         this.gameState = {
-            fen: 'bqknbnr2rp1b1p1p2p2p1p3pp4p993P4PP3P1P2P2P1P1B1PR2RNBNQKB'
+            fen: 'bqknbnr2rp1b1p1p2p2p1p3pp4p993P4PP3P1P2P2P1P1B1PR2RNBNQKB',
+            enPassant: null
         }
     }
 
@@ -126,7 +127,7 @@ class Room {
             }
 
             const board = parseFen(this.gameState.fen)
-            const legal = generateLegalMoves(board, data.from, socket.color)
+            const legal = generateLegalMoves(board, data.from, socket.color, this.gameState.enPassant)
 
             socket.send(JSON.stringify({
                 type: 'legalMoves',
@@ -155,7 +156,7 @@ class Room {
             }
 
             const board = parseFen(this.gameState.fen)
-            const legal = generateLegalMoves(board, from, socket.color)
+            const legal = generateLegalMoves(board, from, socket.color, this.gameState.enPassant)
 
             console.log('legal for', from, legal)
 
@@ -171,14 +172,30 @@ class Room {
                 return
             }
 
+            let capturedPiece = board[to]?.piece || ''
+            let epCaptureCell = null
+
+            if(this.gameState.enPassant){
+                const ep = this.gameState.enPassant
+
+                const isPawn = movingPiece.piece.toLowerCase() == 'p'
+                const isEnemy = ep.color != movingPiece.color
+                const landsOnCaptureCell = to == ep.captureCell
+                
+                if(isPawn && isEnemy && landsOnCaptureCell){
+                    epCaptureCell = ep.pawnCell
+                    capturedPiece = board[epCaptureCell]?.piece || ''
+                }
+            }
+
             const newPieceObj = {
                 piece: movingPiece.piece,
                 color: movingPiece.color,
                 cell: to,
-                coords: Array.isArray(movingPiece.coords) ? [movingPiece.coords] : movingPiece.coords
+                coords: [...board[to].coords]
             }
 
-            const capturedPiece = board[to]?.piece || ''
+            console.log('new piece obj', newPieceObj)
 
             board[to] = newPieceObj
             board[from] = {
@@ -186,6 +203,43 @@ class Room {
                 color: '',
                 cell: from,
                 coords: Array.isArray(board[from]?.coords) ? [...board[from].coords] : board[from]?.coords
+            }
+
+            if(epCaptureCell != null){
+                board[epCaptureCell] = {
+                    piece: '',
+                    color: '',
+                    cell: epCaptureCell,
+                    coords: Array.isArray(board[epCaptureCell]?.coords) ? [...board[epCaptureCell].coords] : board[epCaptureCell]?.coords
+                }
+            }
+
+            this.gameState.enPassant = null
+
+            const isPawn = movingPiece.piece.toLowerCase() == 'p'
+            if(isPawn){
+                const fromR = movingPiece.coords[1]
+                const toR = newPieceObj.coords[1]
+
+                console.log('From, to', fromR, toR)
+
+                if(Math.abs(fromR - toR) == 2){
+                    const midQ = (movingPiece.coords[0] + newPieceObj.coords[0]) / 2
+                    const midR = (movingPiece.coords[1] + newPieceObj.coords[1]) / 2
+                    const midS = (movingPiece.coords[2] + newPieceObj.coords[2]) / 2
+
+                    const midIndex = coordToIndex(midQ, midR, midS)
+
+                    console.log('Two stepper passed over', midIndex)
+
+                    if(midIndex != undefined){
+                        this.gameState.enPassant = {
+                            captureCell: midIndex,
+                            pawnCell: to,
+                            color: movingPiece.color
+                        }
+                    }
+                }
             }
 
             const newFen = boardToFen(board)
@@ -202,7 +256,8 @@ class Room {
                 fen: newFen,
                 from,
                 to,
-                captured: capturedPiece || null
+                captured: capturedPiece || null,
+                capturedCell: epCaptureCell ?? to
             })
 
             socket.send(JSON.stringify({
@@ -210,7 +265,8 @@ class Room {
                 fen: newFen,
                 from,
                 to,
-                captured: capturedPiece || null
+                captured: capturedPiece || null,
+                capturedCell: epCaptureCell ?? to
             }))
 
             return

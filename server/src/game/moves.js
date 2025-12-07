@@ -92,7 +92,14 @@ const coordinates = [
     [0, 5, -5]
 ]
 
+const whitePawnStartCells = [56, 61, 62, 66, 68, 71, 74, 76, 80]
+const blackPawnStartCells = [10, 14, 16, 19, 21, 24, 28, 29, 34]
+
 const coordIndexMap = {}
+
+const coordToIndex = (q, r, s) => {
+    return coordIndexMap[`${q},${r},${s}`]
+}
 
 const parseFen = fen => {
     //bqknbnr2rp1b1p1p2p2p1p3pp4p993P4PP3P1P2P2P1P1B1PR2RNBNQKB
@@ -139,12 +146,12 @@ const parseFen = fen => {
 }
 
 //Generate legal moves for the current 'board' and the piece currently on cell 'cell'
-const generateLegalMoves = (board, cell, color) => {
+const generateLegalMoves = (board, cell, color, enPassantState) => {
     const piece = board[cell]
     if(!piece) return []
 
     switch(piece.piece.toLowerCase()){
-        case 'p': return pawnMoves(board, cell, color)
+        case 'p': return pawnMoves(board, cell, color, enPassantState)
         case 'n': return knightMoves(board, cell, color)
         case 'b': return bishopMoves(board, cell, color)
         case 'r': return rookMoves(board, cell, color)
@@ -165,8 +172,67 @@ const generateLegalMoves = (board, cell, color) => {
         Empty string means nothing on that cell
 
    ------------------------ */
-function pawnMoves(board, cell, color){
+function pawnMoves(board, cell, color, enPassant){
+
+    console.log('passant', enPassant)
+
     const moves = []
+    const pawn = board[cell]
+    if(!pawn || !pawn.piece) return moves
+
+    const [q, r, s] = pawn.coords
+
+    const dir = color == 'white' ? { fq: 0, fr: -1, fs: 1 } : { fq: 0, fr: 1, fs: -1 }
+
+    const captures = color == 'white' ? [ [1, -1, 0], [-1, 0, 1] ] : [[1, 0, -1], [-1, 1, 0]]
+
+    const f1 = `${q + dir.fq},${r + dir.fr},${s + dir.fs}`
+    let idx1 = coordIndexMap[f1]
+
+    if(idx1 != undefined){
+        const target = board[idx1]
+        if(!target.piece){
+            moves.push(idx1)
+
+            const isStart = color == 'white' ? whitePawnStartCells.includes(cell) : blackPawnStartCells.includes(cell)
+
+            if(isStart){
+                const f2 = `${q + dir.fq * 2},${r + dir.fr * 2},${s + dir.fs * 2}`
+                let idx2 = coordIndexMap[f2]
+
+                if(idx2 != undefined && !board[idx2].piece){
+                    moves.push(idx2)
+                }
+            }
+        }
+    }
+
+    for(const [dq, dr, ds] of captures){
+        const key = `${q + dq},${r + dr},${s + ds}`
+        const idx = coordIndexMap[key]
+        if(idx == undefined) continue
+
+        const captureTarget = board[idx]
+        if(captureTarget.piece && captureTarget.color != color){
+            moves.push(idx)
+        }
+    }
+
+    if(enPassant){
+        console.log('hi')
+        const ep = enPassant
+
+        if(ep.color != color){
+
+            for(const [dq, dr, ds] of captures){
+                const key = `${q + dq},${r + dr},${s + ds}`
+                const idx = coordIndexMap[key]
+                if(idx == ep.captureCell){
+                    moves.push(idx)
+                }
+            }
+        }
+    }
 
     return moves
 }
@@ -373,4 +439,4 @@ function isMoveLegal(board, from, to, color){
     return legal.some(cell => cell.num == to.num)
 }
 
-module.exports = {parseFen, isMoveLegal, generateLegalMoves}
+module.exports = {parseFen, isMoveLegal, generateLegalMoves, coordToIndex}
