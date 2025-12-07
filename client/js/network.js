@@ -1,8 +1,10 @@
 import { Game } from "./game.js"
 import { addChatMessage } from "./chat.js"
 
+const host = window.location.hostname
+
 export const setupNetwork = onFenInit => {
-    Game.socket = new WebSocket('ws://localhost:8000')
+    Game.socket = new WebSocket(`ws://${host}:8000`)
 
     Game.socket.onopen = _ => {
         console.log('Connected')
