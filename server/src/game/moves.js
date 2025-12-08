@@ -97,6 +97,40 @@ const blackPawnStartCells = [10, 14, 16, 19, 21, 24, 28, 29, 34]
 
 const coordIndexMap = {}
 
+const cloneBoard = board => {
+    return board.map(p => ({
+        piece: p.piece,
+        color: p.color,
+        cell: p.cell,
+        coords: [...p.coords]
+    }))
+}
+
+const applyMove = (board, from, to) => {
+    const newBoard = cloneBoard(board)
+    const movingPiece = {...newBoard[from]}
+
+    newBoard[to] = {...movingPiece, cell: to}
+    newBoard[from] = {piece: '', color: '', cell: from, coords: [...movingPiece.coords]}
+
+    return newBoard
+}
+
+const isKingAttacked = (board, color, enPassant) => {
+    const king = board.find(p => p.piece.toLowerCase() == 'k' && p.color == color)
+    if(!king) return false
+
+    return board.some(p => p.color != color && generateLegalMoves(board, p.cell, p.color, enPassant).includes(king.cell))
+}
+
+const generateFilteredLegals = (board, cell, color, enPassant) => {
+    const pseudoMoves = generateLegalMoves(board, cell, color, enPassant)
+    return pseudoMoves.filter(to => {
+        const newBoard = applyMove(board, cell, to)
+        return !isKingAttacked(newBoard, color, enPassant)
+    })
+}
+
 const coordToIndex = (q, r, s) => {
     return coordIndexMap[`${q},${r},${s}`]
 }
@@ -339,6 +373,7 @@ function bishopMoves(board, cell, color){
 
     return moves
 }
+
 function rookMoves(board, cell, color){
     const moves = []
 
@@ -385,9 +420,11 @@ function rookMoves(board, cell, color){
 
     return moves
 }
+
 function queenMoves(board, cell, color){
     return [...rookMoves(board, cell, color), ...bishopMoves(board, cell, color)]
 }
+
 function kingMoves(board, cell, color){
     const moves = []
 
@@ -434,9 +471,4 @@ function kingMoves(board, cell, color){
     return moves
 }
 
-function isMoveLegal(board, from, to, color){
-    const legal = generateLegalMoves(board, +from)
-    return legal.some(cell => cell.num == to.num)
-}
-
-module.exports = {parseFen, isMoveLegal, generateLegalMoves, coordToIndex}
+module.exports = {parseFen, generateLegalMoves, coordToIndex, generateFilteredLegals, isKingAttacked}

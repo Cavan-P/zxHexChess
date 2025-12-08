@@ -58,7 +58,7 @@ export class Piece {
             return
         }
 
-        console.log('Piece drop cell', dropCell)
+        //console.log('Piece drop cell', dropCell)
 
         Game.socket.send(JSON.stringify({
             type: 'attemptMove',

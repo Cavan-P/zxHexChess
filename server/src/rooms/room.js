@@ -1,5 +1,5 @@
 const { randomUUID } = require('crypto')
-const { generateLegalMoves, coordToIndex, parseFen } = require('../game/moves.js')
+const { generateLegalMoves, coordToIndex, parseFen, generateFilteredLegals, isKingAttacked } = require('../game/moves.js')
 
 const boardToFen = board => {
     let fen = ''
@@ -127,12 +127,17 @@ class Room {
             }
 
             const board = parseFen(this.gameState.fen)
-            const legal = generateLegalMoves(board, data.from, socket.color, this.gameState.enPassant)
+            //const legal = generateLegalMoves(board, data.from, socket.color, this.gameState.enPassant)
+            const legal = generateFilteredLegals(board, data.from, socket.color, this.gameState.enPassant)
+
+            //const whiteCheck = isKingAttacked(board, 'white', this.gameState.enPassant)
+            //const blackCheck = isKingAttacked(board, 'black', this.gameState.enPassant)
 
             socket.send(JSON.stringify({
                 type: 'legalMoves',
                 from: data.from,
-                moves: legal
+                moves: legal,
+                //check: { white: whiteCheck, black: blackCheck }
             }))
 
             return
@@ -156,9 +161,16 @@ class Room {
             }
 
             const board = parseFen(this.gameState.fen)
-            const legal = generateLegalMoves(board, from, socket.color, this.gameState.enPassant)
+            //const legal = generateLegalMoves(board, from, socket.color, this.gameState.enPassant)
+            const legal = generateFilteredLegals(board, data.from, socket.color, this.gameState.enPassant)
 
-            console.log('legal for', from, legal)
+            const whiteCheck = isKingAttacked(board, 'white', this.gameState.enPassant)
+            const blackCheck = isKingAttacked(board, 'black', this.gameState.enPassant)
+
+            const whiteKing = board.find(p => p.piece.toLowerCase() == 'k' && p.color == 'white')
+            const blackKing = board.find(p => p.piece.toLowerCase() == 'k' && p.color == 'black')
+
+            //console.log('legal for', from, legal)
 
             if(!Array.isArray(legal) || !legal.some(m => +m == to)){
                 socket.send(JSON.stringify({ type: 'illegalMove', from, to }))
@@ -257,7 +269,8 @@ class Room {
                 from,
                 to,
                 captured: capturedPiece || null,
-                capturedCell: epCaptureCell ?? to
+                capturedCell: epCaptureCell ?? to,
+                check: whiteCheck ? whiteKing.cell : blackCheck ? blackKing.cell : null
             })
 
             socket.send(JSON.stringify({
@@ -266,7 +279,8 @@ class Room {
                 from,
                 to,
                 captured: capturedPiece || null,
-                capturedCell: epCaptureCell ?? to
+                capturedCell: epCaptureCell ?? to,
+                check: whiteCheck ? whiteKing.cell : blackCheck ? blackKing.cell : null
             }))
 
             return

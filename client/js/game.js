@@ -16,6 +16,7 @@ export const Game = {
     },
 
     draggedPiece: null,
+    check: null,
 
     socket: null,
 

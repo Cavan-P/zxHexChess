@@ -38,6 +38,7 @@ export const setupNetwork = onFenInit => {
 
             case 'move': 
                 Game.pendingMove = null
+                Game.check = data.check
                 const { from, to, fen} = data
 
                 const piece = Game.pieces.find(p => p.currentCell.num == from)
@@ -88,6 +89,7 @@ export const setupNetwork = onFenInit => {
 
             case 'legalMoves': 
                 Game.legalMoves = data.moves
+                //Game.check = data.check
                 return Game.onLegalMoves?.(data.from, data.moves)
 
             case 'illegalMove': 
