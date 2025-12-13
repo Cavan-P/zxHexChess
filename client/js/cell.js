@@ -59,21 +59,21 @@ export class Cell {
             this.ctx.translate(-this.x, -this.y)
         }
 
-        if(this.hovering && this.occupied && this.occupiedByMyColor(colorPerspective) && !Game.draggedPiece){
-            drawHexagon(this.x, this.y, this.size, '#00611FAA', false, 0, this.ctx)
+        if(this.hovering && this.occupied && this.occupiedByMyColor(colorPerspective) && !Game.draggedPiece && Game.turn == colorPerspective){
+            drawHexagon(this.x, this.y, this.size - 2, '#00000001', true, '#264653CC', 4, this.ctx)
         }
 
         if(this.isLegalTarget){
             if(!this.occupied){
-                drawHexagon(this.x, this.y, this.size, '#00611FAA', false, 0, this.ctx)
+                drawHexagon(this.x, this.y, this.size, '#2a9d90a2', false, 'black', 0, this.ctx)
             }
-            if(this.occupied){
-                drawHexagon(this.x, this.y, this.size, '#5700009e', false, 0, this.ctx)
+            if(this.occupied && this.occupiedBy.toLowerCase() != 'k'){
+                drawHexagon(this.x, this.y, this.size, '#c44436b6', false, 'black', 0, this.ctx)
             }
         }
 
         if(this.num == Game.check){
-            drawHexagon(this.x, this.y, this.size, '#00345ac2', false, 0, this.ctx)
+            drawHexagon(this.x, this.y, this.size - 2, '#b0000c66' , true, '#FF1744FF', 4, this.ctx)
         }
 
         

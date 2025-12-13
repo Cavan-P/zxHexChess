@@ -5,8 +5,7 @@ import { setupRoomMenu } from './roomMenu.js'
 import { setupInput } from './setupInput.js'
 import { setupNetwork, sendChatMessage } from './network.js'
 import { drawBoard, populateBoardFromFen} from './board.js'
-import { Cell } from './cell.js'
-import { Piece } from './piece.js'
+import { setSystemMessage } from './utils.js'
 
 // ------ GLOBALS ------
 
@@ -22,12 +21,13 @@ Game.ctx.textBaseline = 'middle'
 Game.ctx.textAlign = 'center'
 
 Game.onLegalMoves = (from, moves) => {
-    console.log('Legal moves for', from, moves)
+    //console.log('Legal moves for', from, moves)
 
     Game.cells.forEach(cell => {
         cell.isLegalTarget = moves.includes(cell.num)
     })
 }
+
 
 setupRoomMenu()
 setupInput()
@@ -96,6 +96,13 @@ const render = _ => {
     Game.pieces.forEach(piece => piece.display(!true, Game.playerColor))
 
     Game.ctx.restore()
+
+    if(Game.color != Game.playerColor){
+        setSystemMessage('Opponent is thinking...', 'wait')
+    }
+    else {
+        setSystemMessage('Your turn!', 'turn')
+    }
 }
 
 const init = _ => {

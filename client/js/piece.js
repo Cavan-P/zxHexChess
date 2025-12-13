@@ -87,8 +87,11 @@ export class Piece {
     }
 
     update(){
+
         this.hovering = this.checkMouseHover()
         this.size += Smooth(this.size, this.targetSize, this.scaleSpeed)
+
+        if(Game.playerColor != Game.turn) return
 
         if(Game.draggedPiece && Game.draggedPiece != this) return
 

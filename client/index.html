@@ -1,60 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta name = "viewport" content = "width=device-width">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>ZXChess</title>
 
-    <title>ZXChess - Hexagonal Chess</title>
-
-    <link href="./css/style.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="./css/output.css" />
   </head>
 
-  <body>
+  <body class="w-100% h-100% overflow-hidden bg-(--bg-main) text-text-main">
 
-    <div id="room-menu">
-      <div>
-        <h2>ZXChess</h2>
-        <h5>Play online against a friend</h5>
-      
-        <button id="create-room-btn">Create Room</button>
-      
-        <div id="join-room-container">
-          <input id="join-room-input" type="text" maxlength="5" placeholder="Room Code">
-          <button id="join-room-btn">Join Room</button>
-        </div>
-      
-        <div id="room-status"></div>
+    <!-- Room Menu -->
+    <div id="room-menu" class="flex flex-col items-center mt-10 space-y-16">
+      <div id="title" class="">
+        <h1 class="text-8xl tracking-widest font-black text-center text-(--text-main) mt-10">QRS Chess</h1>
+        <h3 class="text-m tracking-wide font-thin text-center text-(--text-main)">Think outside the squares</h3>
       </div>
-    </div>
-    
 
-    <div id="layout">
+      <div id="multiplayer" class="flex flex-col items-center space-y-4">
+        <h1 class="text-2xl font-bold text-center text-(--text-main) tracking-widest">Play Online</h1>
 
-      <canvas id="canvas"></canvas>
-  
-      <img id="pieces" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Chess_Pieces_Sprite.svg/1200px-Chess_Pieces_Sprite.svg.png" hidden/>
-  
-      <div id="chat">
+        <button
+          id="create-room-btn"
+          class="bg-(--accent-primary) hover:bg-(--accent-hover) text-(--bg-main) font-bold px-6 py-2 rounded shadow-md transition-colors"
+        >
+          Create Game
+        </button>
 
-        <div id="room-info">
-          <span id="room-display">Room: ----</span>
-          <button id="copy-room-btn" title="Copy code">📋</button>
+        <div class="flex items-center space-x-2">
+          <input
+            id="join-room-input"
+            type="text"
+            maxlength="5"
+            placeholder="Room Code"
+            class="bg-(--bg-panel) border border-(--border-soft) rounded px-3 py-2 text-center text-(--text-main) focus:outline-none focus:border-(--accent-primary)"
+          />
+          <button
+            id="join-room-btn"
+            class="bg-(--accent-primary) hover:bg-(--accent-hover) text-(--bg-main) font-bold px-4 py-2 rounded shadow-md transition-colors"
+          >
+            Join Game
+          </button>
         </div>
-        
+      </div>
 
-        <div id="chat-title">Chat</div>
-        <div id="chat-box"></div>
-        <form id="chat-form">
-          <input id="chat-input" type="text" placeholder="Type a message">
-          <button type="submit">Send</button>
+      <div id="local" class="flex flex-col items-center space-y-6">
+        <h1 class="text-2xl font-bold text-center text-(--text-main)">
+          Play a Bot
+        </h1>
+      
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+          <!-- Bot 1 -->
+          <button class="group flex flex-col items-center bg-(--bg-panel) border border-(--border-soft) rounded-lg p-4 hover:border-(--accent-primary) hover:bg-(--bg-panel-soft) transition">
+            <img
+              src="/images/bot-placeholder.png"
+              alt="Beginner Bot"
+              class="w-20 h-20 object-contain mb-3"
+            />
+            <span class="text-(--text-main) font-semibold">
+              Martin
+            </span>
+          </button>
+      
+          <!-- Bot 2 -->
+          <button class="group flex flex-col items-center bg-(--bg-panel) border border-(--border-soft) rounded-lg p-4 hover:border-(--accent-primary) hover:bg-(--bg-panel-soft) transition">
+            <img
+              src="/images/bot-placeholder.png"
+              alt="Intermediate Bot"
+              class="w-20 h-20 object-contain mb-3"
+            />
+            <span class="text-(--text-main) font-semibold">
+              Next level bot idk
+            </span>
+          </button>
+      
+          <!-- Bot 3 -->
+          <button class="group flex flex-col items-center bg-(--bg-panel) border border-(--border-soft) rounded-lg p-4 hover:border-(--accent-primary) hover:bg-(--bg-panel-soft) transition">
+            <img
+              src="/images/bot-placeholder.png"
+              alt="Psychopath Bot"
+              class="w-20 h-20 object-contain mb-3"
+            />
+            <span class="text-(--text-main) font-semibold">
+              how good is this
+            </span>
+          </button>
+        </div>
+      </div>
+      
+
+      <div id="room-status"></div>
+    </div>
+
+    <!-- Game Layout -->
+    <div id="layout" class="hidden h-screen flex">
+
+      <canvas id="canvas" class="w-full h-full"></canvas>
+
+      <img
+        id="pieces"
+        src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Chess_Pieces_Sprite.svg/1200px-Chess_Pieces_Sprite.svg.png"
+        hidden
+      />
+
+      <div
+        id="chat"
+        class="flex h-full w-[320px] flex-col border-l border-(--border-soft) bg-(--bg-panel) p-3 text-(--text-main)"
+      >
+        <!-- Room info -->
+        <div
+          id="room-info"
+          class="mb-2 flex items-center justify-between rounded-md border border-(--border-soft) bg-(--bg-panel-soft) px-2 py-1 text-sm"
+        >
+          <span id="room-display" class="font-mono tracking-wider"></span>
+          <button
+            id="copy-room-btn"
+            class="rounded bg-(--bg-panel) px-2 py-1 text-sm hover:bg-(--accent-primary) hover:text-black"
+            title="Copy room code"
+          >
+            📋
+          </button>
+        </div>
+
+        <!-- System text -->
+        <div
+          id="system-text"
+          class="mb-2 rounded-md border border-(--border-soft) bg-(--bg-panel-soft) px-2 py-1 text-center text-xs text-(--text-muted)"
+        >
+          Some text
+        </div>
+
+        <!-- Chat messages -->
+        <div
+          id="chat-box"
+          class="mb-2 flex-1 overflow-y-auto rounded-md border border-(--border-soft) bg-(--bg-main) p-2 text-sm"
+        ></div>
+
+        <!-- Input -->
+        <form id="chat-form" class="flex gap-1">
+          <input
+            id="chat-input"
+            class="flex-1 rounded-md border border-(--border-soft) bg-(--bg-main) px-2 py-1 text-sm text-(--text-main) placeholder:text-(--text-muted) focus:outline-none focus:ring-1 focus:ring-(--accent-primary)"
+            placeholder="Type a message…"
+          />
+          <button
+            type="submit"
+            class="rounded-md bg-(--accent-primary) px-3 py-1 text-sm font-semibold text-black hover:bg-(--accent-hover)"
+          >
+            Send
+          </button>
         </form>
       </div>
+
+      
+
     </div>
   
-    <script type="module" src="js/main.js"></script>
+
+  <script type="module" src="js/main.js"></script>
   </body>
-  
-  
-  
-  
 </html>

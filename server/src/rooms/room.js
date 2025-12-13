@@ -40,7 +40,8 @@ class Room {
         this.spectators = []
         this.gameState = {
             fen: 'bqknbnr2rp1b1p1p2p2p1p3pp4p993P4PP3P1P2P2P1P1B1PR2RNBNQKB',
-            enPassant: null
+            enPassant: null,
+            turn: 'white'
         }
     }
 
@@ -71,7 +72,8 @@ class Room {
 
         socket.send(JSON.stringify({
             type: 'init',
-            fen: this.gameState.fen
+            fen: this.gameState.fen,
+            turn: this.gameState.turn
         }))
 
         console.log(`Client joined room ${this.id} as ${socket.color}`)
@@ -145,6 +147,15 @@ class Room {
 
 
         if(data.type == 'attemptMove'){
+
+            if(socket.color != this.gameState.turn){
+                socket.send(JSON.stringify({
+                    type: 'illegalMove',
+                    reason: 'Not your turn'
+                }))
+                return
+            }
+
             if(socket.color != 'white' && socket.color != 'black'){
                 socket.send(JSON.stringify({
                     type: 'illegalMove',
@@ -163,12 +174,6 @@ class Room {
             const board = parseFen(this.gameState.fen)
             //const legal = generateLegalMoves(board, from, socket.color, this.gameState.enPassant)
             const legal = generateFilteredLegals(board, data.from, socket.color, this.gameState.enPassant)
-
-            const whiteCheck = isKingAttacked(board, 'white', this.gameState.enPassant)
-            const blackCheck = isKingAttacked(board, 'black', this.gameState.enPassant)
-
-            const whiteKing = board.find(p => p.piece.toLowerCase() == 'k' && p.color == 'white')
-            const blackKing = board.find(p => p.piece.toLowerCase() == 'k' && p.color == 'black')
 
             //console.log('legal for', from, legal)
 
@@ -242,8 +247,6 @@ class Room {
 
                     const midIndex = coordToIndex(midQ, midR, midS)
 
-                    console.log('Two stepper passed over', midIndex)
-
                     if(midIndex != undefined){
                         this.gameState.enPassant = {
                             captureCell: midIndex,
@@ -263,6 +266,14 @@ class Room {
                 console.error('[room] FEN roundtrip failed: destination empty after boardToFen')
             }
 
+            const whiteCheck = isKingAttacked(board, 'white', this.gameState.enPassant)
+            const blackCheck = isKingAttacked(board, 'black', this.gameState.enPassant)
+
+            const whiteKing = board.find(p => p.piece.toLowerCase() == 'k' && p.color == 'white')
+            const blackKing = board.find(p => p.piece.toLowerCase() == 'k' && p.color == 'black')
+
+            this.gameState.turn = this.gameState.turn == 'white' ? 'black' : 'white'
+
             this.broadcastExcept(socket, {
                 type: 'move',
                 fen: newFen,
@@ -270,7 +281,8 @@ class Room {
                 to,
                 captured: capturedPiece || null,
                 capturedCell: epCaptureCell ?? to,
-                check: whiteCheck ? whiteKing.cell : blackCheck ? blackKing.cell : null
+                check: whiteCheck ? whiteKing.cell : blackCheck ? blackKing.cell : null,
+                turn: this.gameState.turn
             })
 
             socket.send(JSON.stringify({
@@ -280,7 +292,8 @@ class Room {
                 to,
                 captured: capturedPiece || null,
                 capturedCell: epCaptureCell ?? to,
-                check: whiteCheck ? whiteKing.cell : blackCheck ? blackKing.cell : null
+                check: whiteCheck ? whiteKing.cell : blackCheck ? blackKing.cell : null,
+                turn: this.gameState.turn
             }))
 
             return

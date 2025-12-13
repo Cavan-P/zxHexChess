@@ -120,7 +120,7 @@ export const drawBoard = (colors, stroke, strokeWeight, populateCells) => {
         let x = centerX - ((numCols - 1) * columnOffset) / 2
 
         for(let col = 0; col < numCols; col++){
-            drawHexagon(x, y, hexSize, colors[colorIndex], stroke, strokeWeight, Game.ctx)
+            drawHexagon(x, y, hexSize, colors[colorIndex], stroke, 'black', strokeWeight, Game.ctx)
 
             if(populateCells){
 

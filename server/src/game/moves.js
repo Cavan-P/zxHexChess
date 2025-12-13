@@ -93,7 +93,7 @@ const coordinates = [
 ]
 
 const whitePawnStartCells = [56, 61, 62, 66, 68, 71, 74, 76, 80]
-const blackPawnStartCells = [10, 14, 16, 19, 21, 24, 28, 29, 34]
+const blackPawnStartCells = [10, 14, 16, 19, 22, 24, 28, 29, 34]
 
 const coordIndexMap = {}
 
@@ -208,8 +208,6 @@ const generateLegalMoves = (board, cell, color, enPassantState) => {
    ------------------------ */
 function pawnMoves(board, cell, color, enPassant){
 
-    console.log('passant', enPassant)
-
     const moves = []
     const pawn = board[cell]
     if(!pawn || !pawn.piece) return moves
@@ -253,7 +251,6 @@ function pawnMoves(board, cell, color, enPassant){
     }
 
     if(enPassant){
-        console.log('hi')
         const ep = enPassant
 
         if(ep.color != color){

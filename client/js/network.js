@@ -28,7 +28,9 @@ export const setupNetwork = onFenInit => {
                 Game.onRoomError?.(data.message)
                 return
             
-            case 'init': return onFenInit(data.fen)
+            case 'init': 
+                Game.turn = data.turn
+                return onFenInit(data.fen)
 
             case 'assignColor':
                 Game.playerColor = data.color
@@ -37,6 +39,7 @@ export const setupNetwork = onFenInit => {
             case 'chat': return addChatMessage(data.username, data.payload, false)
 
             case 'move': 
+                Game.turn = data.turn
                 Game.pendingMove = null
                 Game.check = data.check
                 const { from, to, fen} = data

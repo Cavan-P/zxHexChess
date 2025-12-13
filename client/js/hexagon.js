@@ -1,4 +1,4 @@
-export const drawHexagon = (x, y, s, col, stroke, strokeWeight, ctx) => {
+export const drawHexagon = (x, y, s, col, stroke, strokeColor, strokeWeight, ctx) => {
     ctx.fillStyle = col
 
     ctx.beginPath()
@@ -8,7 +8,7 @@ export const drawHexagon = (x, y, s, col, stroke, strokeWeight, ctx) => {
     }
     ctx.closePath()
 
-    if(stroke) ctx.lineWidth = strokeWeight, ctx.stroke()
+    if(stroke) ctx.lineWidth = strokeWeight, ctx.strokeStyle = strokeColor, ctx.stroke()
 
     ctx.fill()
 }

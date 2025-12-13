@@ -45,8 +45,8 @@ export const setupRoomMenu = _ => {
     }
 
     Game.onRoomJoined = _ => {
-        menu.style.display = 'none'
-        layout.style.display = 'flex'
+        menu.classList.add('hidden')
+        layout.classList.remove('hidden')
 
         Game.canvas.width = Game.canvas.clientWidth
         Game.canvas.height = Game.canvas.clientHeight
