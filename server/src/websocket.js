@@ -8,6 +8,10 @@ module.exports = function attachWebSocket(server){
         console.log('Client connected')
         socket.room = null
 
+        socket.on('error', e => {
+            console.error('Websocket error:', e)
+        })
+
         socket.on('message', msg => {
             let data = null
             try { data = JSON.parse(msg) }
