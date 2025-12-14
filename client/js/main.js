@@ -130,3 +130,9 @@ const init = _ => {
 }
 
 requestAnimationFrame(init)
+
+window.addEventListener('beforeunload', _ => {
+    if(Game.socket?.readyState == WebSocket.OPEN){
+        Game.socket.close()
+    }
+})
