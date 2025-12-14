@@ -98,12 +98,6 @@ const render = _ => {
     Game.ctx.restore()
 
     if(Game.turn != Game.playerColor){
-        /*for(;;){
-            setTimeout(_ => setSystemMessage('Opponent is thinking.', 'wait'), 1000)
-            setTimeout(_ => setSystemMessage('Opponent is thinking..', 'wait'), 1000)
-            setTimeout(_ => setSystemMessage('Opponent is thinking...', 'wait'), 1000)
-        }*/
-
         setSystemMessage('Opponent is thinking...', 'wait')
     }
     else {
@@ -116,8 +110,6 @@ const render = _ => {
     if(whiteCheck && Game.playerColor == 'white'){
         setSystemMessage('Check!')
     }
-
-    console.log(Game.gameOver)
 
     if(blackCheck && Game.playerColor == 'black'){
         setSystemMessage('Check!')
