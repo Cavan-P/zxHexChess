@@ -2,6 +2,7 @@ const { WebSocketServer } = require('ws')
 const matchmaker = require('./rooms/matchmaker')
 
 module.exports = function attachWebSocket(server){
+    console.log('Inside attachwebsocket')
     const wss = new WebSocketServer({ server })
 
     wss.on('connection', socket => {

@@ -9,4 +9,8 @@ const server = app.listen(8000, '0.0.0.0', _ => {
     console.log('Server running on port 8000')
 })
 
-attachWebSocket(server)
+try {
+    attachWebSocket(server)
+} catch (e) {
+    console.error('smth happened when trying to attach websocket to server', e)
+}
