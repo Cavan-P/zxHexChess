@@ -39,6 +39,7 @@ export const setupNetwork = onFenInit => {
             case 'chat': return addChatMessage(data.username, data.payload, false)
 
             case 'move': 
+                console.log(data.gameOver)
                 Game.turn = data.turn
                 Game.pendingMove = null
                 Game.check = data.check
@@ -87,6 +88,8 @@ export const setupNetwork = onFenInit => {
                 Game.draggedPiece = null
                 Game.cells.forEach(cell => cell.isLegalTarget = false)
                 Game.legalMoves = []
+
+                Game.gameOver = data.gameOver
 
                 return
 

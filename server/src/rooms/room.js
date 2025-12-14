@@ -272,6 +272,25 @@ class Room {
             const whiteKing = board.find(p => p.piece.toLowerCase() == 'k' && p.color == 'white')
             const blackKing = board.find(p => p.piece.toLowerCase() == 'k' && p.color == 'black')
 
+            const nextColor = this.gameState.turn
+            let movesExist = false
+            for(let i = 0; i < board.length; i++){
+                const piece = board[i]
+                if(piece && piece.color == nextColor){
+                    const legals = generateFilteredLegals(board, i, nextColor, this.gameState.enPassant)
+                    if(legals.length){
+                        movesExist = true
+                        break
+                    }
+                }
+            }
+
+            let gameOver = null
+            if(!movesExist){
+                const kingAttacked = isKingAttacked(board, nextColor, this.gameState.enPassant)
+                gameOver = kingAttacked ? 'checkmate' : 'stalemate'
+            }
+
             this.gameState.turn = this.gameState.turn == 'white' ? 'black' : 'white'
 
             this.broadcastExcept(socket, {
@@ -282,7 +301,8 @@ class Room {
                 captured: capturedPiece || null,
                 capturedCell: epCaptureCell ?? to,
                 check: whiteCheck ? whiteKing.cell : blackCheck ? blackKing.cell : null,
-                turn: this.gameState.turn
+                turn: this.gameState.turn,
+                gameOver
             })
 
             socket.send(JSON.stringify({
@@ -293,7 +313,8 @@ class Room {
                 captured: capturedPiece || null,
                 capturedCell: epCaptureCell ?? to,
                 check: whiteCheck ? whiteKing.cell : blackCheck ? blackKing.cell : null,
-                turn: this.gameState.turn
+                turn: this.gameState.turn,
+                gameOver
             }))
 
             return

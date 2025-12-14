@@ -5,7 +5,13 @@
     <meta name="viewport" content="width=device-width" />
     <title>QRS Chess</title>
 
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+
     <link rel="stylesheet" href="./css/output.css" />
+
   </head>
 
   <body class="w-100% h-100% overflow-hidden bg-(--bg-main) text-text-main">
@@ -49,40 +55,37 @@
           Play a Bot
         </h1>
       
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
           <!-- Bot 1 -->
           <button class="group flex flex-col items-center bg-(--bg-panel) border border-(--border-soft) rounded-lg p-4 hover:border-(--accent-primary) hover:bg-(--bg-panel-soft) transition">
-            <img
-              src="/images/bot-placeholder.png"
-              alt="Beginner Bot"
-              class="w-20 h-20 object-contain mb-3"
-            />
+            
+            <i class="fa-solid fa-3x fa-chess-pawn mb-3"></i>
             <span class="text-(--text-main) font-semibold">
-              Martin
+              Rando-Bot
             </span>
           </button>
       
           <!-- Bot 2 -->
           <button class="group flex flex-col items-center bg-(--bg-panel) border border-(--border-soft) rounded-lg p-4 hover:border-(--accent-primary) hover:bg-(--bg-panel-soft) transition">
-            <img
-              src="/images/bot-placeholder.png"
-              alt="Intermediate Bot"
-              class="w-20 h-20 object-contain mb-3"
-            />
+            <i class="fa-solid fa-3x fa-chess-knight mb-3"></i>
             <span class="text-(--text-main) font-semibold">
-              Next level bot idk
+              Learner
             </span>
           </button>
       
           <!-- Bot 3 -->
           <button class="group flex flex-col items-center bg-(--bg-panel) border border-(--border-soft) rounded-lg p-4 hover:border-(--accent-primary) hover:bg-(--bg-panel-soft) transition">
-            <img
-              src="/images/bot-placeholder.png"
-              alt="Psychopath Bot"
-              class="w-20 h-20 object-contain mb-3"
-            />
+            <i class="fa-solid fa-3x fa-chess-rook mb-3"></i>
             <span class="text-(--text-main) font-semibold">
-              how good is this
+              Competitive
+            </span>
+          </button>
+
+          <!-- Bot 4 -->
+          <button class="group flex flex-col items-center bg-(--bg-panel) border border-(--border-soft) rounded-lg p-4 hover:border-(--accent-primary) hover:bg-(--bg-panel-soft) transition">
+            <i class="fa-solid fa-3x fa-chess-queen mb-3"></i>
+            <span class="text-(--text-main) font-semibold">
+              Expert
             </span>
           </button>
         </div>
@@ -105,12 +108,12 @@
 
       <div
         id="chat"
-        class="flex h-full w-[320px] flex-col border-l border-(--border-soft) bg-(--bg-panel) p-3 text-(--text-main)"
+        class="flex h-full w-[320px] flex-col border-l border-(--border-soft) bg-(--bg-panel-soft) p-3 text-(--text-main)"
       >
         <!-- Room info -->
         <div
           id="room-info"
-          class="mb-2 flex items-center justify-between rounded-md border border-(--border-soft) bg-(--bg-panel-soft) px-2 py-1 text-sm"
+          class="mb-2 flex items-center justify-between rounded-md border border-(--border-soft) bg-(--bg-panel) px-2 py-1 text-sm"
         >
           <span id="room-display" class="font-mono tracking-wider"></span>
           <button
@@ -118,16 +121,16 @@
             class="rounded bg-(--bg-panel) px-2 py-1 text-sm hover:bg-(--accent-primary) hover:text-black"
             title="Copy room code"
           >
-            📋
+            Copy
           </button>
         </div>
 
         <!-- System text -->
         <div
           id="system-text"
-          class="mb-2 rounded-md border border-(--border-soft) bg-(--bg-panel-soft) px-2 py-1 text-center text-xs text-(--text-muted)"
+          class="mb-2 flex items-center justify-between rounded-md border border-(--border-soft) bg-(--bg-panel) px-2 py-1 text-xl"
         >
-          Some text
+          System text thingos go here
         </div>
 
         <!-- Chat messages -->

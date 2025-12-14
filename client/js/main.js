@@ -97,11 +97,37 @@ const render = _ => {
 
     Game.ctx.restore()
 
-    if(Game.color != Game.playerColor){
+    if(Game.turn != Game.playerColor){
+        /*for(;;){
+            setTimeout(_ => setSystemMessage('Opponent is thinking.', 'wait'), 1000)
+            setTimeout(_ => setSystemMessage('Opponent is thinking..', 'wait'), 1000)
+            setTimeout(_ => setSystemMessage('Opponent is thinking...', 'wait'), 1000)
+        }*/
+
         setSystemMessage('Opponent is thinking...', 'wait')
     }
     else {
         setSystemMessage('Your turn!', 'turn')
+    }
+
+    const whiteCheck = Game.check && Game.cells[Game.check].occupiedBy == 'K'
+    const blackCheck = Game.check && Game.cells[Game.check].occupiedBy == 'k'
+
+    if(whiteCheck && Game.playerColor == 'white'){
+        setSystemMessage('Check!')
+    }
+
+    console.log(Game.gameOver)
+
+    if(blackCheck && Game.playerColor == 'black'){
+        setSystemMessage('Check!')
+    }
+
+    if(Game.gameOver == 'checkmate'){
+        setSystemMessage('Checkmate!')
+    }
+    if(Game.gameOver == 'stalemate'){
+        setSystemMessage('Stalemate!')
     }
 }
 

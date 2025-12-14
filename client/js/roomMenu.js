@@ -12,11 +12,11 @@ export const setupRoomMenu = _ => {
     const copyBtn = document.getElementById("copy-room-btn")
 
     if (copyBtn) {
-        copyBtn.addEventListener("click", () => {
+        copyBtn.addEventListener("click", _ => {
             const text = document.getElementById("room-display").textContent.replace("Room: ", "")
             navigator.clipboard.writeText(text)
-            copyBtn.textContent = "✓"
-            setTimeout(() => copyBtn.textContent = "📋", 800)
+            copyBtn.textContent = "Copied!"
+            setTimeout(_ => copyBtn.textContent = "Copy", 1000)
         })
     }
 

@@ -20,7 +20,9 @@ export const setSystemMessage = (text, type = '') => {
     const el = document.getElementById('system-text')
     if (!el) return
 
-    el.className = ''
+    //console.log('Should set', text)
+
+    //el.className = ''
     if (type) el.classList.add(`system-${type}`)
     el.textContent = text
 }
