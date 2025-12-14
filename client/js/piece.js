@@ -11,6 +11,10 @@ export class Piece {
         this.startX = x
         this.startY = y
 
+        this.targetX = x
+        this.targetY = y
+        this.slideSpeed = 4
+
         this.defaultSize = 60
         this.dragSize = 75
         this.size = this.defaultSize
@@ -90,6 +94,13 @@ export class Piece {
 
         this.hovering = this.checkMouseHover()
         this.size += Smooth(this.size, this.targetSize, this.scaleSpeed)
+
+        this.x += Smooth(this.x, this.targetX, this.slideSpeed)
+        this.y += Smooth(this.y, this.targetY, this.slideSpeed)
+
+        if(Math.abs(this.x - this.targetX) < 0.5) this.x = this.targetX
+        if(Math.abs(this.y - this.targetY) < 0.5) this.y = this.targetY
+
 
         if(Game.playerColor != Game.turn) return
 

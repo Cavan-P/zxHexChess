@@ -76,6 +76,14 @@ export class Cell {
             drawHexagon(this.x, this.y, this.size - 2, '#b0000c66' , true, '#FF1744FF', 4, this.ctx)
         }
 
+        if(Game.lastMove?.from == this.num){
+            drawHexagon(this.x, this.y, this.size, '#5E60CECC', false, 'black', 0, this.ctx)
+        }
+
+        if(Game.lastMove?.to == this.num){
+            drawHexagon(this.x, this.y, this.size, '#3A0CA3CC', false, 'black', 0, this.ctx)
+        }
+
         
         //Debug
         if(showCellNumbers){

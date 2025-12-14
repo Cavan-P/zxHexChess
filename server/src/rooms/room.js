@@ -39,6 +39,9 @@ class Room {
         this.players = []
         this.spectators = []
         this.gameState = {
+            //Stalemate '5k92BR96K4N993P3PP7P1P95'
+            //Checkmate '999997P8P3PPKB4R2PN91k2'
+            //Start 'bqknbnr2rp1b1p1p2p2p1p3pp4p993P4PP3P1P2P2P1P1B1PR2RNBNQKB'
             fen: 'bqknbnr2rp1b1p1p2p2p1p3pp4p993P4PP3P1P2P2P1P1B1PR2RNBNQKB',
             enPassant: null,
             turn: 'white'
@@ -272,7 +275,7 @@ class Room {
             const whiteKing = board.find(p => p.piece.toLowerCase() == 'k' && p.color == 'white')
             const blackKing = board.find(p => p.piece.toLowerCase() == 'k' && p.color == 'black')
 
-            const nextColor = this.gameState.turn
+            const nextColor = this.gameState.turn == 'white' ? 'black' : 'white'
             let movesExist = false
             for(let i = 0; i < board.length; i++){
                 const piece = board[i]
@@ -292,6 +295,8 @@ class Room {
             }
 
             this.gameState.turn = this.gameState.turn == 'white' ? 'black' : 'white'
+
+            console.log('gameOver', gameOver)
 
             this.broadcastExcept(socket, {
                 type: 'move',

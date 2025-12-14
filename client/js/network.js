@@ -39,11 +39,12 @@ export const setupNetwork = onFenInit => {
             case 'chat': return addChatMessage(data.username, data.payload, false)
 
             case 'move': 
-                console.log(data.gameOver)
                 Game.turn = data.turn
                 Game.pendingMove = null
                 Game.check = data.check
-                const { from, to, fen} = data
+                
+                const { from, to, fen } = data
+                Game.lastMove = { from, to }
 
                 const piece = Game.pieces.find(p => p.currentCell.num == from)
                 if(!piece){
@@ -79,8 +80,8 @@ export const setupNetwork = onFenInit => {
                 targetCell.occupied = true
                 targetCell.occupiedBy = piece.piece
 
-                piece.x = targetCell.x
-                piece.y = targetCell.y
+                piece.targetX = targetCell.x
+                piece.targetY = targetCell.y
                 piece.currentCell = targetCell
 
                 Game.fen = fen

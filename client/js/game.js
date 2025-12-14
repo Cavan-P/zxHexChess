@@ -20,6 +20,11 @@ export const Game = {
     turn: null,
     gameOver: null,
 
+    lastMove: {
+        from: null,
+        to: null
+    },
+
     socket: null,
 
     pieceSprite: null
