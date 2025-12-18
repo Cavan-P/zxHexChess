@@ -6,7 +6,7 @@ module.exports = function randomBot({ fen, turn, enPassant }) {
 
     for (let i = 0; i < board.length; i++) {
         const piece = board[i]
-        if (!piece || piece.color !== turn) continue
+        if (!piece || piece.color != turn) continue
 
         const legals = generateFilteredLegals(board, i, turn, enPassant)
         for (const to of legals) {

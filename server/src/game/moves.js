@@ -468,4 +468,4 @@ function kingMoves(board, cell, color){
     return moves
 }
 
-module.exports = {parseFen, generateLegalMoves, coordToIndex, generateFilteredLegals, isKingAttacked}
+module.exports = {parseFen, generateLegalMoves, coordToIndex, generateFilteredLegals, isKingAttacked, cloneBoard, applyMove}
