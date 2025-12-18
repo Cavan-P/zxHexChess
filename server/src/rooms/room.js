@@ -49,7 +49,16 @@ class Room {
     }
 
     addClient(socket){
-        if(this.players.length < 2){
+        if(this.isBotGame){
+            socket.color = 'white'
+            this.players.push(socket)
+
+            socket.send(JSON.stringify({
+                type: 'assignColor',
+                color: 'white'
+            }))
+        }
+        else if(this.players.length < 2){
             const colors = ['white', 'black']
             const taken = this.players.map(player => player.color)
             const available = colors.filter(color => !taken.includes(color))
@@ -122,6 +131,9 @@ class Room {
 
 
         if(data.type == 'requestLegalMoves'){
+
+            console.log('Legal move request received', socket.color, data.from)
+
             if(socket.color != 'white' && socket.color != 'black'){
                 socket.send(JSON.stringify({
                     type: 'legalMoves',
@@ -215,7 +227,7 @@ class Room {
                 coords: [...board[to].coords]
             }
 
-            console.log('new piece obj', newPieceObj)
+            //console.log('new piece obj', newPieceObj)
 
             board[to] = newPieceObj
             board[from] = {
@@ -295,8 +307,8 @@ class Room {
             }
 
             this.gameState.turn = this.gameState.turn == 'white' ? 'black' : 'white'
-
-            console.log('gameOver', gameOver)
+            
+            //console.log('gameOver', gameOver)
 
             this.broadcastExcept(socket, {
                 type: 'move',
@@ -310,17 +322,37 @@ class Room {
                 gameOver
             })
 
-            socket.send(JSON.stringify({
-                type: 'move',
-                fen: newFen,
-                from,
-                to,
-                captured: capturedPiece || null,
-                capturedCell: epCaptureCell ?? to,
-                check: whiteCheck ? whiteKing.cell : blackCheck ? blackKing.cell : null,
-                turn: this.gameState.turn,
-                gameOver
-            }))
+            if(socket.send){ // For bot games, we don't need to send to itself
+                socket.send(JSON.stringify({
+                    type: 'move',
+                    fen: newFen,
+                    from,
+                    to,
+                    captured: capturedPiece || null,
+                    capturedCell: epCaptureCell ?? to,
+                    check: whiteCheck ? whiteKing.cell : blackCheck ? blackKing.cell : null,
+                    turn: this.gameState.turn,
+                    gameOver
+                }))
+            }
+
+            if(this.isBotGame && this.botStrategy && this.gameState.turn == 'black'){
+                setTimeout(_ => {
+                    const botMove = this.botStrategy({
+                        fen: this.gameState.fen,
+                        turn: this.gameState.turn,
+                        enPassant: this.gameState.enPassant
+                    })
+
+                    if(!botMove) return
+
+                    this.handleMessage({ color: 'black' }, {
+                        type: 'attemptMove',
+                        from: botMove.from,
+                        to: botMove.to
+                    })
+                }, 400)
+            }
 
             return
         }

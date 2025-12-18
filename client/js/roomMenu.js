@@ -1,5 +1,5 @@
 import { Game } from './game.js'
-import { sendRoomCreate, sendRoomJoin } from './network.js'
+import { sendRoomCreate, sendRoomJoin, sendStartBotGame } from './network.js'
 
 export const setupRoomMenu = _ => {
     const layout = document.getElementById("layout")
@@ -10,6 +10,7 @@ export const setupRoomMenu = _ => {
     const joinInput = document.getElementById("join-room-input")
     const statusBox = document.getElementById("room-status")
     const copyBtn = document.getElementById("copy-room-btn")
+
 
     if (copyBtn) {
         copyBtn.addEventListener("click", _ => {
@@ -38,6 +39,14 @@ export const setupRoomMenu = _ => {
         showStatus('Joining room...')
         sendRoomJoin(code)
     }
+
+    document.querySelectorAll('#local button').forEach(button => {
+        button.addEventListener('click', () => {
+            const botName = button.textContent.trim()
+            sendStartBotGame(botName)
+        })
+    })
+    
     
     Game.onRoomCreated = code => {
         showStatus('Room created!  Share this code:')

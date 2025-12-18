@@ -1,5 +1,6 @@
 const { WebSocketServer } = require('ws')
 const matchmaker = require('./rooms/matchmaker')
+const { getBotStrategy } = require('./ai')
 
 module.exports = function attachWebSocket(server){
     console.log('Inside attachwebsocket')
@@ -17,6 +18,31 @@ module.exports = function attachWebSocket(server){
             let data = null
             try { data = JSON.parse(msg) }
             catch(e){ return }
+
+            console.log('WS received message:', data)
+
+            if(data.type == 'startBotGame'){
+                const botName = data.botName
+                const room = matchmaker.createRoom()
+                const strategy = getBotStrategy(botName)
+        
+                room.botStrategy = strategy
+                room.isBotGame = true
+
+                room.addClient(socket)
+                socket.room = room
+
+                console.log('[WS] Started bot game. Socket color:', socket.color)
+        
+                socket.send(JSON.stringify({
+                    type: 'roomCreated',
+                    code: room.id
+                }))
+                socket.send(JSON.stringify({ type: 'roomJoined', code: room.id }))
+        
+                return
+            }
+            
 
             if(data.type == 'createRoom'){
                 const room = matchmaker.createRoom()
@@ -49,7 +75,11 @@ module.exports = function attachWebSocket(server){
             }
 
             if(socket.room){
+                console.log('ws forwarding message to room handler')
                 socket.room.handleMessage(socket, data)
+            }
+            else {
+                console.warn('ws socket has no room assigned')
             }
         })
 

@@ -117,6 +117,10 @@ export class Piece {
 
                 this.originalCell = this.currentCell
 
+                //console.log('Requesting legal moves from', this.originalCell.num)
+
+                //console.log(Game.socket)
+
                 Game.socket.send(JSON.stringify({
                     type: 'requestLegalMoves',
                     from: this.originalCell.num

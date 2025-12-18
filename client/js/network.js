@@ -151,3 +151,10 @@ export const setRoomCodeDisplay = code => {
     const el = document.getElementById("room-display")
     if (el) el.textContent = "Room: " + code
 }
+
+export const sendStartBotGame = botName => {
+    Game.socket.send(JSON.stringify({
+        type: 'startBotGame',
+        botName
+    }))
+}
