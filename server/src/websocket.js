@@ -19,7 +19,7 @@ module.exports = function attachWebSocket(server){
             try { data = JSON.parse(msg) }
             catch(e){ return }
 
-            console.log('WS received message:', data)
+            //console.log('WS received message:', data)
 
             if(data.type == 'startBotGame'){
                 const botName = data.botName
@@ -32,7 +32,7 @@ module.exports = function attachWebSocket(server){
                 room.addClient(socket)
                 socket.room = room
 
-                console.log('[WS] Started bot game. Socket color:', socket.color)
+                console.log('[WS] Started bot game with ' + botName + '. Socket color:', socket.color)
         
                 socket.send(JSON.stringify({
                     type: 'roomCreated',
@@ -40,6 +40,28 @@ module.exports = function attachWebSocket(server){
                 }))
                 socket.send(JSON.stringify({ type: 'roomJoined', code: room.id }))
         
+                return
+            }
+
+            if(data.type == 'startBotVsBot'){
+                const { botA, botB } = data
+                const room = matchmaker.createRoom()
+
+                const strategyA = getBotStrategy(botA)
+                const strategyB = getBotStrategy(botB)
+
+                room.isBotGame = true
+                room.botStrategies = {
+                    white: strategyA,
+                    black: strategyB
+                }
+
+                room.addClient(socket)
+
+                socket.send(JSON.stringify({ type: 'roomCreated', code: room.id }))
+                socket.send(JSON.stringify({ type: 'roomJoined', code: room.id }))
+                console.log(`Started Bot vs Bot: ${botA} (white) vs ${botB} (black)`)
+
                 return
             }
             
@@ -75,7 +97,7 @@ module.exports = function attachWebSocket(server){
             }
 
             if(socket.room){
-                console.log('ws forwarding message to room handler')
+                //console.log('ws forwarding message to room handler')
                 socket.room.handleMessage(socket, data)
             }
             else {

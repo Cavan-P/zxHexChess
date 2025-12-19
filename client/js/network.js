@@ -158,3 +158,11 @@ export const sendStartBotGame = botName => {
         botName
     }))
 }
+
+export const sendBotVsBot = (botA, botB) => {
+    Game.socket.send(JSON.stringify({
+        type: 'startBotVsBot',
+        botA,
+        botB
+    }))
+}

@@ -1,5 +1,5 @@
 import { Game } from './game.js'
-import { sendRoomCreate, sendRoomJoin, sendStartBotGame } from './network.js'
+import { sendRoomCreate, sendRoomJoin, sendStartBotGame, sendBotVsBot } from './network.js'
 
 export const setupRoomMenu = _ => {
     const layout = document.getElementById("layout")
@@ -46,6 +46,10 @@ export const setupRoomMenu = _ => {
             sendStartBotGame(botName)
         })
     })
+
+    document.getElementById('bot-vs-bot').onclick = _ => {
+        sendBotVsBot('Learner', 'Competitive')
+    }
     
     
     Game.onRoomCreated = code => {

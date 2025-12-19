@@ -49,7 +49,16 @@ class Room {
     }
 
     addClient(socket){
-        if(this.isBotGame){
+        if(this.isBotGame && this.botStrategies?.white && this.botStrategies?.black){
+            socket.color = 'spectator'
+            this.spectators.push(socket)
+
+            socket.send(JSON.stringify({
+                type: 'assignColor',
+                color: 'spectator'
+            }))
+        }
+        else if(this.isBotGame){
             socket.color = 'white'
             this.players.push(socket)
 
@@ -89,6 +98,29 @@ class Room {
         }))
 
         console.log(`Client joined room ${this.id} as ${socket.color}`)
+
+        if(this.isBotGame && this.botStrategies?.white && this.botStrategies?.black && !this.players.length){
+            console.log('Should be moving first bot')
+            
+            setTimeout(_ => {
+                const currentBot = this.botStrategies[this.gameState.turn]
+                if(!currentBot) return
+
+                const botMove = currentBot({
+                    fen: this.gameState.fen,
+                    turn: this.gameState.turn,
+                    enPassant: this.gameState.enPassant
+                })
+
+                if(!botMove) return
+
+                this.handleMessage({ color: this.gameState.turn }, {
+                    type: 'attemptMove',
+                    from: botMove.from,
+                    to: botMove.to
+                })
+            }, 400)
+        }
     }
 
     removeClient(socket){
@@ -132,7 +164,7 @@ class Room {
 
         if(data.type == 'requestLegalMoves'){
 
-            console.log('Legal move request received', socket.color, data.from)
+            //console.log('Legal move request received', socket.color, data.from)
 
             if(socket.color != 'white' && socket.color != 'black'){
                 socket.send(JSON.stringify({
@@ -336,9 +368,11 @@ class Room {
                 }))
             }
 
-            if(this.isBotGame && this.botStrategy && this.gameState.turn == 'black'){
+            const botStrategy = this.botStrategies?.[this.gameState.turn]
+
+            if(this.isBotGame && botStrategy){
                 setTimeout(_ => {
-                    const botMove = this.botStrategy({
+                    const botMove = botStrategy({
                         fen: this.gameState.fen,
                         turn: this.gameState.turn,
                         enPassant: this.gameState.enPassant
@@ -346,7 +380,7 @@ class Room {
 
                     if(!botMove) return
 
-                    this.handleMessage({ color: 'black' }, {
+                    this.handleMessage({ color: this.gameState.turn }, {
                         type: 'attemptMove',
                         from: botMove.from,
                         to: botMove.to

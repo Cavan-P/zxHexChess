@@ -1,4 +1,4 @@
-const { parseFen, generateFilteredLegals, cloneBoard, applyMove } = require('../../game/moves')
+const { parseFen, generateFilteredLegals, cloneBoard, applyMove, isKingAttacked } = require('../../game/moves')
 
 const pieceValues = {
     p: 1,
@@ -49,6 +49,40 @@ const isPieceHanging = (board, color, cellIndex, enPassant) => {
     return false
 }
 
+const isCheckmate = (board, color, enPassant) => {
+    if(!isKingAttacked(board, color, enPassant)) return false
+
+    for(let i = 0; i < board.length; i++){
+        const piece = board[i]
+
+        if(!piece || piece.color != color) continue
+
+        const legals = generateFilteredLegals(board, i, color, enPassant)
+        if(legals.length) return false
+    }
+
+    return true
+}
+
+const getEnemyMaterial = (board, color) => {
+    let score = 0
+
+    for(const cell of board){
+        if(!cell?.piece || cell.color != color) continue
+
+        score += pieceValues[cell.piece.toLowerCase()] || 0
+    }
+
+    return score
+}
+
+const evaluateTrade = (before, after, color, enPassant) => {
+    const scoreBefore = evaluateMaterial(before, color, enPassant)
+    const scoreAfter = evaluateMaterial(after, color, enPassant)
+
+    return scoreAfter - scoreBefore
+}
+
 module.exports = function learnerBot({ fen, turn, enPassant }) {
     const board = parseFen(fen)
     
@@ -64,12 +98,19 @@ module.exports = function learnerBot({ fen, turn, enPassant }) {
         for (const to of legals) {
             const clone = cloneBoard(board)
             const simulatedMove = applyMove(clone, i, to)
+            const enemyColor = turn == 'white' ? 'black' : 'white'
 
-            if(isPieceHanging(simulatedMove, turn, to, enPassant)){
-                continue
+            const score = evaluateTrade(board, simulatedMove, turn, enPassant)
+
+            const enemyMaterial = getEnemyMaterial(simulatedMove, enemyColor)
+
+            if(isKingAttacked(simulatedMove, enemyColor, enPassant) && enemyMaterial < 10){
+                score += 15 - enemyMaterial
             }
 
-            const score = evaluateMaterial(simulatedMove, turn)
+            if(isCheckmate(simulatedMove, enemyColor, enPassant)){
+                score = Infinity
+            }
 
             if(score > highestScore){
                 highestScore = score
