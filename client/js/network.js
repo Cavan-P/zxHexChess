@@ -5,7 +5,7 @@ const host = window.location.hostname
 
 export const setupNetwork = onFenInit => {
     const protocol = window.location.protocol == 'https:' ? 'wss' : 'ws'
-    Game.socket = new WebSocket(`${protocol}://${host}:8000`)
+    Game.socket = new WebSocket(`${protocol}://${host}`)
 
     Game.socket.onopen = _ => {
         console.log('Connected')
