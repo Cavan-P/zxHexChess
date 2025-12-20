@@ -49,7 +49,7 @@ class Room {
     }
 
     addClient(socket){
-        if(this.isBotGame && this.botStrategies?.white && this.botStrategies?.black){
+        if(this.isBotGame && this.botStrategies && typeof this.botStrategies.white == 'function' && typeof this.botStrategies.black == 'function'){
             socket.color = 'spectator'
             this.spectators.push(socket)
 
@@ -58,13 +58,13 @@ class Room {
                 color: 'spectator'
             }))
         }
-        else if(this.isBotGame){
-            socket.color = 'white'
+        else if(this.isBotGame && typeof this.botStrategy == 'function'){
+            socket.color = this.playerColor || 'white'
             this.players.push(socket)
 
             socket.send(JSON.stringify({
                 type: 'assignColor',
-                color: 'white'
+                color: socket.color
             }))
         }
         else if(this.players.length < 2){
@@ -99,8 +99,8 @@ class Room {
 
         console.log(`Client joined room ${this.id} as ${socket.color}`)
 
-        if(this.isBotGame && this.botStrategies?.white && this.botStrategies?.black && !this.players.length){
-            console.log('Should be moving first bot')
+        if(this.isBotGame && this.botStrategies && typeof this.botStrategies.white == 'function' && typeof this.botStrategies.black == 'function'){
+            //console.log('Should be moving first bot')
             
             setTimeout(_ => {
                 const currentBot = this.botStrategies[this.gameState.turn]
@@ -121,6 +121,12 @@ class Room {
                 })
             }, 400)
         }
+
+        console.log(`[room:${this.id}] After addClient — players:`,
+            this.players.map(p => p.color),
+            'spectators:', this.spectators.map(s => s.color)
+          )
+          
     }
 
     removeClient(socket){
@@ -140,6 +146,15 @@ class Room {
     }
 
     handleMessage(socket, data){
+
+        console.log(`[room:${this.id}] handleMessage — socket.color:`, socket.color,
+            'turn:', this.gameState.turn,
+            'isBotGame:', this.isBotGame,
+            'botStrategy:', !!this.botStrategy,
+            'botStrategies:', this.botStrategies
+          )
+          
+
         if(data.type == 'move'){
             this.gameState.fen = data.fen || this.gameState.fen
 
@@ -285,7 +300,7 @@ class Room {
                 const fromR = movingPiece.coords[1]
                 const toR = newPieceObj.coords[1]
 
-                console.log('From, to', fromR, toR)
+                //console.log('From, to', fromR, toR)
 
                 if(Math.abs(fromR - toR) == 2){
                     const midQ = (movingPiece.coords[0] + newPieceObj.coords[0]) / 2
@@ -368,11 +383,18 @@ class Room {
                 }))
             }
 
-            const botStrategy = this.botStrategies?.[this.gameState.turn]
+            let botFunc = null
 
-            if(this.isBotGame && botStrategy){
+            if(this.botStrategies && this.botStrategies[this.gameState.turn]){
+                botFunc = this.botStrategies[this.gameState.turn]
+            }
+            else if(this.botStrategy && typeof this.botStrategy == 'function'){
+                botFunc = this.botStrategy
+            }
+
+            if(this.isBotGame && botFunc && this.gameState.turn != this.playerColor){
                 setTimeout(_ => {
-                    const botMove = botStrategy({
+                    const botMove = botFunc({
                         fen: this.gameState.fen,
                         turn: this.gameState.turn,
                         enPassant: this.gameState.enPassant

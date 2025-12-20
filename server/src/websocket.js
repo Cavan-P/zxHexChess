@@ -3,7 +3,7 @@ const matchmaker = require('./rooms/matchmaker')
 const { getBotStrategy } = require('./ai')
 
 module.exports = function attachWebSocket(server){
-    console.log('Inside attachwebsocket')
+    //console.log('Inside attachwebsocket')
     const wss = new WebSocketServer({ server })
 
     wss.on('connection', socket => {
@@ -23,10 +23,15 @@ module.exports = function attachWebSocket(server){
 
             if(data.type == 'startBotGame'){
                 const botName = data.botName
+
+                const playerColor = data.playerColor || 'white'
+                const botColor = playerColor == 'white' ? 'black' : 'white'
+
                 const room = matchmaker.createRoom()
                 const strategy = getBotStrategy(botName)
         
                 room.botStrategy = strategy
+                room.playerColor = playerColor
                 room.isBotGame = true
 
                 room.addClient(socket)

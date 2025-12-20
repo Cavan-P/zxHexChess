@@ -55,6 +55,8 @@ const evaluatePosition = (board, maximizingColor, enPassant) => {
         const v = pieceValues[cell.piece.toLowerCase()] || 0
         const friendly = cell.color == maximizingColor
 
+        let mobility = generateFilteredLegals(board, i, cell.color, enPassant).length
+
         if(friendly){
             score += v
             if(isPieceHanging(board, maximizingColor, i, enPassant)){
