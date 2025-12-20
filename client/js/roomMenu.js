@@ -11,6 +11,8 @@ export const setupRoomMenu = _ => {
     const statusBox = document.getElementById("room-status")
     const copyBtn = document.getElementById("copy-room-btn")
 
+    const promoUi = document.getElementById('promotion-ui')
+
 
     if (copyBtn) {
         copyBtn.addEventListener("click", _ => {
@@ -38,6 +40,23 @@ export const setupRoomMenu = _ => {
         }
         showStatus('Joining room...')
         sendRoomJoin(code)
+    }
+
+    promoUi.onclick = e => {
+        const piece = e.target.dataset.piece
+        if(!piece) return
+
+        const from = +promoUi.dataset.from
+        const to = +promoUi.dataset.to
+
+        Game.socket.send(JSON.stringify({
+            type: 'promotionChoice',
+            from,
+            to,
+            promotion: piece
+        }))
+
+        promoUi.classList.add('hidden')
     }
 
     document.querySelectorAll('#local button').forEach(button => {

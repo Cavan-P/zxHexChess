@@ -95,9 +95,6 @@ const coordinates = [
 const whitePawnStartCells = [56, 61, 62, 66, 68, 71, 74, 76, 80]
 const blackPawnStartCells = [10, 14, 16, 19, 22, 24, 28, 29, 34]
 
-const whitePromotionCells = [0,  1,  2,  3,  5,  6,  9,  10, 14]
-const blackPromotionCells = [76, 80, 81, 84, 85, 87, 88, 89, 90]
-
 const coordIndexMap = {}
 
 const cloneBoard = board => {

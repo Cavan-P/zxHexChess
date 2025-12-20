@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>QRS Chess</title>
 
     <link
@@ -14,7 +14,30 @@
 
   </head>
 
-  <body class="w-100% h-100% overflow-hidden bg-(--bg-main) text-text-main">
+  <body class="w-screen h-screen overflow-hidden bg-(--bg-main) text-text-main">
+
+    <div
+      id="promotion-ui"
+      class="hidden fixed inset-0 z-10 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+    >
+      <div class="bg-(--bg-panel) text-(--text-main) rounded-xl shadow-2xl px-6 py-5 w-80 max-w-[90vw] text-center">
+        <h2 class="text-xl font-bold mb-4">Promote Pawn</h2>
+        <div class="grid grid-cols-2 gap-4">
+          <button class="flex items-center justify-center rounded-lg border border-(--border-soft) bg-(--bg-panel-soft) p-4 text-(--text-main) transition transform duration-150 hover:scale-110 hover:border-(--accent-primary) hover:bg-(--bg-panel) hover:text-(--accent-primary) hover:shadow-lg">
+            <i data-piece="q" class="fa-solid fa-3x fa-chess-queen mb-3"></i>
+          </button>
+          <button class="flex items-center justify-center rounded-lg border border-(--border-soft) bg-(--bg-panel-soft) p-4 text-(--text-main) transition transform duration-150 hover:scale-110 hover:border-(--accent-primary) hover:bg-(--bg-panel) hover:text-(--accent-primary) hover:shadow-lg">
+            <i data-piece="r" class="fa-solid fa-3x fa-chess-rook mb-3"></i>
+          </button>
+          <button class="flex items-center justify-center rounded-lg border border-(--border-soft) bg-(--bg-panel-soft) p-4 text-(--text-main) transition transform duration-150 hover:scale-110 hover:border-(--accent-primary) hover:bg-(--bg-panel) hover:text-(--accent-primary) hover:shadow-lg">
+            <i data-piece="n" class="fa-solid fa-3x fa-chess-knight mb-3"></i>
+          </button>
+          <button class="flex items-center justify-center rounded-lg border border-(--border-soft) bg-(--bg-panel-soft) p-4 text-(--text-main) transition transform duration-150 hover:scale-110 hover:border-(--accent-primary) hover:bg-(--bg-panel) hover:text-(--accent-primary) hover:shadow-lg">
+            <i data-piece="b" class="fa-solid fa-3x fa-chess-bishop mb-3"></i>
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- Room Menu -->
     <div id="room-menu" class="flex flex-col items-center mt-10 space-y-16">
@@ -115,7 +138,12 @@
 
       <div
         id="chat"
-        class="flex h-full w-[320px] flex-col border-l border-(--border-soft) bg-(--bg-panel-soft) p-3 text-(--text-main)"
+        class="flex flex-col border-l border-(--border-soft) bg-(--bg-panel-soft) p-3 text-(--text-main)
+               h-full w-[320px] max-w-[90vw] lg:max-w-[320px]
+               transition-transform duration-300 ease-in-out
+               md:relative md:translate-y-0
+               fixed bottom-0 right-0 left-0 md:bottom-auto md:left-auto
+               translate-y-full"
       >
         <!-- Room info -->
         <div
@@ -161,12 +189,7 @@
           </button>
         </form>
       </div>
-
-      
-
     </div>
-  
-
   <script type="module" src="js/main.js"></script>
   </body>
 </html>

@@ -1,5 +1,5 @@
 const { randomUUID } = require('crypto')
-const { generateLegalMoves, coordToIndex, parseFen, generateFilteredLegals, isKingAttacked } = require('../game/moves.js')
+const { coordToIndex, parseFen, generateFilteredLegals, isKingAttacked } = require('../game/moves.js')
 
 const boardToFen = board => {
     let fen = ''
@@ -33,6 +33,9 @@ const boardToFen = board => {
         return fen
 }
 
+const whitePromotionCells = [0,  1,  2,  3,  5,  6,  9,  10, 14]
+const blackPromotionCells = [76, 80, 81, 84, 85, 87, 88, 89, 90]
+
 class Room {
     constructor(id){
         this.id = id || randomUUID.slice(0, 6).toUpperCase()
@@ -46,6 +49,8 @@ class Room {
             enPassant: null,
             turn: 'white'
         }
+
+        this.pendingPromotion = null
     }
 
     addClient(socket){
@@ -146,14 +151,6 @@ class Room {
     }
 
     handleMessage(socket, data){
-
-        console.log(`[room:${this.id}] handleMessage — socket.color:`, socket.color,
-            'turn:', this.gameState.turn,
-            'isBotGame:', this.isBotGame,
-            'botStrategy:', !!this.botStrategy,
-            'botStrategies:', this.botStrategies
-          )
-          
 
         if(data.type == 'move'){
             this.gameState.fen = data.fen || this.gameState.fen
@@ -267,6 +264,22 @@ class Room {
                 }
             }
 
+            const isPawn = movingPiece.piece.toLowerCase() == 'p'
+
+            const promotionRank = movingPiece.color == 'white' ? whitePromotionCells.includes(to) : blackPromotionCells.includes(to)
+
+            if(isPawn && promotionRank){
+                this.pendingPromotion = { from, to, color: movingPiece.color }
+
+                socket.send(JSON.stringify({
+                    type: 'promotionRequired',
+                    from,
+                    to
+                }))
+
+                return
+            }
+
             const newPieceObj = {
                 piece: movingPiece.piece,
                 color: movingPiece.color,
@@ -295,7 +308,6 @@ class Room {
 
             this.gameState.enPassant = null
 
-            const isPawn = movingPiece.piece.toLowerCase() == 'p'
             if(isPawn){
                 const fromR = movingPiece.coords[1]
                 const toR = newPieceObj.coords[1]
@@ -377,6 +389,138 @@ class Room {
                     to,
                     captured: capturedPiece || null,
                     capturedCell: epCaptureCell ?? to,
+                    check: whiteCheck ? whiteKing.cell : blackCheck ? blackKing.cell : null,
+                    turn: this.gameState.turn,
+                    gameOver
+                }))
+            }
+
+            let botFunc = null
+
+            if(this.botStrategies && this.botStrategies[this.gameState.turn]){
+                botFunc = this.botStrategies[this.gameState.turn]
+            }
+            else if(this.botStrategy && typeof this.botStrategy == 'function'){
+                botFunc = this.botStrategy
+            }
+
+            if(this.isBotGame && botFunc && this.gameState.turn != this.playerColor){
+                setTimeout(_ => {
+                    const botMove = botFunc({
+                        fen: this.gameState.fen,
+                        turn: this.gameState.turn,
+                        enPassant: this.gameState.enPassant
+                    })
+
+                    if(!botMove) return
+
+                    this.handleMessage({ color: this.gameState.turn }, {
+                        type: 'attemptMove',
+                        from: botMove.from,
+                        to: botMove.to
+                    })
+                }, 400)
+            }
+
+            return
+        }
+
+        if(data.type == 'promotionChoice'){
+            const { from, to } = data
+            let { promotion } = data
+
+            console.log('Promotion to ', promotion)
+
+            if(!this.pendingPromotion || this.pendingPromotion.from != from || this.pendingPromotion.to != to){
+                socket.send(JSON.stringify({
+                    type: 'illegalMove',
+                    reason: 'Promotion mismatch'
+                }))
+
+                return
+            }
+
+            if(this.pendingPromotion.color == 'white'){
+                promotion = promotion.toUpperCase()
+            }
+            else {
+                promotion = promotion.toLowerCase()
+            }
+
+            const board = parseFen(this.gameState.fen)
+            const movingPiece = board[from]
+            let capturedPiece = board[to]?.piece || ''
+            let epCaptureCell = null
+
+            board[to] = {
+                piece: promotion,
+                color: movingPiece.color,
+                cell: to,
+                coords: [...board[to].coords]
+            }
+
+            board[from] = {
+                piece: '',
+                color: '',
+                cell: from,
+                coords: [...movingPiece.coords]
+            }
+
+            this.pendingPromotion = null
+
+            this.gameState.fen = boardToFen(board)
+
+            const whiteCheck = isKingAttacked(board, 'white', this.gameState.enPassant)
+            const blackCheck = isKingAttacked(board, 'black', this.gameState.enPassant)
+
+            const whiteKing = board.find(p => p.piece.toLowerCase() == 'k' && p.color == 'white')
+            const blackKing = board.find(p => p.piece.toLowerCase() == 'k' && p.color == 'black')
+
+            const nextColor = this.gameState.turn == 'white' ? 'black' : 'white'
+            let movesExist = false
+            for(let i = 0; i < board.length; i++){
+                const piece = board[i]
+                if(piece && piece.color == nextColor){
+                    const legals = generateFilteredLegals(board, i, nextColor, this.gameState.enPassant)
+                    if(legals.length){
+                        movesExist = true
+                        break
+                    }
+                }
+            }
+
+            let gameOver = null
+            if(!movesExist){
+                const kingAttacked = isKingAttacked(board, nextColor, this.gameState.enPassant)
+                gameOver = kingAttacked ? 'checkmate' : 'stalemate'
+            }
+
+            this.gameState.turn = this.gameState.turn == 'white' ? 'black' : 'white'
+            
+            //console.log('gameOver', gameOver)
+
+            this.broadcastExcept(socket, {
+                type: 'move',
+                fen: this.gameState.fen,
+                from,
+                to,
+                captured: capturedPiece || null,
+                capturedCell: to,
+                promotion: promotion,
+                check: whiteCheck ? whiteKing.cell : blackCheck ? blackKing.cell : null,
+                turn: this.gameState.turn,
+                gameOver
+            })
+
+            if(socket.send){ // For bot games, we don't need to send to itself
+                socket.send(JSON.stringify({
+                    type: 'move',
+                    fen: this.gameState.fen,
+                    from,
+                    to,
+                    captured: capturedPiece || null,
+                    capturedCell: to,
+                    promotion: promotion,
                     check: whiteCheck ? whiteKing.cell : blackCheck ? blackKing.cell : null,
                     turn: this.gameState.turn,
                     gameOver

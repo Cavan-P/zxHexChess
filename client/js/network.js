@@ -47,6 +47,7 @@ export const setupNetwork = onFenInit => {
                 Game.lastMove = { from, to }
 
                 const piece = Game.pieces.find(p => p.currentCell.num == from)
+
                 if(!piece){
                     console.error('Could not find piece for move', data)
                     return
@@ -78,6 +79,11 @@ export const setupNetwork = onFenInit => {
                 piece.currentCell.occupiedBy = ''
 
                 targetCell.occupied = true
+
+                if(data.promotion){
+                    piece.piece = data.promotion
+                }
+
                 targetCell.occupiedBy = piece.piece
 
                 piece.targetX = targetCell.x
@@ -113,6 +119,16 @@ export const setupNetwork = onFenInit => {
                 Game.cells.forEach(cell => cell.isLegalTarget = false)
                 Game.legalMoves = []
                 Game.draggedPiece = null
+                return
+
+            case 'promotionRequired':
+
+                const promoUi = document.getElementById('promotion-ui')
+
+                promoUi.classList.remove('hidden')
+                promoUi.dataset.from = data.from
+                promoUi.dataset.to = data.to
+
                 return
         }
     }
