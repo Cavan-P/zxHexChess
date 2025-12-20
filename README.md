@@ -1,34 +1,13 @@
-# zxHexChess
-Hexagonal chess game built with Node JS.  Support for multiplayer and a computer opponent
+# QRSChess
 
-## About
-Gliński's Chess is one of many hexagonal variants of Chess.  As expected, it's played on a hexagon-shaped grid consisting of 91 smaller hexagons.
-This is my third time trying my hand at hexagonal chess, and by far the most complete.  My first version featured local multiplayer and no Check
-(therefore no checkmate or stalemate), and was missing en-passant.  My second version was much more polished, with check, checkmate, stalemate, and even
-en-passant all implemented.  There was even a 'random bot' opponent, who would play any random legal move.
+QRSChess is my third, and probably final, attempt at a Hexagonal chess engine.
+It's a web-based implementation of Gliński's variant of hexagonal chess, allowing one to play both online against a friend or against one of several bot opponents.
 
-
-## Features
-#### Current
-- Multiplayer
-
-#### Future
-- Multiple different difficulties of computer opponents
+**NOTE:** The online version currently does not have a working implementation of the 'Expert' bot
 
 ## Tech Stack
-
-
-## How It Works
-
-
-### Board Representation
-
-
-### Piece Logic
-
-
-## Installation
-
+Frontend: Vanilla JS, HTML5, Tailwind CSS
+Backend: Node.js, WebSocket server
 
 ## Running the project
-
+Visit 165.227.222.224:8000 to play online.
