@@ -10,4 +10,4 @@ Frontend: Vanilla JS, HTML5, Tailwind CSS
 Backend: Node.js, WebSocket server
 
 ## Running the project
-Visit 165.227.222.224:8000 to play online.
+Visit qrschess.itscavanp.dev to play online.
