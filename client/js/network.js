@@ -4,7 +4,8 @@ import { addChatMessage } from "./chat.js"
 const host = window.location.hostname
 
 export const setupNetwork = onFenInit => {
-    Game.socket = new WebSocket(`ws://${host}:8000`)
+    const protocol = window.location.protocol == 'https:' ? 'wss' : 'ws'
+    Game.socket = new WebSocket(`${protocol}://${host}:8000`)
 
     Game.socket.onopen = _ => {
         console.log('Connected')
