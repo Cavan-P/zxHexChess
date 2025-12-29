@@ -13,7 +13,7 @@ export class Piece {
 
         this.targetX = x
         this.targetY = y
-        this.slideSpeed = 4
+        this.slideSpeed = 5
 
         this.defaultSize = 60
         this.dragSize = 75
