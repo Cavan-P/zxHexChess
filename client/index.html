@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -14,7 +14,7 @@
 
   </head>
 
-  <body class="w-screen h-screen overflow-hidden bg-(--bg-main) text-text-main">
+  <body class="w-screen h-full overflow-y-auto overflow-x-hidden bg-(--bg-main) text-text-main">
 
     <div
       id="promotion-ui"
@@ -78,8 +78,9 @@
           Play a Bot
         </h1>
       
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-          <!-- Bot 1 -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-6">
+
+          <!--
           <button id="rando-bot-btn" class="group flex flex-col items-center bg-(--bg-panel) border border-(--border-soft) rounded-lg p-4 hover:border-(--accent-primary) hover:bg-(--bg-panel-soft) transition">
             
             <i class="fa-solid fa-3x fa-chess-pawn mb-3"></i>
@@ -88,7 +89,6 @@
             </span>
           </button>
       
-          <!-- Bot 2 -->
           <button id="learner-btn" class="group flex flex-col items-center bg-(--bg-panel) border border-(--border-soft) rounded-lg p-4 hover:border-(--accent-primary) hover:bg-(--bg-panel-soft) transition">
             <i class="fa-solid fa-3x fa-chess-knight mb-3"></i>
             <span class="text-(--text-main) font-semibold">
@@ -96,7 +96,6 @@
             </span>
           </button>
       
-          <!-- Bot 3 -->
           <button id="competitive-btn" class="group flex flex-col items-center bg-(--bg-panel) border border-(--border-soft) rounded-lg p-4 hover:border-(--accent-primary) hover:bg-(--bg-panel-soft) transition">
             <i class="fa-solid fa-3x fa-chess-rook mb-3"></i>
             <span class="text-(--text-main) font-semibold">
@@ -104,7 +103,6 @@
             </span>
           </button>
 
-          <!-- Bot 4 -->
           <button id="expert-btn" class="group flex flex-col items-center bg-(--bg-panel) border border-(--border-soft) rounded-lg p-4 hover:border-(--accent-primary) hover:bg-(--bg-panel-soft) transition">
             <i class="fa-solid fa-3x fa-chess-queen mb-3"></i>
             <span class="text-(--text-main) font-semibold">
@@ -112,17 +110,20 @@
             </span>
           </button>
         </div>
-
-        <button
-          id="bot-vs-bot"
-          class="bg-(--accent-primary) hover:bg-(--accent-hover) text-(--bg-main) font-bold px-6 py-2 rounded shadow-md transition-colors"
-        >
-          Bot Battle
-        </button>
+      -->
       </div>
+
+      
+      <button
+        id="bot-vs-bot"
+        class="bg-(--accent-primary) hover:bg-(--accent-hover) text-(--bg-main) font-bold px-6 py-2 rounded shadow-md transition-colors"
+      >
+        Bot Battle
+      </button>
       
 
       <div id="room-status"></div>
+      </div>
     </div>
 
     <!-- Game Layout -->

@@ -11,6 +11,7 @@ export const setupNetwork = onFenInit => {
 
     Game.socket.onopen = _ => {
         console.log('Connected')
+        Game.socket.send(JSON.stringify({ type: 'getBotList' }))
     }
 
     Game.socket.onmessage = msg => {
@@ -25,6 +26,7 @@ export const setupNetwork = onFenInit => {
             case 'roomJoined':
                 Game.onRoomJoined?.()
                 if(data.code) setRoomCodeDisplay(data.code)
+                onFenInit(Game.fen)
                 return
             
             case 'error':
@@ -32,8 +34,11 @@ export const setupNetwork = onFenInit => {
                 return
             
             case 'init': 
+                console.log('received init message')
                 Game.turn = data.turn
-                return onFenInit(data.fen)
+                Game.fen = data.fen
+                //return onFenInit(data.fen)
+                return
 
             case 'assignColor':
                 Game.playerColor = data.color
@@ -133,6 +138,10 @@ export const setupNetwork = onFenInit => {
                 promoUi.dataset.to = data.to
 
                 return
+
+            case 'botList':
+                Game.onBotListReceived?.(data.bots)
+                return
         }
     }
 
@@ -171,10 +180,10 @@ export const setRoomCodeDisplay = code => {
     if (el) el.textContent = "Room: " + code
 }
 
-export const sendStartBotGame = botName => {
+export const sendStartBotGame = botId => {
     Game.socket.send(JSON.stringify({
         type: 'startBotGame',
-        botName
+        botId
     }))
 }
 

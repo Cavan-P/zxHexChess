@@ -1,4 +1,4 @@
-const random = require('./strategies/random')
+const random = require('./strategies/beginner/timothyWells')
 const heuristic = require('./strategies/heuristic')
 const minimax = require('./strategies/minimax')
 //const neural = require('./strategies/neural')

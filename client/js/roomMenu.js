@@ -59,12 +59,70 @@ export const setupRoomMenu = _ => {
         promoUi.classList.add('hidden')
     }
 
-    document.querySelectorAll('#local button').forEach(button => {
-        button.addEventListener('click', () => {
-            const botName = button.textContent.trim()
-            sendStartBotGame(botName)
+    Game.onBotListReceived = bots => {
+        //console.log(`[roomMenu.js] received bot list:`, bots)
+
+        const categoryOrder = [
+            'Beginner',
+            'Novice',
+            'Apprentice',
+            'Intermediate',
+            'Advanced',
+            'Expert',
+            'Master',
+
+            //Fun categories
+            'Category A',
+            'Category B'
+        ]
+
+        const container = document.querySelector('#local .grid')
+        //console.log('bot container element', container)
+        container.innerHTML = ''
+
+        const grouped = {}
+
+        bots.forEach(bot => {
+            if(!grouped[bot.category]) grouped[bot.category] = []
+            grouped[bot.category].push(bot)
         })
-    })
+
+        categoryOrder.forEach(category => {
+            const list = grouped[category]
+            if(!list) return
+
+            const header = document.createElement('h2')
+            header.textContent = category
+            header.className = 'text-xl font-bold col-span-full mt-8 mb-2 text-center text-(--text-main)'
+
+            container.appendChild(header)
+
+            list.sort((a, b) => a.elo - b.elo)
+
+            for(const bot of list){
+                const btn = document.createElement('button')
+                btn.className = 'group relative flex flex-col items-center bg-(--bg-panel) border border-(--border-soft) rounded-lg p-4 hover:border-(--accent-primary) hover:bg-(--border-strong) hover:cursor-pointer transition'
+                btn.innerHTML = `
+                    <div class="mb-3">
+                        ${bot.image ? `<img src="${bot.image}" class="w-12 h-12 object-contain" />` : `<i class="fa-solid fa-3x ${bot.icon}"></i>` }
+                    </div>
+                    <div class="text-center">
+                        <span class="text-(--text-main) font-semibold">${bot.name}</span>
+                        <span class="text-(--text-muted) font-light">(${bot.elo})</span>
+                    </div>
+                    <div class="pointer-events-none absolute bottom-full mb-3 w-56 rounded-md border border-(--border-soft) bg-(--bg-panel) p-3 text-sm text-(--text-muted) opacity-0 scale-95 transition-all duration-150 group-hover:opacity-100 group-hover:scale-100">
+                        ${bot.description}
+                    </div>
+                `
+
+                btn.addEventListener('click', _ => {
+                    sendStartBotGame(bot.id)
+                })
+
+                container.appendChild(btn)
+            }
+        })
+    }
 
     document.getElementById('bot-vs-bot').onclick = _ => {
         sendBotVsBot('Learner', 'Competitive')
@@ -80,10 +138,22 @@ export const setupRoomMenu = _ => {
         menu.classList.add('hidden')
         layout.classList.remove('hidden')
 
-        Game.canvas.width = Game.canvas.clientWidth
-        Game.canvas.height = Game.canvas.clientHeight
+        console.log(layout)
 
-        window.dispatchEvent(new Event('resize'))
+        requestAnimationFrame(_ => {
+            requestAnimationFrame(_ => {
+                Game.canvas.width = Game.canvas.clientWidth
+                Game.canvas.height = Game.canvas.clientHeight
+
+                console.log('AFTER SHOW', Game.canvas.width, Game.canvas.height)
+            })
+        })
+
+
+        //onFenInit(Game.fen)
+
+
+        console.log('Client joined room!')
     }
 
     Game.onRoomError = msg => {

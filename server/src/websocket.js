@@ -1,6 +1,7 @@
 const { WebSocketServer } = require('ws')
 const matchmaker = require('./rooms/matchmaker')
 const { getBotStrategy } = require('./ai')
+const { getBotList, getBotByName } = require('./ai/botManager')
 
 module.exports = function attachWebSocket(server){
     //console.log('Inside attachwebsocket')
@@ -21,24 +22,48 @@ module.exports = function attachWebSocket(server){
 
             //console.log('WS received message:', data)
 
+            if(data.type == 'getBotList'){
+                socket.send(JSON.stringify({
+                    type: 'botList',
+                    bots: getBotList()
+                }))
+
+                //console.log("[websocket.js] Sending Bot list:", getBotList())
+
+                return
+            }
+
             if(data.type == 'startBotGame'){
-                const botName = data.botName
+                console.log('[websocket.js] bot id is', data)
+                const botId = data.botId
+                const strategy = getBotByName(botId)
+
+                console.log(strategy)
+
+                if(!strategy){
+                    console.warn(`[websocket.js] Bot not found:`, botId)
+                    socket.send(JSON.stringify({ type: 'error', message: 'bot not found' }))
+                    return
+                }
 
                 const playerColor = data.playerColor || 'white'
-                const botColor = playerColor == 'white' ? 'black' : 'white'
+                //const botColor = playerColor == 'white' ? 'black' : 'white'
 
                 const room = matchmaker.createRoom()
-                const strategy = getBotStrategy(botName)
-        
-                room.botStrategy = strategy
-                room.playerColor = playerColor
+                //const strategy = getBotStrategy(botId)
                 room.isBotGame = true
+                room.botStrategy = strategy
+                room.botStrategies = undefined
+                room.playerColor = playerColor
 
                 room.addClient(socket)
                 socket.room = room
 
-                console.log('[WS] Started bot game with ' + botName + '. Socket color:', socket.color)
-        
+                console.log('[WS] Started bot game with ' + botId + '. Socket color:', socket.color)
+
+                //socket.send(JSON.stringify({ type: 'assignColor', color: socket.color }))
+                //socket.send(JSON.stringify({ type: 'init', fen: room.gameState.fen, turn: room.gameState.turn }))
+
                 socket.send(JSON.stringify({
                     type: 'roomCreated',
                     code: room.id

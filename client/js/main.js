@@ -20,6 +20,8 @@ Game.canvas.height = Game.canvas.clientHeight
 Game.ctx.textBaseline = 'middle'
 Game.ctx.textAlign = 'center'
 
+//console.log(Game.canvas, "HASDHFALKSDFHALSDKFHALSDFKSA")
+
 Game.onLegalMoves = (from, moves) => {
     //console.log('Legal moves for', from, moves)
 
@@ -66,11 +68,18 @@ Game.boardCenter = {
 }
 
 const render = _ => {
+
     Game.ctx.clearRect(0, 0, Game.canvas.width, Game.canvas.height)
 
     Game.ctx.save()
 
     drawBoard(0, 1, 5)
+
+    //console.log('RENDER', Game.playerColor, Game.pieces?.length, Game.fen)
+
+    //const p = Game.pieces[0]
+    //console.log("piece0", p?.x, p?.y, "cell", p?.currentCell?.x, p?.currentCell?.y)
+
 
     if(Game.playerColor == 'black'){
         Game.ctx.translate(Game.boardCenter.x, Game.boardCenter.y)

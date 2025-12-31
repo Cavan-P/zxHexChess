@@ -54,6 +54,11 @@ class Room {
     }
 
     addClient(socket){
+
+        //console.log(`[room.js] isBotGame?`, this.isBotGame)
+        //console.log(`[room.js] has strategy?`, this.botStrategy)
+        //console.log(`[room.js] strategies?`, this.botStrategies)
+
         if(this.isBotGame && this.botStrategies && typeof this.botStrategies.white == 'function' && typeof this.botStrategies.black == 'function'){
             socket.color = 'spectator'
             this.spectators.push(socket)
@@ -127,10 +132,10 @@ class Room {
             }, 400)
         }
 
-        console.log(`[room:${this.id}] After addClient — players:`,
-            this.players.map(p => p.color),
-            'spectators:', this.spectators.map(s => s.color)
-          )
+        //console.log(`[room:${this.id}] After addClient — players:`,
+        //    this.players.map(p => p.color),
+        //    'spectators:', this.spectators.map(s => s.color)
+        //  )
           
     }
 
@@ -269,6 +274,16 @@ class Room {
             const promotionRank = movingPiece.color == 'white' ? whitePromotionCells.includes(to) : blackPromotionCells.includes(to)
 
             if(isPawn && promotionRank){
+
+                if(data.promotion){
+                    return this.handleMessage(socket, {
+                        type: 'promotionChoice',
+                        from,
+                        to,
+                        promotion: data.promotion
+                    })
+                }
+
                 this.pendingPromotion = { from, to, color: movingPiece.color }
 
                 socket.send(JSON.stringify({
@@ -429,7 +444,7 @@ class Room {
             const { from, to } = data
             let { promotion } = data
 
-            console.log('Promotion to ', promotion)
+            //console.log('Promotion to ', promotion)
 
             if(!this.pendingPromotion || this.pendingPromotion.from != from || this.pendingPromotion.to != to){
                 socket.send(JSON.stringify({
