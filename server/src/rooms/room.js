@@ -45,7 +45,7 @@ class Room {
             //Stalemate '5k92BR96K4N993P3PP7P1P95'
             //Checkmate '999997P8P3PPKB4R2PN91k2'
             //Start 'bqknbnr2rp1b1p1p2p2p1p3pp4p993P4PP3P1P2P2P1P1B1PR2RNBNQKB'
-            fen: 'bqknbnr2rp1b1p1p2p2p1p3pp4p993P4PP3P1P2P2P1P1B1PR2RNBNQKB',
+            fen: '999997P8P3PPKB4R2PN91k2',
             enPassant: null,
             turn: 'white'
         }
@@ -278,6 +278,20 @@ class Room {
 
             if(isPawn && promotionRank){
 
+                if(this.isBotGame && socket.color != this.playerColor){
+                    if(!data.promotion){
+                        console.error('Promotion missing from bot move')
+                        return
+                    }
+
+                    return this.handleMessage(socket, {
+                        type: 'promotionChoice',
+                        from,
+                        to,
+                        promotion: data.promotion
+                    })
+                }
+
                 if(data.promotion){
                     return this.handleMessage(socket, {
                         type: 'promotionChoice',
@@ -437,7 +451,8 @@ class Room {
                     this.handleMessage({ color: this.gameState.turn }, {
                         type: 'attemptMove',
                         from: botMove.from,
-                        to: botMove.to
+                        to: botMove.to,
+                        promotion: botMove.promotion
                     })
                 }, 400)
             }
@@ -445,29 +460,27 @@ class Room {
             return
         }
 
+
         if(data.type == 'promotionChoice'){
             const { from, to } = data
             let { promotion } = data
 
             //console.log('Promotion to ', promotion)
+            if(!this.isBotGame){
+                if(!this.pendingPromotion || this.pendingPromotion.from != from || this.pendingPromotion.to != to){
+                    socket.send(JSON.stringify({
+                        type: 'illegalMove',
+                        reason: 'Promotion mismatch'
+                    }))
 
-            if(!this.pendingPromotion || this.pendingPromotion.from != from || this.pendingPromotion.to != to){
-                socket.send(JSON.stringify({
-                    type: 'illegalMove',
-                    reason: 'Promotion mismatch'
-                }))
-
-                return
-            }
-
-            if(this.pendingPromotion.color == 'white'){
-                promotion = promotion.toUpperCase()
-            }
-            else {
-                promotion = promotion.toLowerCase()
+                    return
+                }
             }
 
             const board = parseFen(this.gameState.fen)
+
+            promotion = board[from].color == 'white' ? promotion.toUpperCase() : promotion.toLowerCase()
+
             const movingPiece = board[from]
             let capturedPiece = board[to]?.piece || ''
             let epCaptureCell = null
@@ -569,9 +582,21 @@ class Room {
                     this.handleMessage({ color: this.gameState.turn }, {
                         type: 'attemptMove',
                         from: botMove.from,
-                        to: botMove.to
+                        to: botMove.to,
+                        promotion: botMove.promotion
                     })
                 }, 400)
+            }
+
+            return
+        }
+
+
+        if(data.type == 'leaveRoom'){
+            removeClient(socket)
+
+            if(!this.players.length && !this.spectators.length){
+                this.finished = true
             }
 
             return

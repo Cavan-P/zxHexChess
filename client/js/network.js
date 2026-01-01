@@ -1,5 +1,6 @@
 import { Game } from "./game.js"
 import { addChatMessage } from "./chat.js"
+import { setSystemMessage } from "./utils.js"
 
 const host = window.location.hostname
 const isLocal = host == 'localhost' || host == '127.0.0.1'
@@ -106,6 +107,11 @@ export const setupNetwork = onFenInit => {
 
                 Game.gameOver = data.gameOver
 
+                if(Game.gameOver){
+                    handleGameOver(Game.gameOver)
+                    return //just in case I add something else here
+                }
+
                 return
 
             case 'legalMoves': 
@@ -193,4 +199,43 @@ export const sendBotVsBot = (botA, botB) => {
         botA,
         botB
     }))
+}
+
+const handleGameOver = cause => {
+    Game.state = 'gameOver'
+    
+
+    Game.draggedPiece = null
+    Game.legalMoves = []
+    Game.cells.forEach(c => c.isLegalTarget = false)
+
+    let title = ''
+
+    switch(cause){
+        case 'checkmate':
+            setSystemMessage('Checkmate!')
+            title = 'Checkmate!'
+        break
+        case 'stalemate':
+            setSystemMessage('Stalemate!')
+            title = 'Stalemate!'
+        break
+        default:
+            setSystemMessage('Game has ended by due to some unforseen circumstance')
+            title = 'Game over.  idk why'
+    }
+
+    showReturnHome(title)
+}
+
+const showReturnHome = cause => {
+    Game.state = 'idle'
+    Game.gameOver = null
+    //Game.socket.close()
+
+    const overlay = document.getElementById('game-over-overlay')
+    const title = document.getElementById('game-over-title')
+
+    title.textContent = cause
+    overlay.classList.remove('hidden')
 }

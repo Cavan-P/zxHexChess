@@ -36,6 +36,35 @@ module.exports.isNotCapture = (board, move) => {
     return board[move.to].piece ? 0 : 1
 }
 
+module.exports.tradeDelta = (board, move, color, enPassant) => {
+    if(!board[move.to].piece) return 0
+
+    const attacker = board[move.from].piece
+    const target = board[move.to].piece
+
+    const attackerValue = pieceValue(attacker)
+    const targetValue = pieceValue(target)
+
+    const newBoard = applyMove(board, move.from, move.to)
+    const enemy = color == 'white' ? 'black' : 'white'
+
+    let canRecapture = false
+
+    for(const p of newBoard){
+        if(p.color != enemy) continue
+
+        const legalMoves = generateFilteredLegals(newBoard, p.cell, p.color, enPassant)
+
+        if(legalMoves.includes(move.to)){
+            canRecapture = true
+            break
+        }
+    }
+
+    return canRecapture ? targetValue - attackerValue : targetValue
+
+} 
+
 
 const isPieceHanging = (board, color, cellIndex, enPassant) => {
     const enemyColor = color == 'white' ? 'black' : 'white'

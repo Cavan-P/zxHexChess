@@ -116,11 +116,11 @@ const render = _ => {
     const whiteCheck = Game.check && Game.cells[Game.check].occupiedBy == 'K'
     const blackCheck = Game.check && Game.cells[Game.check].occupiedBy == 'k'
 
-    if(whiteCheck && Game.playerColor == 'white'){
+    if(whiteCheck && Game.playerColor == 'white' && Game.state != 'gameOver'){
         setSystemMessage('Check!')
     }
 
-    if(blackCheck && Game.playerColor == 'black'){
+    if(blackCheck && Game.playerColor == 'black' && Game.state != 'gameOver'){
         setSystemMessage('Check!')
     }
 

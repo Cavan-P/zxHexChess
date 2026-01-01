@@ -1,4 +1,41 @@
-const { parseFen, generateFilteredLegals } = require('../../../game/moves')
+const heuristics = require('../../heuristics')
+const { applyMove, parseFen, generateFilteredLegals } = require('../../../game/moves')
+
+
+const weights = {
+    trade: 1.5,
+    capture: 1.0,
+    check: 0.6,
+    material: 0.4,
+    hanging: 0.3
+}
+
+const pickMove = ({ board, moves, color, enPassant }) => {
+    const scored = []
+
+    for(const move of moves){
+        let score = 0
+
+        const captureScore = heuristics.isCapture(board, move) * weights.capture
+        const checkScore = heuristics.givesCheck(board, move, color, enPassant) * weights.check
+        const materialScore = heuristics.materialDelta(board, move) * weights.material
+        const tradeScore = Math.abs(heuristics.tradeDelta(board, move)) * weights.trade
+
+        const newBoard = applyMove(board, move.from, move.to)
+        const hangingScore = heuristics.hangingPenalty(newBoard, color, move.to, enPassant) * weights.hanging
+    
+        score = captureScore + checkScore + materialScore + hangingScore + tradeScore
+
+        scored.push({ move, score })
+    }
+
+    scored.sort((a, b) => b.score - a.score)
+
+    const cutoff = Math.min(3, scored.length)
+    const candidates = scored.slice(0, cutoff)
+
+    return candidates[Math.floor(Math.random() * candidates.length)].move
+}
 
 const promotionCells = {
     white: [0,  1,  2,  3,  5,  6,  9,  10, 14],
@@ -7,23 +44,24 @@ const promotionCells = {
 
 function strategy({ fen, turn, enPassant }) {
     const board = parseFen(fen)
-    const candidates = []
+    const moves = []
 
-    for (let i = 0; i < board.length; i++) {
-        const piece = board[i]
-        if (!piece || piece.color != turn) continue
+    board.forEach(p => {
+        if(p.color != turn) return
 
-        const legals = generateFilteredLegals(board, i, turn, enPassant)
-        for (const to of legals) {
-            const isPawn = piece.piece.toLowerCase() == 'p'
-            const isPromotion = isPawn && promotionCells[turn].includes(to)
+        const legals = generateFilteredLegals(board, p.cell, turn, enPassant)
+        legals.forEach(to => {
+            moves.push({ from: p.cell, to })
+        })
+    })
 
-            candidates.push({ from: i, to, promotion: isPromotion ? 'q' : undefined })
-        }
+    const chosen = pickMove({ board, moves, color: turn, enPassant })
+
+    if(promotionCells[turn].includes(chosen.to)){
+        return {...chosen, promotion: 'q'}
     }
 
-    if (!candidates.length) return null
-    return candidates[Math.floor(Math.random() * candidates.length)]
+    return chosen
 }
 
 module.exports = {

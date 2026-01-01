@@ -13,6 +13,8 @@ export const setupRoomMenu = _ => {
 
     const promoUi = document.getElementById('promotion-ui')
 
+    const returnHomeBtn = document.getElementById('return-home')
+
 
     if (copyBtn) {
         copyBtn.addEventListener("click", _ => {
@@ -57,6 +59,36 @@ export const setupRoomMenu = _ => {
         }))
 
         promoUi.classList.add('hidden')
+    }
+
+    returnHomeBtn.onclick = _ => {
+        layout.classList.add('hidden')
+        document.getElementById('game-over-overlay').classList.add('hidden')
+        menu.classList.remove('hidden')
+
+        Game.state = 'idle'
+        Game.gameOver = null
+        Game.turn = null
+        Game.fen = null
+        Game.check = null
+        Game.playerColor = null
+
+        Game.draggedPiece = null
+        Game.pendingMove = null
+        Game.legalMoves = []
+        Game.lastMove = null
+
+        Game.cells?.forEach(c => {
+            c.isLegalTarget = false
+            c.occupied = false
+            c.occupiedBy = ''
+        })
+
+        Game.pieces = []
+
+        Game.socket.send(JSON.stringify({ type: 'leaveRoom' }))
+
+        //if(Game.socket && Game.socket.readyState == WebSocket.OPEN) Game.socket.close()
     }
 
     Game.onBotListReceived = bots => {
@@ -138,7 +170,7 @@ export const setupRoomMenu = _ => {
         menu.classList.add('hidden')
         layout.classList.remove('hidden')
 
-        console.log(layout)
+        //console.log(layout)
 
         requestAnimationFrame(_ => {
             requestAnimationFrame(_ => {
