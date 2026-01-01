@@ -45,7 +45,7 @@ class Room {
             //Stalemate '5k92BR96K4N993P3PP7P1P95'
             //Checkmate '999997P8P3PPKB4R2PN91k2'
             //Start 'bqknbnr2rp1b1p1p2p2p1p3pp4p993P4PP3P1P2P2P1P1B1PR2RNBNQKB'
-            fen: '999997P8P3PPKB4R2PN91k2',
+            fen: 'bqknbnr2rp1b1p1p2p2p1p3pp4p993P4PP3P1P2P2P1P1B1PR2RNBNQKB',
             enPassant: null,
             turn: 'white'
         }
