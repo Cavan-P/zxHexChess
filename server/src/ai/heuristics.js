@@ -26,6 +26,16 @@ module.exports.hangingPenalty = (board, color, cellIndex, enPassant) => {
     return -pieceValue(piece.piece)
 }
 
+module.exports.movesQueen = (board, move) => {
+    const piece = board[move.from]
+    if(!piece || !piece.piece) return 0
+    return piece.piece.toLowerCase() == 'q' ? 1 : 0
+}
+
+module.exports.isNotCapture = (board, move) => {
+    return board[move.to].piece ? 0 : 1
+}
+
 
 const isPieceHanging = (board, color, cellIndex, enPassant) => {
     const enemyColor = color == 'white' ? 'black' : 'white'

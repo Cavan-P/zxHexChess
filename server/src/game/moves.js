@@ -108,10 +108,10 @@ const cloneBoard = board => {
 
 const applyMove = (board, from, to) => {
     const newBoard = cloneBoard(board)
-    const movingPiece = {...newBoard[from]}
+    const movingPiece = newBoard[from]
 
-    newBoard[to] = {...movingPiece, cell: to}
-    newBoard[from] = {piece: '', color: '', cell: from, coords: [...movingPiece.coords]}
+    newBoard[to] = {...movingPiece, cell: to, coords: [...coordinates[to]]}
+    newBoard[from] = {piece: '', color: '', cell: from, coords: [...coordinates[from]]}
 
     return newBoard
 }

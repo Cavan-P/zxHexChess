@@ -3,10 +3,10 @@ const { applyMove, parseFen, generateFilteredLegals } = require('../../../game/m
 
 
 const weights = {
-    capture: 0.8,
-    check: 1.0,
-    material: 0.4,
-    hanging: 0.3
+    capture: 0.0,
+    check: 10.0,
+    material: 0.0,
+    hanging: 0.0
 }
 
 const pickMove = ({ board, moves, color, enPassant }) => {
@@ -24,6 +24,8 @@ const pickMove = ({ board, moves, color, enPassant }) => {
     
         score = captureScore + checkScore + materialScore + hangingScore
 
+        //if(heuristics.givesCheck(board, move, color, enPassant)) console.log(`FOUND CHECK`, move.from, '->', move.to)
+/*
         console.log(`[EVAN BROOKS] ${move.from} -> ${move.to}`,
             {
                 captureScore,
@@ -33,7 +35,7 @@ const pickMove = ({ board, moves, color, enPassant }) => {
                 total: score
             }
         )
-
+*/
         scored.push({ move, score })
     }
 

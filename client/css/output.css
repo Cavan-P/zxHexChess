@@ -362,9 +362,6 @@
       margin-inline-end: calc(calc(var(--spacing) * 2) * calc(1 - var(--tw-space-x-reverse)));
     }
   }
-  .overflow-hidden {
-    overflow: hidden;
-  }
   .overflow-x-hidden {
     overflow-x: hidden;
   }
@@ -445,9 +442,6 @@
   .py-5 {
     padding-block: calc(var(--spacing) * 5);
   }
-  .pt-3 {
-    padding-top: calc(var(--spacing) * 3);
-  }
   .text-center {
     text-align: center;
   }
@@ -502,14 +496,8 @@
     --tw-tracking: var(--tracking-widest);
     letter-spacing: var(--tracking-widest);
   }
-  .text-\(--accent-primary\) {
-    color: var(--accent-primary);
-  }
   .text-\(--bg-main\) {
     color: var(--bg-main);
-  }
-  .text-\(--text-chat\) {
-    color: var(--text-chat);
   }
   .text-\(--text-main\) {
     color: var(--text-main);
@@ -632,13 +620,6 @@
       }
     }
   }
-  .hover\:bg-\(--bg-border-strong\) {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--bg-border-strong);
-      }
-    }
-  }
   .hover\:bg-\(--bg-panel\) {
     &:hover {
       @media (hover: hover) {
@@ -723,11 +704,6 @@
     @media (width >= 48rem) {
       --tw-translate-y: calc(var(--spacing) * 0);
       translate: var(--tw-translate-x) var(--tw-translate-y);
-    }
-  }
-  .md\:grid-cols-4 {
-    @media (width >= 48rem) {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
   .md\:grid-cols-5 {

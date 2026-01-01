@@ -144,13 +144,8 @@ export const setupRoomMenu = _ => {
             requestAnimationFrame(_ => {
                 Game.canvas.width = Game.canvas.clientWidth
                 Game.canvas.height = Game.canvas.clientHeight
-
-                console.log('AFTER SHOW', Game.canvas.width, Game.canvas.height)
             })
         })
-
-
-        //onFenInit(Game.fen)
 
 
         console.log('Client joined room!')

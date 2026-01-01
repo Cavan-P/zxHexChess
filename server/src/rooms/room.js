@@ -51,6 +51,8 @@ class Room {
         }
 
         this.pendingPromotion = null
+
+        this.finished = false
     }
 
     addClient(socket){
@@ -156,6 +158,7 @@ class Room {
     }
 
     handleMessage(socket, data){
+        if(this.finished) return
 
         if(data.type == 'move'){
             this.gameState.fen = data.fen || this.gameState.fen
@@ -380,6 +383,8 @@ class Room {
                 gameOver = kingAttacked ? 'checkmate' : 'stalemate'
             }
 
+            if(gameOver) this.finished = true
+
             this.gameState.turn = this.gameState.turn == 'white' ? 'black' : 'white'
             
             //console.log('gameOver', gameOver)
@@ -419,7 +424,7 @@ class Room {
                 botFunc = this.botStrategy
             }
 
-            if(this.isBotGame && botFunc && this.gameState.turn != this.playerColor){
+            if(!this.finished && this.isBotGame && botFunc && this.gameState.turn != this.playerColor){
                 setTimeout(_ => {
                     const botMove = botFunc({
                         fen: this.gameState.fen,
