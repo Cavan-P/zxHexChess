@@ -467,6 +467,10 @@
     font-size: var(--text-xl);
     line-height: var(--tw-leading, var(--text-xl--line-height));
   }
+  .font-\(--accent-primary\) {
+    --tw-font-weight: var(--accent-primary);
+    font-weight: var(--accent-primary);
+  }
   .font-black {
     --tw-font-weight: var(--font-weight-black);
     font-weight: var(--font-weight-black);
@@ -499,6 +503,9 @@
     --tw-tracking: var(--tracking-widest);
     letter-spacing: var(--tracking-widest);
   }
+  .text-\(--accent-primary\) {
+    color: var(--accent-primary);
+  }
   .text-\(--bg-main\) {
     color: var(--bg-main);
   }
@@ -513,10 +520,6 @@
   }
   .opacity-0 {
     opacity: 0%;
-  }
-  .shadow {
-    --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
-    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
   .shadow-2xl {
     --tw-shadow: 0 25px 50px -12px var(--tw-shadow-color, rgb(0 0 0 / 0.25));
@@ -627,13 +630,6 @@
     &:hover {
       @media (hover: hover) {
         background-color: var(--bg-panel);
-      }
-    }
-  }
-  .hover\:bg-\(--bg-panel-soft\) {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--bg-panel-soft);
       }
     }
   }
