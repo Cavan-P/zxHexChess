@@ -27,5 +27,8 @@ export const Game = {
 
     socket: null,
 
-    pieceSprite: null
+    pieceSprite: null,
+
+    botList: [],
+    matchInfo: null
 }

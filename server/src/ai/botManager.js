@@ -1,8 +1,31 @@
 const fs = require('fs')
 const path = require('path')
+const eloStore = require('./eloStore')
 
 const bots = {}
 //const botFolder = path.join(__dirname, 'strategies')
+
+// Registers an already-`require`'d bot module (or freshly-loaded one) into the live registry.
+const registerBotModule = (bot, categoryOverride = null) => {
+    if(typeof bot.play != 'function'){
+        console.warn(`[BotLoader] Skipping ${bot.id || bot.name || 'unknown bot'}: no play() function`)
+        return
+    }
+
+    const category = bot.category || categoryOverride || 'Uncategorized'
+
+    bots[bot.id] = {
+        play: bot.play,
+        meta: {
+            id: bot.id,
+            name: bot.name,
+            description: bot.description || '',
+            icon: bot.icon || 'fa-chess-pawn',
+            elo: bot.elo,
+            category
+        }
+    }
+}
 
 const loadBotsFromDirectory = (directory, categoryOverride = null) => {
     const entries = fs.readdirSync(directory, { withFileTypes: true })
@@ -17,26 +40,7 @@ const loadBotsFromDirectory = (directory, categoryOverride = null) => {
 
         if(!entry.name.endsWith('.js')) continue
 
-        const bot = require(fullPath)
-
-        if(typeof bot.play != 'function'){
-            console.warn(`[BotLoader] Skipping ${entry.name}: no play() function`)
-            continue
-        }
-
-        const category = bot.category || categoryOverride || 'Uncategorized'
-
-        bots[bot.id] = {
-            play: bot.play,
-            meta: {
-                id: bot.id,
-                name: bot.name,
-                description: bot.description || '',
-                icon: bot.icon || 'fa-chess-pawn',
-                elo: bot.elo,
-                category
-            }
-        }
+        registerBotModule(require(fullPath), categoryOverride)
     }
 }
 
@@ -70,10 +74,16 @@ fs.readdirSync(botFolder).forEach(file => {
 })
 */
 module.exports = {
-    getBotList: _ => Object.values(bots).map(b => b.meta),
+    getBotList: _ => Object.values(bots).map(b => {
+        const record = eloStore.getRecord(b.meta.id, b.meta.elo)
+        return { ...b.meta, elo: record.elo, wins: record.wins, losses: record.losses, draws: record.draws, gamesPlayed: record.gamesPlayed }
+    }),
     getBotByName: id => {
         const bot = bots[id]
         if(!bot) console.warn(`[botManager.js] No bot found with ID:`, id)
         return bot?.play
-    }
+    },
+    // Registers a bot in the live in-process registry immediately (used by evolve.js so a freshly
+    // trained bot is playable right away, without waiting for a server restart to rescan the directory).
+    registerBot: registerBotModule
 }

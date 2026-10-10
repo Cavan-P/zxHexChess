@@ -468,4 +468,49 @@ function kingMoves(board, cell, color){
     return moves
 }
 
-module.exports = {parseFen, generateLegalMoves, coordToIndex, generateFilteredLegals, isKingAttacked, cloneBoard, applyMove}
+const boardToFen = board => {
+    let fen = ''
+    let emptyCount = 0
+
+    const flushEmpty = _ => {
+        while(emptyCount > 9){
+            fen += '9'
+            emptyCount -= 9
+        }
+        if(emptyCount > 0){
+            fen += String(emptyCount)
+            emptyCount = 0
+        }
+    }
+
+    for(let i = 0; i < board.length; i++){
+        const cell = board[i]
+
+        const isEmpty = !cell || !cell.piece || cell.piece == ''
+
+        if(isEmpty) emptyCount ++
+        else {
+            if(emptyCount > 0) flushEmpty()
+            fen += cell.piece
+        }
+    }
+
+    if(emptyCount > 0) flushEmpty()
+
+    return fen
+}
+
+// Returns 'checkmate' | 'stalemate' | null for the side to move (`color`)
+const getGameStatus = (board, color, enPassant) => {
+    for(let i = 0; i < board.length; i++){
+        const piece = board[i]
+        if(!piece || piece.color != color) continue
+
+        const legals = generateFilteredLegals(board, i, color, enPassant)
+        if(legals.length) return null
+    }
+
+    return isKingAttacked(board, color, enPassant) ? 'checkmate' : 'stalemate'
+}
+
+module.exports = {parseFen, generateLegalMoves, coordToIndex, generateFilteredLegals, isKingAttacked, cloneBoard, applyMove, boardToFen, getGameStatus}

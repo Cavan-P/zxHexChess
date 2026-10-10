@@ -1,7 +1,13 @@
 const { WebSocketServer } = require('ws')
 const matchmaker = require('./rooms/matchmaker')
-const { getBotStrategy } = require('./ai')
 const { getBotList, getBotByName } = require('./ai/botManager')
+const { runTournament } = require('./ai/tournament')
+const { runEvolution, materializeGenome } = require('./ai/evolve')
+
+const getBotMeta = id => {
+    const meta = getBotList().find(b => b.id == id)
+    return meta ? { id: meta.id, name: meta.name, elo: meta.elo } : null
+}
 
 module.exports = function attachWebSocket(server){
     //console.log('Inside attachwebsocket')
@@ -47,14 +53,14 @@ module.exports = function attachWebSocket(server){
                 }
 
                 const playerColor = data.playerColor || 'white'
-                //const botColor = playerColor == 'white' ? 'black' : 'white'
+                const botColor = playerColor == 'white' ? 'black' : 'white'
 
                 const room = matchmaker.createRoom()
-                //const strategy = getBotStrategy(botId)
                 room.isBotGame = true
                 room.botStrategy = strategy
                 room.botStrategies = undefined
                 room.playerColor = playerColor
+                room.botMeta = { [botColor]: getBotMeta(botId) }
 
                 room.addClient(socket)
                 socket.room = room
@@ -75,18 +81,26 @@ module.exports = function attachWebSocket(server){
 
             if(data.type == 'startBotVsBot'){
                 const { botA, botB } = data
-                const room = matchmaker.createRoom()
 
-                const strategyA = getBotStrategy(botA)
-                const strategyB = getBotStrategy(botB)
+                const strategyA = getBotByName(botA)
+                const strategyB = getBotByName(botB)
+
+                if(!strategyA || !strategyB){
+                    socket.send(JSON.stringify({ type: 'error', message: 'bot not found' }))
+                    return
+                }
+
+                const room = matchmaker.createRoom()
 
                 room.isBotGame = true
                 room.botStrategies = {
                     white: strategyA,
                     black: strategyB
                 }
+                room.botMeta = { white: getBotMeta(botA), black: getBotMeta(botB) }
 
                 room.addClient(socket)
+                socket.room = room
 
                 socket.send(JSON.stringify({ type: 'roomCreated', code: room.id }))
                 socket.send(JSON.stringify({ type: 'roomJoined', code: room.id }))
@@ -94,7 +108,59 @@ module.exports = function attachWebSocket(server){
 
                 return
             }
-            
+
+            if(data.type == 'startTournament'){
+                const { botIds, gamesPerPairing } = data
+
+                if(!Array.isArray(botIds) || botIds.length < 2){
+                    socket.send(JSON.stringify({ type: 'error', message: 'Pick at least 2 bots for a tournament' }))
+                    return
+                }
+
+                runTournament({
+                    botIds,
+                    gamesPerPairing: gamesPerPairing || 2,
+                    onProgress: progress => {
+                        if(socket.readyState == 1) socket.send(JSON.stringify({ type: 'tournamentProgress', ...progress }))
+                    }
+                }).then(summary => {
+                    if(socket.readyState == 1) socket.send(JSON.stringify({ type: 'tournamentComplete', ...summary }))
+                }).catch(e => {
+                    console.error('[websocket.js] Tournament error:', e)
+                    if(socket.readyState == 1) socket.send(JSON.stringify({ type: 'error', message: 'Tournament failed: ' + e.message }))
+                })
+
+                return
+            }
+
+            if(data.type == 'startTraining'){
+                const { generations, populationSize, gamesPerMatch } = data
+
+                runEvolution({
+                    generations: generations || 6,
+                    populationSize: populationSize || 8,
+                    gamesPerMatch: gamesPerMatch || 1,
+                    onProgress: progress => {
+                        if(socket.readyState == 1) socket.send(JSON.stringify({ type: 'trainingProgress', ...progress }))
+                    }
+                }).then(best => {
+                    const created = materializeGenome(best.genome, { generations: generations || 6, populationSize: populationSize || 8 })
+                    if(socket.readyState == 1){
+                        socket.send(JSON.stringify({
+                            type: 'trainingComplete',
+                            bot: created,
+                            fitness: best.fitness,
+                            bots: getBotList()
+                        }))
+                    }
+                }).catch(e => {
+                    console.error('[websocket.js] Training error:', e)
+                    if(socket.readyState == 1) socket.send(JSON.stringify({ type: 'error', message: 'Training failed: ' + e.message }))
+                })
+
+                return
+            }
+
 
             if(data.type == 'createRoom'){
                 const room = matchmaker.createRoom()

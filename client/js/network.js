@@ -45,6 +45,11 @@ export const setupNetwork = onFenInit => {
                 Game.playerColor = data.color
                 return
 
+            case 'matchInfo':
+                Game.matchInfo = { white: data.white, black: data.black }
+                Game.onMatchInfo?.(Game.matchInfo)
+                return
+
             case 'chat': return addChatMessage(data.username, data.payload, false)
 
             case 'move': 
@@ -148,6 +153,22 @@ export const setupNetwork = onFenInit => {
             case 'botList':
                 Game.onBotListReceived?.(data.bots)
                 return
+
+            case 'tournamentProgress':
+                Game.onTournamentProgress?.(data)
+                return
+
+            case 'tournamentComplete':
+                Game.onTournamentComplete?.(data)
+                return
+
+            case 'trainingProgress':
+                Game.onTrainingProgress?.(data)
+                return
+
+            case 'trainingComplete':
+                Game.onTrainingComplete?.(data)
+                return
         }
     }
 
@@ -198,6 +219,23 @@ export const sendBotVsBot = (botA, botB) => {
         type: 'startBotVsBot',
         botA,
         botB
+    }))
+}
+
+export const sendStartTournament = (botIds, gamesPerPairing) => {
+    Game.socket.send(JSON.stringify({
+        type: 'startTournament',
+        botIds,
+        gamesPerPairing
+    }))
+}
+
+export const sendStartTraining = (generations, populationSize, gamesPerMatch) => {
+    Game.socket.send(JSON.stringify({
+        type: 'startTraining',
+        generations,
+        populationSize,
+        gamesPerMatch
     }))
 }
 

@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "server",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["src/index.js"],
+      "cwd": "server",
+      "port": 8000
+    }
+  ]
+}

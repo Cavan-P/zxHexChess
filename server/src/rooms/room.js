@@ -1,37 +1,5 @@
 const { randomUUID } = require('crypto')
-const { coordToIndex, parseFen, generateFilteredLegals, isKingAttacked } = require('../game/moves.js')
-
-const boardToFen = board => {
-    let fen = ''
-    let emptyCount = 0
-
-    const flushEmpty = _ => {
-        while(emptyCount > 9){
-            fen += '9'
-            emptyCount -= 9
-        }
-        if(emptyCount > 0){
-            fen += String(emptyCount)
-            emptyCount = 0
-        }
-    }
-
-    for(let i = 0; i < board.length; i++){
-        const cell = board[i]
-
-        const isEmpty = !cell || !cell.piece || cell.piece == ''
-
-        if(isEmpty) emptyCount ++
-        else {
-            if(emptyCount > 0) flushEmpty()
-            fen += cell.piece
-        }
-    }
-
-    if(emptyCount > 0) flushEmpty()
-
-        return fen
-}
+const { coordToIndex, parseFen, generateFilteredLegals, isKingAttacked, boardToFen, getGameStatus } = require('../game/moves.js')
 
 const whitePromotionCells = [0,  1,  2,  3,  5,  6,  9,  10, 14]
 const blackPromotionCells = [76, 80, 81, 84, 85, 87, 88, 89, 90]
@@ -109,6 +77,11 @@ class Room {
             turn: this.gameState.turn
         }))
 
+        socket.send(JSON.stringify({
+            type: 'matchInfo',
+            ...this.getMatchInfo()
+        }))
+
         console.log(`Client joined room ${this.id} as ${socket.color}`)
 
         if(this.isBotGame && this.botStrategies && typeof this.botStrategies.white == 'function' && typeof this.botStrategies.black == 'function'){
@@ -139,6 +112,19 @@ class Room {
         //    'spectators:', this.spectators.map(s => s.color)
         //  )
           
+    }
+
+    // this.botMeta is set by websocket.js when starting a bot game: { white: {id,name,elo}|null, black: {id,name,elo}|null }
+    getMatchInfo(){
+        const colorInfo = color => {
+            const meta = this.botMeta?.[color]
+            return meta ? { type: 'bot', id: meta.id, name: meta.name, elo: meta.elo } : { type: 'human' }
+        }
+
+        return {
+            white: colorInfo('white'),
+            black: colorInfo('black')
+        }
     }
 
     removeClient(socket){
@@ -379,23 +365,7 @@ class Room {
             const blackKing = board.find(p => p.piece.toLowerCase() == 'k' && p.color == 'black')
 
             const nextColor = this.gameState.turn == 'white' ? 'black' : 'white'
-            let movesExist = false
-            for(let i = 0; i < board.length; i++){
-                const piece = board[i]
-                if(piece && piece.color == nextColor){
-                    const legals = generateFilteredLegals(board, i, nextColor, this.gameState.enPassant)
-                    if(legals.length){
-                        movesExist = true
-                        break
-                    }
-                }
-            }
-
-            let gameOver = null
-            if(!movesExist){
-                const kingAttacked = isKingAttacked(board, nextColor, this.gameState.enPassant)
-                gameOver = kingAttacked ? 'checkmate' : 'stalemate'
-            }
+            const gameOver = getGameStatus(board, nextColor, this.gameState.enPassant)
 
             if(gameOver) this.finished = true
 
@@ -510,26 +480,12 @@ class Room {
             const blackKing = board.find(p => p.piece.toLowerCase() == 'k' && p.color == 'black')
 
             const nextColor = this.gameState.turn == 'white' ? 'black' : 'white'
-            let movesExist = false
-            for(let i = 0; i < board.length; i++){
-                const piece = board[i]
-                if(piece && piece.color == nextColor){
-                    const legals = generateFilteredLegals(board, i, nextColor, this.gameState.enPassant)
-                    if(legals.length){
-                        movesExist = true
-                        break
-                    }
-                }
-            }
+            const gameOver = getGameStatus(board, nextColor, this.gameState.enPassant)
 
-            let gameOver = null
-            if(!movesExist){
-                const kingAttacked = isKingAttacked(board, nextColor, this.gameState.enPassant)
-                gameOver = kingAttacked ? 'checkmate' : 'stalemate'
-            }
+            if(gameOver) this.finished = true
 
             this.gameState.turn = this.gameState.turn == 'white' ? 'black' : 'white'
-            
+
             //console.log('gameOver', gameOver)
 
             this.broadcastExcept(socket, {
@@ -569,7 +525,7 @@ class Room {
                 botFunc = this.botStrategy
             }
 
-            if(this.isBotGame && botFunc && this.gameState.turn != this.playerColor){
+            if(!this.finished && this.isBotGame && botFunc && this.gameState.turn != this.playerColor){
                 setTimeout(_ => {
                     const botMove = botFunc({
                         fen: this.gameState.fen,
@@ -593,7 +549,7 @@ class Room {
 
 
         if(data.type == 'leaveRoom'){
-            removeClient(socket)
+            this.removeClient(socket)
 
             if(!this.players.length && !this.spectators.length){
                 this.finished = true

@@ -106,7 +106,12 @@ const render = _ => {
 
     Game.ctx.restore()
 
-    if(Game.turn != Game.playerColor){
+    if(Game.playerColor == 'spectator'){
+        const activeBot = Game.matchInfo?.[Game.turn]
+        const label = activeBot?.type == 'bot' ? activeBot.name : (Game.turn == 'white' ? 'White' : 'Black')
+        setSystemMessage(`${label} is thinking...`, 'wait')
+    }
+    else if(Game.turn != Game.playerColor){
         setSystemMessage('Opponent is thinking...', 'wait')
     }
     else {
