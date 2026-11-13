@@ -28,6 +28,9 @@ const pickMove = ({ board, moves, color, enPassant }) => {
         scored.push({ move, score })
     }
 
+    // Shuffle first so tied moves are broken at random. Without this, ties keep their board order
+    // and the bot keeps picking the same piece (e.g. shuffling one rook back and forth forever).
+    heuristics.shuffle(scored)
     scored.sort((a, b) => b.score - a.score)
 
     const cutoff = Math.min(3, scored.length)

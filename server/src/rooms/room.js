@@ -165,7 +165,7 @@ class Room {
             const botRating = this.botMeta[botColor]?.elo
             if(!profileId || botRating == null) return null
 
-            const change = this.profiles.recordBotGame(profileId, botRating, scoreFor(humanColor))
+            const change = this.profiles.recordBotGame(profileId, botRating, scoreFor(humanColor), this.bots[botColor])
             if(change) changes = { [humanColor]: change, [botColor]: null }
         }
         else if(white && black && white != black){

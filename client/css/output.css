@@ -287,12 +287,6 @@
   .mb-6 {
     margin-bottom: calc(var(--spacing) * 6);
   }
-  .line-clamp-3 {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-  }
   .block {
     display: block;
   }
@@ -1238,6 +1232,34 @@
     color: var(--text-strong);
     font-size: 1.15rem;
     box-shadow: inset 0 0 0 1px rgba(122, 82, 48, .2);
+  }
+  .beaten-badge {
+    position: absolute;
+    right: -4px;
+    bottom: -4px;
+    display: grid;
+    place-items: center;
+    width: 1.15rem;
+    height: 1.15rem;
+    border-radius: 999px;
+    background: var(--success);
+    color: #fff;
+    font-size: 0.6rem;
+    box-shadow: 0 0 0 2px var(--bg-card);
+  }
+  .tier-progress {
+    order: 2;
+    margin-left: 0.25rem;
+    padding: 0 0.45rem;
+    border-radius: 999px;
+    background: var(--bg-sunken);
+    color: var(--text-main);
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+  }
+  .tier-progress.is-complete {
+    background: var(--success);
+    color: #fff;
   }
   .elo-badge {
     display: inline-block;

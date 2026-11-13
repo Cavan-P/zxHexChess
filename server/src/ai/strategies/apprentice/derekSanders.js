@@ -12,7 +12,7 @@ function strategy({ fen, turn, enPassant }) {
 module.exports = {
     id: 'derekSanders',
     name: 'Derek Sanders',
-    description: 'Derek stopped guessing. He actually looks at the board before he moves - just not very far ahead.',
+    description: "Finally stopped guessing! Actually looks at the board now. Just... not very far into it.",
     category: 'Apprentice',
     icon: 'fa-chess-bishop',
     elo: 380,

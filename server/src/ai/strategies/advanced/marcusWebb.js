@@ -12,7 +12,7 @@ function strategy({ fen, turn, enPassant }) {
 module.exports = {
     id: 'marcusWebb',
     name: 'Marcus Webb',
-    description: 'Marcus searches several moves deep and fights for the center of the board.',
+    description: "The middle of the board belongs to Marcus. Thinks a few moves deep to keep it that way.",
     category: 'Advanced',
     icon: 'fa-chess-knight',
     elo: 850,

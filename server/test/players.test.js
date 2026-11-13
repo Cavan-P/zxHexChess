@@ -64,6 +64,16 @@ test('beating a much stronger bot gains more than beating a weaker one; bots are
     assert.ok(vsWeak >= 0)
 })
 
+test('wins against a bot are remembered; losses are not', _ => {
+    const store = tempStore()
+    const p = store.register('Hunter').player
+    store.recordBotGame(p.id, 500, 0, 'ninaWhitfield')
+    assert.deepStrictEqual(Object.keys(store.get(p.id).botsBeaten), [])
+    store.recordBotGame(p.id, 500, 1, 'ninaWhitfield')
+    store.recordBotGame(p.id, 500, 0.75, 'ninaWhitfield')
+    assert.strictEqual(store.get(p.id).botsBeaten.ninaWhitfield.wins, 2)
+})
+
 const playOpening = room => {
     // f5-f6 for White, f7... is blocked, so Black answers with a knight move: just use legal ones.
     const { cellName, NUM_CELLS } = require('../src/game/moves')

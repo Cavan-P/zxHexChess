@@ -12,7 +12,7 @@ function strategy({ fen, turn, enPassant }) {
 module.exports = {
     id: 'ninaWhitfield',
     name: 'Nina Whitfield',
-    description: 'Nina thinks two moves ahead now, and she won\'t hang a piece for no reason anymore.',
+    description: "Thinks two whole moves ahead now! Hasn't hung a piece for no reason in weeks. Mostly.",
     category: 'Intermediate',
     icon: 'fa-chess-rook',
     elo: 550,

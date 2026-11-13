@@ -76,6 +76,7 @@ class PlayerStore {
             draws: 0,
             gamesPlayed: 0,
             history: [{ t: Date.now(), elo: STARTING_ELO }],
+            botsBeaten: {},
             createdAt: Date.now()
         }
         this.save()
@@ -111,7 +112,12 @@ class PlayerStore {
 
     publicProfile(id){
         const { tokenHash, ...profile } = this.players[id]
-        return { ...profile, provisional: profile.gamesPlayed < PROVISIONAL_GAMES, history: [...profile.history] }
+        return {
+            ...profile,
+            provisional: profile.gamesPlayed < PROVISIONAL_GAMES,
+            history: [...profile.history],
+            botsBeaten: { ...(profile.botsBeaten || {}) }
+        }
     }
 
     applyResult(player, opponentRating, score){
@@ -148,12 +154,19 @@ class PlayerStore {
     }
 
     // A player against a bot with a fixed rating. Only the player's rating moves, so bots stay
-    // stable reference points on the ladder.
-    recordBotGame(id, botRating, score){
+    // stable reference points on the ladder. Wins are also remembered per bot.
+    recordBotGame(id, botRating, score, botId = null){
         const player = this.players[id]
         if(!player) return null
 
         const change = this.applyResult(player, botRating, score)
+
+        if(botId && score > 0.5){
+            player.botsBeaten ||= {}
+            const record = player.botsBeaten[botId] || { first: Date.now(), wins: 0 }
+            record.wins++
+            player.botsBeaten[botId] = record
+        }
         this.save()
         return change
     }

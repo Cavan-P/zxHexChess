@@ -3,7 +3,7 @@ const { makeEngineBot } = require('../../engine')
 module.exports = makeEngineBot({
     id: "priyaNandakumar",
     name: "Priya Nandakumar",
-    description: "Priya can spot a free piece from across the room. Whether she notices hers is under attack is another matter.",
+    description: "Can spot a free piece from across the room! Her own pieces, though? Different story.",
     category: "Novice",
     icon: "fa-chess-pawn",
     elo: 340

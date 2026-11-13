@@ -3,6 +3,7 @@ import { Game } from './game.js'
 // The browser keeps { playerId, token } so the server can recognise this player next visit.
 const STORAGE_KEY = 'qrs.profile'
 const SKIP_KEY = 'qrs.profileSkipped'
+const BEATEN_KEY = 'qrs.botsBeaten'
 
 const storage = {
     get(key){ try { return JSON.parse(localStorage.getItem(key)) } catch(e){ return null } },
@@ -17,6 +18,19 @@ const send = msg => {
 const $ = id => document.getElementById(id)
 
 const initial = name => (name || '?').trim().charAt(0).toUpperCase()
+
+// Bots this player has beaten: from their profile, plus any wins saved in this browser
+// (so players who skipped making a profile still get their checkmarks).
+export const getBeatenBots = _ => new Set([
+    ...Object.keys(Game.profile?.botsBeaten || {}),
+    ...(storage.get(BEATEN_KEY) || [])
+])
+
+export const markBotBeaten = botId => {
+    const local = new Set(storage.get(BEATEN_KEY) || [])
+    local.add(botId)
+    storage.set(BEATEN_KEY, [...local])
+}
 
 export const ratingLabel = (elo, provisional) => `${elo}${provisional ? '?' : ''}`
 
@@ -197,6 +211,7 @@ export const setupProfile = _ => {
         renderChip()
         if(!$('profile-view').classList.contains('hidden') && !modal.classList.contains('hidden')) openProfile()
         Game.updatePlayers?.()
+        Game.refreshBotGrid?.()
     }
 
     Game.onRegistered = (player, token) => {

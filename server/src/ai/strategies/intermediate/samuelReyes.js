@@ -3,7 +3,7 @@ const { makeEngineBot } = require('../../engine')
 module.exports = makeEngineBot({
     id: "samuelReyes",
     name: "Samuel Reyes",
-    description: "Samuel keeps his pieces active and rarely gives anything away for free. Rarely.",
+    description: "Every piece needs a job. Never gives anything away for free. Rarely. Okay, sometimes.",
     category: "Intermediate",
     icon: "fa-chess-rook",
     elo: 630

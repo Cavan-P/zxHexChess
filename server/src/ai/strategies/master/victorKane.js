@@ -12,7 +12,7 @@ function strategy({ fen, turn, enPassant }) {
 module.exports = {
     id: 'victorKane',
     name: 'Victor Kane',
-    description: 'Victor sees further than anyone else at the table and keeps his king well defended. Bring your best game.',
+    description: "Sees further than everyone else and keeps his king locked down tight. Bring your best game. Seriously.",
     category: 'Master',
     icon: 'fa-chess-king',
     elo: 1900,

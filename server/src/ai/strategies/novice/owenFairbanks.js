@@ -3,7 +3,7 @@ const { makeEngineBot } = require('../../engine')
 module.exports = makeEngineBot({
     id: "owenFairbanks",
     name: "Owen Fairbanks",
-    description: "Owen plays fast and trusts his gut. His gut is right about half the time.",
+    description: "Plays fast and goes with his gut. His gut is right about half the time, which he considers a great record.",
     category: "Novice",
     icon: "fa-bolt",
     elo: 380

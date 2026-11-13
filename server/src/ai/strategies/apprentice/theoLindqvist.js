@@ -3,7 +3,7 @@ const { makeEngineBot } = require('../../engine')
 module.exports = makeEngineBot({
     id: "theoLindqvist",
     name: "Theo Lindqvist",
-    description: "Theo checks your reply before he moves. Most of the time. When he's not distracted.",
+    description: "Definitely checks every reply before moving. Unless there's a bird outside. There's usually a bird outside.",
     category: "Apprentice",
     icon: "fa-chess-bishop",
     elo: 395

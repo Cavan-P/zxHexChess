@@ -3,7 +3,7 @@ const { makeEngineBot } = require('../../engine')
 module.exports = makeEngineBot({
     id: "graceOkafor",
     name: "Grace Okafor",
-    description: "Grace sees two moves deep and loves a well-placed bishop, though she sometimes misjudges a quiet position.",
+    description: "Three bishops each?? Best variant ever. Gets a little lost when the position goes quiet, though.",
     category: "Intermediate",
     icon: "fa-chess-bishop",
     elo: 610

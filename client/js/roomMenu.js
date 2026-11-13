@@ -1,5 +1,5 @@
 import { Game } from './game.js'
-import { ratingLabel, requestLeaderboard } from './profile.js'
+import { ratingLabel, requestLeaderboard, getBeatenBots, markBotBeaten } from './profile.js'
 import { sendRoomCreate, sendRoomJoin, sendStartBotGame, sendBotVsBot, sendStartTournament, sendStartTraining, sendResign, sendOfferDraw, sendAcceptDraw, sendDeclineDraw, sendLeaveRoom } from './network.js'
 
 const categoryOrder = [
@@ -28,12 +28,20 @@ const safeIcon = icon => /^[a-z0-9- ]+$/i.test(icon || '') ? icon : 'fa-chess-pa
 
 // Bot cards are built with DOM APIs (not innerHTML) and show the description inline,
 // so they work on touch screens where hover tooltips don't.
-const renderBotCard = (bot, { selected = false, compact = false, onClick } = {}) => {
-    const card = el('button', `bot-card${selected ? ' is-selected' : ''}`)
+const renderBotCard = (bot, { selected = false, compact = false, beaten = false, onClick } = {}) => {
+    const card = el('button', `bot-card${selected ? ' is-selected' : ''}${beaten ? ' is-beaten' : ''}`)
     card.type = 'button'
 
-    const avatar = el('span', 'bot-avatar')
+    const avatar = el('span', 'bot-avatar relative')
     avatar.append(el('i', `fa-solid ${safeIcon(bot.icon)}`))
+
+    if(beaten){
+        const badge = el('span', 'beaten-badge')
+        badge.title = `You've beaten ${bot.name}`
+        badge.append(el('i', 'fa-solid fa-check'))
+        avatar.append(badge)
+        card.setAttribute('aria-label', `${bot.name}, beaten`)
+    }
 
     const body = el('span', 'min-w-0 flex-1')
     const top = el('span', 'flex items-center justify-between gap-2')
@@ -41,7 +49,7 @@ const renderBotCard = (bot, { selected = false, compact = false, onClick } = {})
     body.append(top)
 
     if(!compact && bot.description){
-        body.append(el('span', 'mt-1 text-sm leading-snug text-(--text-main) line-clamp-3', bot.description))
+        body.append(el('span', 'mt-1 text-sm leading-snug text-(--text-main)', bot.description))
     }
 
     card.append(avatar, body)
@@ -161,6 +169,15 @@ export const setupRoomMenu = _ => {
     Game.onGameOver = _ => {
         updateControls()
         updatePlayers()
+
+        // Beat a bot? Remember it so its card gets a checkmark.
+        const opponent = Game.playerColor == 'white' ? 'black' : 'white'
+        const bot = Game.matchInfo?.[opponent]
+        const seated = Game.playerColor == 'white' || Game.playerColor == 'black'
+        if(seated && bot?.type == 'bot' && Game.result?.winner == Game.playerColor){
+            markBotBeaten(bot.id)
+            renderBotGrid()
+        }
     }
 
     // ------ Players ------
@@ -342,8 +359,19 @@ export const setupRoomMenu = _ => {
         document.getElementById('tournament-btn').classList.toggle('hidden', !Game.labEnabled)
         document.getElementById('train-bot-btn').classList.toggle('hidden', !Game.labEnabled)
 
+        renderBotGrid()
+        renderBotVsBotPanel()
+        renderTournamentGrid()
+    }
+
+    const renderBotGrid = _ => {
+        const beaten = getBeatenBots()
+        const beatenCount = Game.botList.filter(b => beaten.has(b.id)).length
         const tiers = new Set(Game.botList.map(b => b.category)).size
-        document.getElementById('bot-count').textContent = `${Game.botList.length} opponents across ${tiers} skill levels.`
+
+        document.getElementById('bot-count').textContent = beatenCount
+            ? `${Game.botList.length} opponents across ${tiers} skill levels · ${beatenCount} beaten`
+            : `${Game.botList.length} opponents across ${tiers} skill levels.`
 
         const container = document.getElementById('bot-grid')
         container.replaceChildren()
@@ -352,14 +380,17 @@ export const setupRoomMenu = _ => {
         for(const bot of Game.botList){
             if(bot.category != currentCategory){
                 currentCategory = bot.category
-                container.append(el('h3', 'tier-heading', currentCategory))
+                const inTier = Game.botList.filter(b => b.category == currentCategory)
+                const tierBeaten = inTier.filter(b => beaten.has(b.id)).length
+                const heading = el('h3', 'tier-heading', currentCategory)
+                if(tierBeaten) heading.append(el('span', `tier-progress${tierBeaten == inTier.length ? ' is-complete' : ''}`, `${tierBeaten}/${inTier.length}`))
+                container.append(heading)
             }
-            container.append(renderBotCard(bot, { onClick: b => sendStartBotGame(b.id, pickBotColor()) }))
+            container.append(renderBotCard(bot, { beaten: beaten.has(bot.id), onClick: b => sendStartBotGame(b.id, pickBotColor()) }))
         }
-
-        renderBotVsBotPanel()
-        renderTournamentGrid()
     }
+
+    Game.refreshBotGrid = _ => { if(Game.botList?.length) renderBotGrid() }
 
     // ------ Panel toggling ------
 

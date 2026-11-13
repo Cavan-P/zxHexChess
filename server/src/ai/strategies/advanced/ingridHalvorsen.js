@@ -3,7 +3,7 @@ const { makeEngineBot } = require('../../engine')
 module.exports = makeEngineBot({
     id: "ingridHalvorsen",
     name: "Ingrid Halvorsen",
-    description: "Ingrid counts material three moves ahead and will happily grab anything you leave loose.",
+    description: "Counts every pawn. Twice. Leave anything loose and it's going straight into the collection.",
     category: "Advanced",
     icon: "fa-chess-queen",
     elo: 760

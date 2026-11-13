@@ -3,7 +3,7 @@ const { makeEngineBot } = require('../../engine')
 module.exports = makeEngineBot({
     id: "luciaMoreno",
     name: "Lucia Moreno",
-    description: "Lucia has learned that knights belong in the middle of the board, and she'll tell you so.",
+    description: "Knights go in the middle. Always. Will remind you of this every single game.",
     category: "Apprentice",
     icon: "fa-chess-knight",
     elo: 410

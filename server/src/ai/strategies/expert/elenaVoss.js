@@ -12,7 +12,7 @@ function strategy({ fen, turn, enPassant }) {
 module.exports = {
     id: 'elenaVoss',
     name: 'Elena Voss',
-    description: 'Elena calculates deep lines, weighs mobility and center control, and punishes anything you leave undefended.',
+    description: "Calculates the long lines so you don't have to. An undefended piece is basically an invitation.",
     category: 'Expert',
     icon: 'fa-chess-queen',
     elo: 1300,
