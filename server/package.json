@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "vite"
+    "start": "node src/index.js",
+    "lab": "ENABLE_BOT_LAB=1 node src/index.js",
+    "test": "node --test"
   },
   "keywords": [],
   "author": "",

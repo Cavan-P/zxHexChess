@@ -1,1 +1,4 @@
 **/node_modules
+# Player profiles are live runtime data (and contain token hashes)
+server/data/players.json
+server/data/*.tmp

@@ -15,7 +15,6 @@ const pickMove = ({ board, moves, color, enPassant }) => {
     for(const move of moves){
         let score = 0
 
-        if(heuristics.isCapture(board, move)) console.log('Kyle found a capture')
 
         const captureScore = heuristics.isCapture(board, move) * weights.capture
         const checkScore = heuristics.givesCheck(board, move, color, enPassant) * weights.check
@@ -37,10 +36,7 @@ const pickMove = ({ board, moves, color, enPassant }) => {
     return candidates[Math.floor(Math.random() * candidates.length)].move
 }
 
-const promotionCells = {
-    white: [0,  1,  2,  3,  5,  6,  9,  10, 14],
-    black: [76, 80, 81, 84, 85, 87, 88, 89, 90]
-}
+const { promotionCells } = require('../../../game/moves')
 
 function strategy({ fen, turn, enPassant }) {
     const board = parseFen(fen)

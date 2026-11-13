@@ -5,12 +5,16 @@ import { Piece } from './piece.js'
 
 export let cells = []
 
+export const BOARD_WIDTH = 800
+export const BOARD_HEIGHT = 880
+
 export const drawBoard = (colors, stroke, strokeWeight, populateCells) => {
     let cellNum = 0
     const hexSize = Game.cellSize
 
-    const centerX = window.innerWidth / 2
-    const centerY = window.innerHeight / 2
+    // The board is laid out in a fixed logical space; main.js scales it to fit the canvas.
+    const centerX = BOARD_WIDTH / 2
+    const centerY = BOARD_HEIGHT / 2
 
     const rows = [1, 2, 3, 4, 5, 6, 5, 6, 5, 6, 5, 6, 5, 6, 5, 6, 5, 4, 3, 2, 1]
 
@@ -120,7 +124,7 @@ export const drawBoard = (colors, stroke, strokeWeight, populateCells) => {
         let x = centerX - ((numCols - 1) * columnOffset) / 2
 
         for(let col = 0; col < numCols; col++){
-            drawHexagon(x, y, hexSize, colors[colorIndex], stroke, 'black', strokeWeight, Game.ctx)
+            drawHexagon(x, y, hexSize, colors[colorIndex], stroke, '#3b2718', strokeWeight, Game.ctx)
 
             if(populateCells){
 

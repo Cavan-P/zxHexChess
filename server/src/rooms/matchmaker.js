@@ -3,6 +3,7 @@ const Room = require('./room')
 class Matchmaker {
     constructor(){
         this.rooms = new Map()
+        this.profiles = null      // PlayerStore, set at startup
     }
 
     generateCode(){
@@ -15,19 +16,19 @@ class Matchmaker {
         return code
     }
 
-    createRoom(){
+    createRoom(options = {}){
         let code
         do {
             code = this.generateCode()
         } while (this.rooms.has(code))
 
-        const room = new Room(code)
+        const room = new Room(code, { profiles: this.profiles, ...options, onEmpty: r => this.removeRoom(r.id) })
         this.rooms.set(code, room)
         return room
     }
 
     getRoom(code){
-        return this.rooms.get(code)
+        return typeof code == 'string' ? this.rooms.get(code.trim().toUpperCase()) : undefined
     }
 
     removeRoom(code){

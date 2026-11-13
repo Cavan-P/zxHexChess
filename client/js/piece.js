@@ -62,13 +62,10 @@ export class Piece {
             return
         }
 
-        //console.log('Piece drop cell', dropCell)
-
         Game.socket.send(JSON.stringify({
             type: 'attemptMove',
             from: this.originalCell.num,
-            to: dropCell.num,
-            color: Game.playerColor
+            to: dropCell.num
         }))
 
         Game.pendingMove = {
@@ -102,7 +99,7 @@ export class Piece {
         if(Math.abs(this.y - this.targetY) < 0.5) this.y = this.targetY
 
 
-        if(Game.playerColor != Game.turn) return
+        if(Game.state == 'gameOver' || Game.playerColor != Game.turn) return
 
         if(Game.draggedPiece && Game.draggedPiece != this) return
 
@@ -116,10 +113,6 @@ export class Piece {
                 this.startY = this.y
 
                 this.originalCell = this.currentCell
-
-                //console.log('Requesting legal moves from', this.originalCell.num)
-
-                //console.log(Game.socket)
 
                 Game.socket.send(JSON.stringify({
                     type: 'requestLegalMoves',

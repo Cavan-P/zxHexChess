@@ -1,5 +1,6 @@
 import { Game } from './game.js'
-import { sendRoomCreate, sendRoomJoin, sendStartBotGame, sendBotVsBot, sendStartTournament, sendStartTraining } from './network.js'
+import { ratingLabel, requestLeaderboard } from './profile.js'
+import { sendRoomCreate, sendRoomJoin, sendStartBotGame, sendBotVsBot, sendStartTournament, sendStartTraining, sendResign, sendOfferDraw, sendAcceptDraw, sendDeclineDraw, sendLeaveRoom } from './network.js'
 
 const categoryOrder = [
     'Beginner',
@@ -16,25 +17,51 @@ const categoryOrder = [
     'Category B'
 ]
 
-const renderBotCard = (bot, { selected = false, onClick } = {}) => {
-    const btn = document.createElement('button')
-    btn.className = `group relative flex flex-col items-center bg-(--bg-panel) border rounded-lg p-4 hover:border-(--accent-primary) hover:bg-(--border-strong) hover:cursor-pointer transition ${selected ? 'border-(--accent-primary) ring-2 ring-(--accent-primary)' : 'border-(--border-soft)'}`
-    btn.innerHTML = `
-        <div class="mb-3">
-            ${bot.image ? `<img src="${bot.image}" class="w-12 h-12 object-contain" />` : `<i class="fa-solid fa-3x ${bot.icon}"></i>` }
-        </div>
-        <div class="text-center">
-            <span class="text-(--text-main) font-semibold">${bot.name}</span>
-            <span class="text-(--text-muted) font-light">(${bot.elo})</span>
-        </div>
-        <div class="pointer-events-none absolute bottom-full mb-3 w-56 rounded-md border border-(--border-soft) bg-(--bg-panel) p-3 text-sm text-(--text-muted) opacity-0 scale-95 transition-all duration-150 group-hover:opacity-100 group-hover:scale-100 z-10">
-            ${bot.description}
-        </div>
-    `
+const el = (tag, className = '', text = '') => {
+    const node = document.createElement(tag)
+    if(className) node.className = className
+    if(text) node.textContent = text
+    return node
+}
 
-    if(onClick) btn.addEventListener('click', _ => onClick(bot))
+const safeIcon = icon => /^[a-z0-9- ]+$/i.test(icon || '') ? icon : 'fa-chess-pawn'
 
-    return btn
+// Bot cards are built with DOM APIs (not innerHTML) and show the description inline,
+// so they work on touch screens where hover tooltips don't.
+const renderBotCard = (bot, { selected = false, compact = false, onClick } = {}) => {
+    const card = el('button', `bot-card${selected ? ' is-selected' : ''}`)
+    card.type = 'button'
+
+    const avatar = el('span', 'bot-avatar')
+    avatar.append(el('i', `fa-solid ${safeIcon(bot.icon)}`))
+
+    const body = el('span', 'min-w-0 flex-1')
+    const top = el('span', 'flex items-center justify-between gap-2')
+    top.append(el('span', 'truncate font-semibold text-(--text-strong)', bot.name), el('span', 'elo-badge', String(bot.elo)))
+    body.append(top)
+
+    if(!compact && bot.description){
+        body.append(el('span', 'mt-1 text-sm leading-snug text-(--text-main) line-clamp-3', bot.description))
+    }
+
+    card.append(avatar, body)
+    if(onClick) card.addEventListener('click', _ => onClick(bot))
+    return card
+}
+
+const SPRITE_COLUMNS = { k: 0, q: 1, b: 2, n: 3, r: 4, p: 5 }
+
+// Paints a piece from the sprite sheet into an element (used by the promotion dialog).
+const paintSprite = (node, piece, color) => {
+    const col = SPRITE_COLUMNS[piece]
+    Object.assign(node.style, {
+        display: 'block',
+        width: '72%',
+        height: '72%',
+        backgroundImage: 'url(./img/pieces.png)',
+        backgroundSize: '600% 200%',
+        backgroundPosition: `${col * 20}% ${color == 'black' ? 100 : 0}%`
+    })
 }
 
 export const setupRoomMenu = _ => {
@@ -42,68 +69,223 @@ export const setupRoomMenu = _ => {
     const menu = document.getElementById("room-menu")
 
     const createBtn = document.getElementById("create-room-btn")
-    const joinBtn   = document.getElementById("join-room-btn")
+    const joinForm = document.getElementById("join-form")
     const joinInput = document.getElementById("join-room-input")
     const statusBox = document.getElementById("room-status")
     const copyBtn = document.getElementById("copy-room-btn")
 
     const promoUi = document.getElementById('promotion-ui')
-
     const returnHomeBtn = document.getElementById('return-home')
 
-
-    if (copyBtn) {
-        copyBtn.addEventListener("click", _ => {
-            const text = document.getElementById("room-display").textContent.replace("Room: ", "")
-            navigator.clipboard.writeText(text)
-            copyBtn.textContent = "Copied!"
-            setTimeout(_ => copyBtn.textContent = "Copy", 1000)
-        })
-    }
+    copyBtn.addEventListener("click", _ => {
+        navigator.clipboard?.writeText(document.getElementById("room-display").textContent)
+        copyBtn.innerHTML = '<i class="fa-solid fa-check"></i>'
+        setTimeout(_ => copyBtn.innerHTML = '<i class="fa-regular fa-copy"></i>', 1200)
+    })
 
     const showStatus = text => {
         statusBox.textContent = text
     }
 
     createBtn.onclick = _ => {
-        showStatus('Creating room...')
+        showStatus('')
         sendRoomCreate()
     }
 
-    joinBtn.onclick = _ => {
+    joinForm.onsubmit = e => {
+        e.preventDefault()
         const code = joinInput.value.trim().toUpperCase()
-        if(!code.length){
-            showStatus('Enter a room code')
-            return
-        }
-        showStatus('Joining room...')
+        if(!code.length) return showStatus('Enter a room code to join.')
+        showStatus('')
         sendRoomJoin(code)
     }
 
-    promoUi.onclick = e => {
-        const piece = e.target.dataset.piece
-        if(!piece) return
+    // ------ Promotion ------
 
-        const from = +promoUi.dataset.from
-        const to = +promoUi.dataset.to
+    Game.onPromotionRequired = _ => {
+        const color = Game.playerColor == 'black' ? 'black' : 'white'
+        promoUi.querySelectorAll('[data-sprite]').forEach(node => paintSprite(node, node.dataset.sprite, color))
+    }
+
+    promoUi.onclick = e => {
+        const option = e.target.closest('[data-piece]')
+        if(!option) return
 
         Game.socket.send(JSON.stringify({
             type: 'promotionChoice',
-            from,
-            to,
-            promotion: piece
+            from: +promoUi.dataset.from,
+            to: +promoUi.dataset.to,
+            promotion: option.dataset.piece
         }))
 
         promoUi.classList.add('hidden')
     }
 
-    returnHomeBtn.onclick = _ => {
+    // ------ In-game controls ------
+
+    const gameOverOverlay = document.getElementById('game-over-overlay')
+    const resignBtn = document.getElementById('resign-btn')
+    const drawBtn = document.getElementById('draw-btn')
+    const leaveBtn = document.getElementById('leave-btn')
+    const drawOfferBox = document.getElementById('draw-offer')
+    const moveList = document.getElementById('move-list')
+    const controls = document.getElementById('game-controls')
+
+    const isPlaying = _ => Game.state == 'playing' && (Game.playerColor == 'white' || Game.playerColor == 'black')
+    const isBotGame = _ => Game.matchInfo?.white?.type == 'bot' || Game.matchInfo?.black?.type == 'bot'
+
+    const setButton = (btn, icon, label) => {
+        btn.replaceChildren(el('i', icon), el('span', '', label))
+    }
+
+    const updateControls = _ => {
+        const playing = isPlaying()
+        const showDraw = playing && !isBotGame()
+
+        controls.classList.toggle('hidden', !playing)
+        controls.classList.toggle('grid-cols-2', showDraw)
+        resignBtn.classList.toggle('hidden', !playing)
+        drawBtn.classList.toggle('hidden', !showDraw)
+
+        setButton(leaveBtn, playing ? 'fa-solid fa-arrow-right-from-bracket' : 'fa-solid fa-house', playing ? 'Leave' : 'Home')
+
+        const iOffered = Game.drawOffer && Game.drawOffer == Game.playerColor
+        drawBtn.disabled = Boolean(Game.drawOffer)
+        setButton(drawBtn, 'fa-solid fa-handshake', iOffered ? 'Draw offered' : 'Offer draw')
+
+        const theyOffered = playing && Game.drawOffer && Game.drawOffer != Game.playerColor
+        drawOfferBox.classList.toggle('hidden', !theyOffered)
+    }
+
+    Game.onDrawOfferChanged = updateControls
+    Game.onGameOver = _ => {
+        updateControls()
+        updatePlayers()
+    }
+
+    // ------ Players ------
+
+    const updatePlayers = _ => {
+        const info = Game.matchInfo
+        if(!info) return
+
+        const bottomColor = Game.playerColor == 'black' ? 'black' : 'white'
+        const topColor = bottomColor == 'white' ? 'black' : 'white'
+        const seated = Game.playerColor == 'white' || Game.playerColor == 'black'
+
+        const renderRow = (row, color) => {
+            const side = info[color]
+            const present = Game.presence ? Game.presence[color] : true
+
+            const isMe = Game.playerColor == color
+            let name
+            if(side.type == 'bot') name = side.name
+            else if(!present) name = isMe ? 'You' : 'Waiting for opponent…'
+            else if(side.name) name = isMe ? `${side.name} (you)` : side.name
+            else if(isMe) name = 'You'
+            else name = seated ? 'Opponent' : (color == 'white' ? 'White' : 'Black')
+
+            const swatch = el('span', 'swatch')
+            swatch.style.background = color == 'white' ? '#fffaf3' : '#2b1b0f'
+
+            const label = el('span', `min-w-0 truncate text-sm font-semibold ${side.type != 'bot' && !present ? 'text-(--text-muted) italic font-medium' : 'text-(--text-strong)'}`, name)
+
+            row.replaceChildren(swatch, label)
+            if(side.elo != null && present) row.append(el('span', 'elo-badge', ratingLabel(side.elo, side.provisional)))
+            row.append(el('span', 'turn-dot'))
+
+            row.classList.toggle('is-turn', Game.state == 'playing' && Game.turn == color)
+        }
+
+        renderRow(document.getElementById('player-top'), topColor)
+        renderRow(document.getElementById('player-bottom'), bottomColor)
+    }
+
+    Game.updatePlayers = updatePlayers
+    Game.onMatchInfo = updatePlayers
+
+    // ------ Bot speech bubble ------
+
+    const bubble = document.getElementById('bot-bubble')
+    let bubbleTimer = null
+
+    Game.onBotSpeech = ({ username, payload, color }) => {
+        // The bubble sits beside the speaking bot's side of the board.
+        const bottomColor = Game.playerColor == 'black' ? 'black' : 'white'
+        const atBottom = color == bottomColor
+
+        bubble.classList.toggle('is-bottom', atBottom)
+        bubble.classList.toggle('is-top', !atBottom)
+
+        const icon = Game.matchInfo?.[color]?.icon
+        document.getElementById('bot-bubble-avatar').replaceChildren(el('i', `fa-solid ${safeIcon(icon)}`))
+        document.getElementById('bot-bubble-name').textContent = username
+        document.getElementById('bot-bubble-text').textContent = payload
+
+        bubble.classList.add('is-visible')
+        clearTimeout(bubbleTimer)
+        bubbleTimer = setTimeout(_ => bubble.classList.remove('is-visible'), 3500 + payload.length * 45)
+    }
+
+    // ------ Move list ------
+
+    let history = []
+
+    const renderMoveList = _ => {
+        moveList.replaceChildren()
+
+        if(!history.length){
+            moveList.append(el('li', 'col-span-3 py-1 font-sans text-(--text-muted)', 'No moves yet'))
+            return
+        }
+
+        for(let i = 0; i < history.length; i += 2){
+            const isLastRow = i + 2 >= history.length
+            moveList.append(
+                el('li', 'text-right text-(--text-muted)', `${i / 2 + 1}.`),
+                el('span', isLastRow && history.length % 2 == 1 ? 'bg-(--accent-primary)/50 font-semibold' : '', history[i]),
+                el('span', isLastRow && history.length % 2 == 0 ? 'bg-(--accent-primary)/50 font-semibold' : '', history[i + 1] || '')
+            )
+        }
+
+        moveList.scrollTop = moveList.scrollHeight
+    }
+
+    Game.onHistory = moves => { history = [...moves]; renderMoveList() }
+    Game.onMovePlayed = notation => { if(notation){ history.push(notation); renderMoveList() } }
+
+    resignBtn.onclick = _ => {
+        if(isPlaying() && confirm('Resign this game?')) sendResign()
+    }
+
+    drawBtn.onclick = _ => {
+        if(isPlaying() && !Game.drawOffer) sendOfferDraw()
+    }
+
+    document.getElementById('draw-accept-btn').onclick = _ => sendAcceptDraw()
+    document.getElementById('draw-decline-btn').onclick = _ => sendDeclineDraw()
+
+    document.getElementById('view-board').onclick = _ => gameOverOverlay.classList.add('hidden')
+
+    const returnHome = _ => {
         layout.classList.add('hidden')
-        document.getElementById('game-over-overlay').classList.add('hidden')
+        gameOverOverlay.classList.add('hidden')
+        promoUi.classList.add('hidden')
         menu.classList.remove('hidden')
+        window.scrollTo(0, 0)
+
+        sendLeaveRoom()
+        requestLeaderboard()
 
         Game.state = 'idle'
-        Game.gameOver = null
+        Game.result = null
+        Game.drawOffer = null
+        Game.opponentAway = false
+        Game.presence = null
+        history = []
+        renderMoveList()
+        document.getElementById('chat-box').replaceChildren()
+        showStatus('')
         Game.turn = null
         Game.fen = null
         Game.check = null
@@ -122,44 +304,58 @@ export const setupRoomMenu = _ => {
         })
 
         Game.pieces = []
-
-        Game.socket.send(JSON.stringify({ type: 'leaveRoom' }))
-
-        //if(Game.socket && Game.socket.readyState == WebSocket.OPEN) Game.socket.close()
+        bubble.classList.remove('is-visible')
     }
 
-    const groupByCategory = bots => {
-        const grouped = {}
-        bots.forEach(bot => {
-            if(!grouped[bot.category]) grouped[bot.category] = []
-            grouped[bot.category].push(bot)
-        })
-        return grouped
+    returnHomeBtn.onclick = returnHome
+
+    leaveBtn.onclick = _ => {
+        if(isPlaying() && history.length && !confirm('Leaving now resigns the game. Leave anyway?')) return
+        returnHome()
+    }
+
+    // ------ Bot color choice ------
+
+    let botColorChoice = 'white'
+
+    const colorButtons = [...document.querySelectorAll('.bot-color-btn')]
+    const renderColorChoice = _ => colorButtons.forEach(btn => {
+        const active = btn.dataset.color == botColorChoice
+        btn.classList.toggle('is-active', active)
+        btn.setAttribute('aria-pressed', active)
+    })
+    colorButtons.forEach(btn => btn.onclick = _ => { botColorChoice = btn.dataset.color; renderColorChoice() })
+    renderColorChoice()
+
+    const pickBotColor = _ => botColorChoice == 'random' ? (Math.random() < 0.5 ? 'white' : 'black') : botColorChoice
+
+    // ------ Bot list ------
+
+    const sortBots = bots => {
+        const rank = c => { const i = categoryOrder.indexOf(c); return i < 0 ? categoryOrder.length : i }
+        return [...bots].sort((a, b) => rank(a.category) - rank(b.category) || a.elo - b.elo)
     }
 
     Game.onBotListReceived = bots => {
-        Game.botList = bots
+        Game.botList = sortBots(bots)
 
-        const container = document.querySelector('#local .grid')
-        container.innerHTML = ''
+        document.getElementById('tournament-btn').classList.toggle('hidden', !Game.labEnabled)
+        document.getElementById('train-bot-btn').classList.toggle('hidden', !Game.labEnabled)
 
-        const grouped = groupByCategory(bots)
+        const tiers = new Set(Game.botList.map(b => b.category)).size
+        document.getElementById('bot-count').textContent = `${Game.botList.length} opponents across ${tiers} skill levels.`
 
-        categoryOrder.forEach(category => {
-            const list = grouped[category]
-            if(!list) return
+        const container = document.getElementById('bot-grid')
+        container.replaceChildren()
 
-            const header = document.createElement('h2')
-            header.textContent = category
-            header.className = 'text-xl font-bold col-span-full mt-8 mb-2 text-center text-(--text-main)'
-            container.appendChild(header)
-
-            list.sort((a, b) => a.elo - b.elo)
-
-            for(const bot of list){
-                container.appendChild(renderBotCard(bot, { onClick: b => sendStartBotGame(b.id) }))
+        let currentCategory = null
+        for(const bot of Game.botList){
+            if(bot.category != currentCategory){
+                currentCategory = bot.category
+                container.append(el('h3', 'tier-heading', currentCategory))
             }
-        })
+            container.append(renderBotCard(bot, { onClick: b => sendStartBotGame(b.id, pickBotColor()) }))
+        }
 
         renderBotVsBotPanel()
         renderTournamentGrid()
@@ -174,11 +370,14 @@ export const setupRoomMenu = _ => {
     }
 
     const togglePanel = key => {
-        Object.entries(panels).forEach(([k, el]) => {
-            if(!el) return
-            if(k == key) el.classList.toggle('hidden')
-            else el.classList.add('hidden')
+        Object.entries(panels).forEach(([k, panel]) => {
+            if(k == key) panel.classList.toggle('hidden')
+            else panel.classList.add('hidden')
         })
+
+        if(!panels[key].classList.contains('hidden')){
+            panels[key].scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
     }
 
     document.getElementById('bot-vs-bot-btn').onclick = _ => togglePanel('battle')
@@ -192,24 +391,24 @@ export const setupRoomMenu = _ => {
     const renderBotVsBotPanel = _ => {
         const whiteGrid = document.getElementById('bvb-white-grid')
         const blackGrid = document.getElementById('bvb-black-grid')
-        const startBtn = document.getElementById('bvb-start-btn')
-        if(!whiteGrid || !blackGrid) return
 
-        whiteGrid.innerHTML = ''
-        blackGrid.innerHTML = ''
+        whiteGrid.replaceChildren()
+        blackGrid.replaceChildren()
 
         Game.botList.forEach(bot => {
-            whiteGrid.appendChild(renderBotCard(bot, {
+            whiteGrid.append(renderBotCard(bot, {
+                compact: true,
                 selected: bvbSelection.white == bot.id,
                 onClick: b => { bvbSelection.white = b.id; renderBotVsBotPanel() }
             }))
-            blackGrid.appendChild(renderBotCard(bot, {
+            blackGrid.append(renderBotCard(bot, {
+                compact: true,
                 selected: bvbSelection.black == bot.id,
                 onClick: b => { bvbSelection.black = b.id; renderBotVsBotPanel() }
             }))
         })
 
-        if(startBtn) startBtn.disabled = !(bvbSelection.white && bvbSelection.black)
+        document.getElementById('bvb-start-btn').disabled = !(bvbSelection.white && bvbSelection.black)
     }
 
     document.getElementById('bvb-start-btn').onclick = _ => {
@@ -223,15 +422,15 @@ export const setupRoomMenu = _ => {
 
     const renderTournamentGrid = _ => {
         const grid = document.getElementById('tournament-grid')
-        if(!grid) return
 
         if(!tournamentSelection.size){
             Game.botList.forEach(b => tournamentSelection.add(b.id))
         }
 
-        grid.innerHTML = ''
+        grid.replaceChildren()
         Game.botList.forEach(bot => {
-            grid.appendChild(renderBotCard(bot, {
+            grid.append(renderBotCard(bot, {
+                compact: true,
                 selected: tournamentSelection.has(bot.id),
                 onClick: b => {
                     if(tournamentSelection.has(b.id)) tournamentSelection.delete(b.id)
@@ -248,39 +447,38 @@ export const setupRoomMenu = _ => {
 
         const games = +document.getElementById('tournament-games').value || 2
 
-        document.getElementById('tournament-log').innerHTML = ''
-        document.getElementById('tournament-standings').innerHTML = ''
+        document.getElementById('tournament-log').replaceChildren()
+        document.getElementById('tournament-standings').replaceChildren()
 
         sendStartTournament(ids, games)
     }
 
+    const botName = id => Game.botList.find(b => b.id == id)?.name || id
+
     Game.onTournamentProgress = data => {
         const log = document.getElementById('tournament-log')
-        if(!log) return
 
         const { white, black, result, gamesPlayed, totalGames } = data
-        const whiteName = Game.botList.find(b => b.id == white)?.name || white
-        const blackName = Game.botList.find(b => b.id == black)?.name || black
         const outcome = result.result == 'draw'
             ? 'Draw'
-            : (result.result == 'white' ? `${whiteName} wins` : `${blackName} wins`)
+            : `${botName(result.result == 'white' ? white : black)} wins`
 
-        const line = document.createElement('div')
-        line.textContent = `[${gamesPlayed}/${totalGames}] ${whiteName} vs ${blackName}: ${outcome} (${result.reason})`
-        log.appendChild(line)
+        log.append(el('div', '', `[${gamesPlayed}/${totalGames}] ${botName(white)} vs ${botName(black)}: ${outcome} (${result.reason})`))
         log.scrollTop = log.scrollHeight
     }
 
     Game.onTournamentComplete = data => {
         const standingsEl = document.getElementById('tournament-standings')
-        if(standingsEl){
-            const rows = Object.entries(data.standings)
-                .map(([id, r]) => ({ id, name: Game.botList.find(b => b.id == id)?.name || id, ...r }))
-                .filter(r => tournamentSelection.has(r.id))
-                .sort((a, b) => b.elo - a.elo)
+        const rows = Object.entries(data.standings)
+            .map(([id, r]) => ({ id, name: botName(id), ...r }))
+            .filter(r => tournamentSelection.has(r.id))
+            .sort((a, b) => b.elo - a.elo)
 
-            standingsEl.innerHTML = '<div class="font-bold mb-1">Final Standings</div>' +
-                rows.map(r => `<div class="flex justify-between"><span>${r.name}</span><span>${r.elo} (${r.wins}W ${r.losses}L ${r.draws}D)</span></div>`).join('')
+        standingsEl.replaceChildren(el('div', 'mb-1 font-semibold text-(--text-strong)', 'Final standings'))
+        for(const r of rows){
+            const row = el('div', 'flex justify-between border-b border-(--border-soft) py-1')
+            row.append(el('span', '', r.name), el('span', 'tabular-nums', `${r.elo} (${r.wins}W ${r.losses}L ${r.draws}D)`))
+            standingsEl.append(row)
         }
 
         Game.socket.send(JSON.stringify({ type: 'getBotList' }))
@@ -293,73 +491,46 @@ export const setupRoomMenu = _ => {
         const population = +document.getElementById('train-population').value || 8
         const games = +document.getElementById('train-games').value || 1
 
-        document.getElementById('train-log').innerHTML = ''
+        document.getElementById('train-log').replaceChildren()
 
         sendStartTraining(generations, population, games)
     }
 
     Game.onTrainingProgress = data => {
         const log = document.getElementById('train-log')
-        if(!log) return
-
-        const line = document.createElement('div')
-        line.textContent = `Generation ${data.generation}/${data.generations}: best this gen ${data.bestFitnessThisGen}, best ever ${data.bestFitnessEver}`
-        log.appendChild(line)
+        log.append(el('div', '', `Generation ${data.generation}/${data.generations}: best this gen ${data.bestFitnessThisGen}, best ever ${data.bestFitnessEver}`))
         log.scrollTop = log.scrollHeight
     }
 
     Game.onTrainingComplete = data => {
         const log = document.getElementById('train-log')
-        if(log){
-            const line = document.createElement('div')
-            line.className = 'font-bold text-(--text-main)'
-            line.textContent = `Done! New bot created: ${data.bot.name}`
-            log.appendChild(line)
-            log.scrollTop = log.scrollHeight
-        }
+        log.append(el('div', 'font-semibold text-(--text-strong)', `Done! New bot created: ${data.bot.name}`))
+        log.scrollTop = log.scrollHeight
 
         Game.onBotListReceived?.(data.bots)
     }
 
-    // ------ Matchup display ------
+    // ------ Room lifecycle ------
 
-    Game.onMatchInfo = info => {
-        const el = document.getElementById('matchup-info')
-        if(!el) return
-
-        const label = (side, color) => {
-            if(side.type == 'bot') return `${side.name} (${side.elo})`
-            if(Game.playerColor == color) return 'You'
-            return color == 'white' ? 'White' : 'Black'
-        }
-
-        el.textContent = `White: ${label(info.white, 'white')}  vs  Black: ${label(info.black, 'black')}`
-    }
-
-
-    Game.onRoomCreated = code => {
-        showStatus('Room created!  Share this code:')
-        statusBox.innerHTML = `<strong>${code}</strong>`
-    }
+    Game.onRoomCreated = _ => showStatus('')
 
     Game.onRoomJoined = _ => {
         menu.classList.add('hidden')
         layout.classList.remove('hidden')
+        gameOverOverlay.classList.add('hidden')
+        window.scrollTo(0, 0)
 
-        //console.log(layout)
+        Game.state = 'playing'
+        updatePlayers()
+        updateControls()
 
-        requestAnimationFrame(_ => {
-            requestAnimationFrame(_ => {
-                Game.canvas.width = Game.canvas.clientWidth
-                Game.canvas.height = Game.canvas.clientHeight
-            })
-        })
-
-
-        console.log('Client joined room!')
+        // The canvas only has a size once the layout is visible.
+        requestAnimationFrame(_ => Game.resizeCanvas?.())
     }
 
     Game.onRoomError = msg => {
-        showStatus(`Error: ${msg}`)
+        showStatus(msg == 'Room not found' ? 'No game with that code. Check it and try again.' : msg)
     }
+
+    renderMoveList()
 }

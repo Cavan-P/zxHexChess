@@ -1,562 +1,392 @@
-const { randomUUID } = require('crypto')
-const { coordToIndex, parseFen, generateFilteredLegals, isKingAttacked, boardToFen, getGameStatus } = require('../game/moves.js')
+const { GameState } = require('../game/rules')
+const { requestBotMove } = require('../ai/botPool')
+const { Chatter } = require('../ai/chat/chatter')
 
-const whitePromotionCells = [0,  1,  2,  3,  5,  6,  9,  10, 14]
-const blackPromotionCells = [76, 80, 81, 84, 85, 87, 88, 89, 90]
+const BOT_MOVE_DELAY_MS = 400
+const RECONNECT_GRACE_MS = 60000
+const MAX_CHAT_LENGTH = 300
+const MIN_RATED_PLIES = 2      // both sides must move at least once for a game to be rated
 
 class Room {
-    constructor(id){
-        this.id = id || randomUUID.slice(0, 6).toUpperCase()
+    // bots: { white?: botId, black?: botId }   botMeta: { white?: {id,name,elo}, black?: {id,name,elo} }
+    // profiles: the PlayerStore used to look up and rate signed-in players (optional)
+    constructor(id, { bots = {}, botMeta = {}, profiles = null, onEmpty } = {}){
+        this.id = id
         this.players = []
         this.spectators = []
-        this.gameState = {
-            //Stalemate '5k92BR96K4N993P3PP7P1P95'
-            //Checkmate '999997P8P3PPKB4R2PN91k2'
-            //Start 'bqknbnr2rp1b1p1p2p2p1p3pp4p993P4PP3P1P2P2P1P1B1PR2RNBNQKB'
-            fen: 'bqknbnr2rp1b1p1p2p2p1p3pp4p993P4PP3P1P2P2P1P1B1PR2RNBNQKB',
-            enPassant: null,
-            turn: 'white'
+        this.game = new GameState()
+
+        this.bots = bots
+        this.botMeta = botMeta
+        this.onEmpty = onEmpty
+        this.profiles = profiles
+
+        // Which profile sits in each human seat. If a different profile takes over a seat mid-game
+        // (e.g. a stranger fills a disconnected player's spot), the game becomes unrated.
+        this.seatProfiles = { white: null, black: null }
+        this.unrated = false
+        this.rated = false
+
+        // Each bot gets a voice. Messages go out as ordinary chat, flagged as coming from a bot.
+        this.chatters = {}
+        for(const color of ['white', 'black']){
+            if(!bots[color]) continue
+            const opponent = color == 'white' ? 'black' : 'white'
+            this.chatters[color] = new Chatter({
+                botId: bots[color],
+                color,
+                opponentIsBot: Boolean(bots[opponent]),
+                getOpponentName: _ => this.botMeta[opponent]?.name?.split(' ')[0]
+                    || (this.seatProfiles[opponent] && this.profiles?.get(this.seatProfiles[opponent])?.name),
+                say: text => this.broadcast({ type: 'chat', username: this.botMeta[color]?.name || 'Bot', payload: text, bot: true, color })
+            })
         }
 
-        this.pendingPromotion = null
+        this.botThinking = false
+        this.drawOffer = null          // color that offered a draw
+        this.disconnectTimer = null
+        this.destroyed = false
+    }
 
-        this.finished = false
+    get isBotGame(){
+        return Boolean(this.bots.white || this.bots.black)
+    }
+
+    get isBotVsBot(){
+        return Boolean(this.bots.white && this.bots.black)
+    }
+
+    send(socket, msg){
+        if(socket.readyState == 1) socket.send(JSON.stringify(msg))
+    }
+
+    broadcast(msg){
+        const json = JSON.stringify(msg)
+        for(const client of [...this.players, ...this.spectators]){
+            if(client.readyState == 1) client.send(json)
+        }
     }
 
     addClient(socket){
+        if(this.destroyed) return false
 
-        //console.log(`[room.js] isBotGame?`, this.isBotGame)
-        //console.log(`[room.js] has strategy?`, this.botStrategy)
-        //console.log(`[room.js] strategies?`, this.botStrategies)
+        const humanColors = ['white', 'black'].filter(c => !this.bots[c])
+        const taken = this.players.map(p => p.color)
+        const free = humanColors.filter(c => !taken.includes(c))
 
-        if(this.isBotGame && this.botStrategies && typeof this.botStrategies.white == 'function' && typeof this.botStrategies.black == 'function'){
-            socket.color = 'spectator'
-            this.spectators.push(socket)
-
-            socket.send(JSON.stringify({
-                type: 'assignColor',
-                color: 'spectator'
-            }))
-        }
-        else if(this.isBotGame && typeof this.botStrategy == 'function'){
-            socket.color = this.playerColor || 'white'
+        if(free.length){
+            socket.color = free[0]
             this.players.push(socket)
-
-            socket.send(JSON.stringify({
-                type: 'assignColor',
-                color: socket.color
-            }))
-        }
-        else if(this.players.length < 2){
-            const colors = ['white', 'black']
-            const taken = this.players.map(player => player.color)
-            const available = colors.filter(color => !taken.includes(color))
-
-            const assignedColor = available.length ? available[0] : colors[Math.floor(Math.random() * 2)]
-
-            socket.color = assignedColor
-            this.players.push(socket)
-
-            socket.send(JSON.stringify({
-                type: 'assignColor',
-                color: assignedColor
-            }))
+            this.claimSeat(socket)
         }
         else {
             socket.color = 'spectator'
             this.spectators.push(socket)
-            socket.send(JSON.stringify({
-                type: 'assignColor',
-                color: 'spectator'
-            }))
         }
 
-        socket.send(JSON.stringify({
+        // A player came back (or someone took the empty seat) before the abandonment timer ran out.
+        if(this.disconnectTimer && this.players.length == humanColors.length){
+            clearTimeout(this.disconnectTimer)
+            this.disconnectTimer = null
+            this.broadcast({ type: 'opponentReconnected' })
+        }
+
+        this.send(socket, { type: 'assignColor', color: socket.color })
+        this.send(socket, {
             type: 'init',
-            fen: this.gameState.fen,
-            turn: this.gameState.turn
-        }))
+            fen: this.game.fen,
+            turn: this.game.turn,
+            history: this.game.history.map(m => m.notation),
+            lastMove: this.game.history.at(-1) || null,
+            result: this.game.result
+        })
+        this.broadcastPresence()
 
-        socket.send(JSON.stringify({
-            type: 'matchInfo',
-            ...this.getMatchInfo()
-        }))
-
-        console.log(`Client joined room ${this.id} as ${socket.color}`)
-
-        if(this.isBotGame && this.botStrategies && typeof this.botStrategies.white == 'function' && typeof this.botStrategies.black == 'function'){
-            //console.log('Should be moving first bot')
-            
-            setTimeout(_ => {
-                const currentBot = this.botStrategies[this.gameState.turn]
-                if(!currentBot) return
-
-                const botMove = currentBot({
-                    fen: this.gameState.fen,
-                    turn: this.gameState.turn,
-                    enPassant: this.gameState.enPassant
-                })
-
-                if(!botMove) return
-
-                this.handleMessage({ color: this.gameState.turn }, {
-                    type: 'attemptMove',
-                    from: botMove.from,
-                    to: botMove.to
-                })
-            }, 400)
+        // Bots say hello once someone is there to hear it: the human opponent, or the first viewer of a bot battle.
+        if(socket.color != 'spectator' || this.isBotVsBot){
+            for(const chatter of Object.values(this.chatters)) chatter.onStart()
         }
 
-        //console.log(`[room:${this.id}] After addClient — players:`,
-        //    this.players.map(p => p.color),
-        //    'spectators:', this.spectators.map(s => s.color)
-        //  )
-          
+        this.scheduleBotMove()
+        return true
     }
 
-    // this.botMeta is set by websocket.js when starting a bot game: { white: {id,name,elo}|null, black: {id,name,elo}|null }
+    claimSeat(socket){
+        const profileId = socket.profileId || null
+        const current = this.seatProfiles[socket.color]
+
+        if(current && current != profileId) this.unrated = true
+        if(!current) this.seatProfiles[socket.color] = profileId
+    }
+
     getMatchInfo(){
         const colorInfo = color => {
-            const meta = this.botMeta?.[color]
-            return meta ? { type: 'bot', id: meta.id, name: meta.name, elo: meta.elo } : { type: 'human' }
+            const meta = this.botMeta[color]
+            if(meta) return { type: 'bot', id: meta.id, name: meta.name, elo: meta.elo, icon: meta.icon }
+
+            const profile = this.seatProfiles[color] && this.profiles?.get(this.seatProfiles[color])
+            return profile
+                ? { type: 'human', name: profile.name, elo: profile.elo, provisional: profile.provisional }
+                : { type: 'human' }
         }
 
-        return {
-            white: colorInfo('white'),
-            black: colorInfo('black')
+        return { white: colorInfo('white'), black: colorInfo('black') }
+    }
+
+    // Which seats are filled (bots always are), so clients can show "waiting for opponent",
+    // plus fresh names and ratings for everyone.
+    broadcastPresence(){
+        const seated = color => Boolean(this.bots[color]) || this.players.some(p => p.color == color)
+        this.broadcast({ type: 'matchInfo', ...this.getMatchInfo() })
+        this.broadcast({ type: 'presence', white: seated('white'), black: seated('black') })
+    }
+
+    // Applies Elo changes for a finished game. Returns { white, black } rating changes (null for
+    // bots and unrated sides), or null if the game wasn't rated at all.
+    rateGame(result){
+        if(this.rated || !this.profiles || this.unrated || this.isBotVsBot) return null
+        if(this.game.history.length < MIN_RATED_PLIES) return null
+
+        const scoreFor = color => {
+            if(!result.winner) return 0.5
+            const won = result.winner == color
+            if(result.reason == 'stalemate') return won ? 0.75 : 0.25
+            return won ? 1 : 0
         }
+
+        const white = this.seatProfiles.white
+        const black = this.seatProfiles.black
+        let changes = null
+
+        if(this.isBotGame){
+            const humanColor = this.bots.white ? 'black' : 'white'
+            const botColor = humanColor == 'white' ? 'black' : 'white'
+            const profileId = this.seatProfiles[humanColor]
+            const botRating = this.botMeta[botColor]?.elo
+            if(!profileId || botRating == null) return null
+
+            const change = this.profiles.recordBotGame(profileId, botRating, scoreFor(humanColor))
+            if(change) changes = { [humanColor]: change, [botColor]: null }
+        }
+        else if(white && black && white != black){
+            const res = this.profiles.recordGame(white, black, scoreFor('white'))
+            if(res) changes = { white: res[white], black: res[black] }
+        }
+
+        if(!changes) return null
+        this.rated = true
+
+        // Push updated profiles to whoever is still connected.
+        for(const socket of this.players){
+            const profile = socket.profileId && this.profiles.get(socket.profileId)
+            if(profile) this.send(socket, { type: 'profile', player: profile })
+        }
+
+        return changes
     }
 
     removeClient(socket){
-        this.players = this.players.filter(player => player != socket)
-        this.spectators = this.spectators.filter(spectator => spectator != socket)
+        const wasPlayer = this.players.includes(socket)
+
+        this.players = this.players.filter(p => p != socket)
+        this.spectators = this.spectators.filter(s => s != socket)
+
+        const nobodyLeft = !this.players.length && !this.spectators.length
+        const noHumansLeft = this.isBotGame && !this.isBotVsBot && !this.players.length
+
+        // Walking away from a bot game in progress counts as a loss, so it can't be dodged.
+        if(noHumansLeft && wasPlayer && !this.game.result && this.game.history.length >= MIN_RATED_PLIES){
+            this.endGame(this.game.abandon(socket.color))
+        }
+
+        // Bot games have no one to wait for, and an empty room is just garbage.
+        if(nobodyLeft || noHumansLeft) return this.destroy()
+
+        this.broadcastPresence()
+
+        if(wasPlayer && !this.game.result && this.game.history.length){
+            this.broadcast({ type: 'opponentDisconnected', graceSeconds: RECONNECT_GRACE_MS / 1000 })
+
+            clearTimeout(this.disconnectTimer)
+            this.disconnectTimer = setTimeout(_ => {
+                this.disconnectTimer = null
+                this.endGame(this.game.abandon(socket.color))
+            }, RECONNECT_GRACE_MS)
+        }
     }
 
-    broadcastExcept(sender, msgObj){
-        const msg = JSON.stringify(msgObj)
-        const all = [...this.players, ...this.spectators]
+    destroy(){
+        if(this.destroyed) return
+        this.destroyed = true
+        clearTimeout(this.disconnectTimer)
+        for(const chatter of Object.values(this.chatters)) chatter.stop()
+        this.onEmpty?.(this)
+    }
 
-        all.forEach(client => {
-            if(client != sender && client.readyState == 1){
-                client.send(msg)
-            }
-        })
+    endGame(result){
+        if(!result) return
+        this.drawOffer = null
+        clearTimeout(this.disconnectTimer)
+        this.disconnectTimer = null
+
+        let ratings = null
+        try { ratings = this.rateGame(result) }
+        catch(e){ console.error(`[room ${this.id}] Rating update failed:`, e) }
+
+        this.broadcast({ type: 'gameOver', result, ratings })
+
+        for(const chatter of Object.values(this.chatters)) chatter.onGameOver(result)
+    }
+
+    isPlayer(socket){
+        return this.players.includes(socket) && (socket.color == 'white' || socket.color == 'black')
     }
 
     handleMessage(socket, data){
-        if(this.finished) return
+        switch(data.type){
+            case 'chat': return this.handleChat(socket, data)
+            case 'requestLegalMoves': return this.handleLegalMoves(socket, data)
+            case 'attemptMove':
+            case 'promotionChoice': return this.handleMove(socket, data)
+            case 'resign': return this.handleResign(socket)
+            case 'offerDraw': return this.handleOfferDraw(socket)
+            case 'acceptDraw': return this.handleAcceptDraw(socket)
+            case 'declineDraw': return this.handleDeclineDraw(socket)
+            case 'leaveRoom': return this.handleLeave(socket)
+        }
+    }
 
-        if(data.type == 'move'){
-            this.gameState.fen = data.fen || this.gameState.fen
+    handleChat(socket, data){
+        if(typeof data.payload != 'string') return
+        const text = data.payload.trim().slice(0, MAX_CHAT_LENGTH)
+        if(!text) return
 
-            this.broadcastExcept(socket, {
-                type: 'move',
-                fen: this.gameState.fen,
-                username: data.username,
-                payload: data.payload
-            })
+        const seatName = socket.color == 'spectator' ? 'Spectator' : socket.color == 'white' ? 'White' : 'Black'
+        const name = (socket.profileId && this.profiles?.get(socket.profileId)?.name) || seatName
+        for(const client of [...this.players, ...this.spectators]){
+            if(client != socket) this.send(client, { type: 'chat', username: name, payload: text })
         }
 
+        // A bot answers its opponent (spectators chatting in a bot battle get answers too).
+        for(const [color, chatter] of Object.entries(this.chatters)){
+            if(socket.color != color) chatter.onOpponentChat(text)
+        }
+    }
 
-        if(data.type == 'chat'){
-            this.broadcastExcept(socket, {
-                type: 'chat',
-                username: data.username,
-                payload: data.payload,
-                self: false
-            })
+    handleLegalMoves(socket, data){
+        const moves = this.isPlayer(socket) ? this.game.legalMovesFrom(socket.color, data.from) : []
+        this.send(socket, { type: 'legalMoves', from: data.from, moves })
+    }
+
+    handleMove(socket, data){
+        if(!this.isPlayer(socket)){
+            return this.send(socket, { type: 'illegalMove', reason: 'Spectators cannot make moves' })
         }
 
+        const fenBefore = this.game.fen
+        const res = this.game.play(socket.color, data.from, data.to, data.promotion)
 
-        if(data.type == 'requestLegalMoves'){
-
-            //console.log('Legal move request received', socket.color, data.from)
-
-            if(socket.color != 'white' && socket.color != 'black'){
-                socket.send(JSON.stringify({
-                    type: 'legalMoves',
-                    from: data.from,
-                    moves: []
-                }))
-                return
-            }
-
-            const board = parseFen(this.gameState.fen)
-            //const legal = generateLegalMoves(board, data.from, socket.color, this.gameState.enPassant)
-            const legal = generateFilteredLegals(board, data.from, socket.color, this.gameState.enPassant)
-
-            //const whiteCheck = isKingAttacked(board, 'white', this.gameState.enPassant)
-            //const blackCheck = isKingAttacked(board, 'black', this.gameState.enPassant)
-
-            socket.send(JSON.stringify({
-                type: 'legalMoves',
-                from: data.from,
-                moves: legal,
-                //check: { white: whiteCheck, black: blackCheck }
-            }))
-
-            return
+        if(!res.ok){
+            if(res.needsPromotion) return this.send(socket, { type: 'promotionRequired', from: +data.from, to: +data.to })
+            return this.send(socket, { type: 'illegalMove', reason: res.reason })
         }
 
+        this.afterMove(res.move, fenBefore, socket.color)
+    }
 
-        if(data.type == 'attemptMove'){
+    afterMove(move, fenBefore, mover){
+        this.drawOffer = null
 
-            if(socket.color != this.gameState.turn){
-                socket.send(JSON.stringify({
-                    type: 'illegalMove',
-                    reason: 'Not your turn'
-                }))
-                return
-            }
+        this.broadcast({
+            type: 'move',
+            ...move,
+            fen: this.game.fen,
+            turn: this.game.turn,
+            result: this.game.result
+        })
 
-            if(socket.color != 'white' && socket.color != 'black'){
-                socket.send(JSON.stringify({
-                    type: 'illegalMove',
-                    reason: 'Spectators cannot make moves'
-                }))
-                return
-            }
+        if(this.game.result) return this.endGame(this.game.result)
 
-            const from = +data.from
-            const to = +data.to
-            if(Number.isNaN(from) || Number.isNaN(to)){
-                socket.send(JSON.stringify({ type: 'illegalMove', reason: 'Bad cell index' }))
-                return
-            }
-
-            const board = parseFen(this.gameState.fen)
-            //const legal = generateLegalMoves(board, from, socket.color, this.gameState.enPassant)
-            const legal = generateFilteredLegals(board, data.from, socket.color, this.gameState.enPassant)
-
-            //console.log('legal for', from, legal)
-
-            if(!Array.isArray(legal) || !legal.some(m => +m == to)){
-                socket.send(JSON.stringify({ type: 'illegalMove', from, to }))
-                return
-            }
-
-            const movingPiece = board[from]
-
-            if(!movingPiece || !movingPiece.piece){
-                socket.send(JSON.stringify({ type: 'illegalMove', reason: 'No piece at from' }))
-                return
-            }
-
-            let capturedPiece = board[to]?.piece || ''
-            let epCaptureCell = null
-
-            if(this.gameState.enPassant){
-                const ep = this.gameState.enPassant
-
-                const isPawn = movingPiece.piece.toLowerCase() == 'p'
-                const isEnemy = ep.color != movingPiece.color
-                const landsOnCaptureCell = to == ep.captureCell
-                
-                if(isPawn && isEnemy && landsOnCaptureCell){
-                    epCaptureCell = ep.pawnCell
-                    capturedPiece = board[epCaptureCell]?.piece || ''
-                }
-            }
-
-            const isPawn = movingPiece.piece.toLowerCase() == 'p'
-
-            const promotionRank = movingPiece.color == 'white' ? whitePromotionCells.includes(to) : blackPromotionCells.includes(to)
-
-            if(isPawn && promotionRank){
-
-                if(this.isBotGame && socket.color != this.playerColor){
-                    if(!data.promotion){
-                        console.error('Promotion missing from bot move')
-                        return
-                    }
-
-                    return this.handleMessage(socket, {
-                        type: 'promotionChoice',
-                        from,
-                        to,
-                        promotion: data.promotion
-                    })
-                }
-
-                if(data.promotion){
-                    return this.handleMessage(socket, {
-                        type: 'promotionChoice',
-                        from,
-                        to,
-                        promotion: data.promotion
-                    })
-                }
-
-                this.pendingPromotion = { from, to, color: movingPiece.color }
-
-                socket.send(JSON.stringify({
-                    type: 'promotionRequired',
-                    from,
-                    to
-                }))
-
-                return
-            }
-
-            const newPieceObj = {
-                piece: movingPiece.piece,
-                color: movingPiece.color,
-                cell: to,
-                coords: [...board[to].coords]
-            }
-
-            //console.log('new piece obj', newPieceObj)
-
-            board[to] = newPieceObj
-            board[from] = {
-                piece: '',
-                color: '',
-                cell: from,
-                coords: Array.isArray(board[from]?.coords) ? [...board[from].coords] : board[from]?.coords
-            }
-
-            if(epCaptureCell != null){
-                board[epCaptureCell] = {
-                    piece: '',
-                    color: '',
-                    cell: epCaptureCell,
-                    coords: Array.isArray(board[epCaptureCell]?.coords) ? [...board[epCaptureCell].coords] : board[epCaptureCell]?.coords
-                }
-            }
-
-            this.gameState.enPassant = null
-
-            if(isPawn){
-                const fromR = movingPiece.coords[1]
-                const toR = newPieceObj.coords[1]
-
-                //console.log('From, to', fromR, toR)
-
-                if(Math.abs(fromR - toR) == 2){
-                    const midQ = (movingPiece.coords[0] + newPieceObj.coords[0]) / 2
-                    const midR = (movingPiece.coords[1] + newPieceObj.coords[1]) / 2
-                    const midS = (movingPiece.coords[2] + newPieceObj.coords[2]) / 2
-
-                    const midIndex = coordToIndex(midQ, midR, midS)
-
-                    if(midIndex != undefined){
-                        this.gameState.enPassant = {
-                            captureCell: midIndex,
-                            pawnCell: to,
-                            color: movingPiece.color
-                        }
-                    }
-                }
-            }
-
-            const newFen = boardToFen(board)
-            this.gameState.fen = newFen
-
-            const verify = parseFen(newFen)
-
-            if(!verify[to] || !verify[to].piece){
-                console.error('[room] FEN roundtrip failed: destination empty after boardToFen')
-            }
-
-            const whiteCheck = isKingAttacked(board, 'white', this.gameState.enPassant)
-            const blackCheck = isKingAttacked(board, 'black', this.gameState.enPassant)
-
-            const whiteKing = board.find(p => p.piece.toLowerCase() == 'k' && p.color == 'white')
-            const blackKing = board.find(p => p.piece.toLowerCase() == 'k' && p.color == 'black')
-
-            const nextColor = this.gameState.turn == 'white' ? 'black' : 'white'
-            const gameOver = getGameStatus(board, nextColor, this.gameState.enPassant)
-
-            if(gameOver) this.finished = true
-
-            this.gameState.turn = this.gameState.turn == 'white' ? 'black' : 'white'
-            
-            //console.log('gameOver', gameOver)
-
-            this.broadcastExcept(socket, {
-                type: 'move',
-                fen: newFen,
-                from,
-                to,
-                captured: capturedPiece || null,
-                capturedCell: epCaptureCell ?? to,
-                check: whiteCheck ? whiteKing.cell : blackCheck ? blackKing.cell : null,
-                turn: this.gameState.turn,
-                gameOver
-            })
-
-            if(socket.send){ // For bot games, we don't need to send to itself
-                socket.send(JSON.stringify({
-                    type: 'move',
-                    fen: newFen,
-                    from,
-                    to,
-                    captured: capturedPiece || null,
-                    capturedCell: epCaptureCell ?? to,
-                    check: whiteCheck ? whiteKing.cell : blackCheck ? blackKing.cell : null,
-                    turn: this.gameState.turn,
-                    gameOver
-                }))
-            }
-
-            let botFunc = null
-
-            if(this.botStrategies && this.botStrategies[this.gameState.turn]){
-                botFunc = this.botStrategies[this.gameState.turn]
-            }
-            else if(this.botStrategy && typeof this.botStrategy == 'function'){
-                botFunc = this.botStrategy
-            }
-
-            if(!this.finished && this.isBotGame && botFunc && this.gameState.turn != this.playerColor){
-                setTimeout(_ => {
-                    const botMove = botFunc({
-                        fen: this.gameState.fen,
-                        turn: this.gameState.turn,
-                        enPassant: this.gameState.enPassant
-                    })
-
-                    if(!botMove) return
-
-                    this.handleMessage({ color: this.gameState.turn }, {
-                        type: 'attemptMove',
-                        from: botMove.from,
-                        to: botMove.to,
-                        promotion: botMove.promotion
-                    })
-                }, 400)
-            }
-
-            return
+        for(const chatter of Object.values(this.chatters)){
+            try { chatter.onMove({ move, mover, fenBefore, game: this.game }) }
+            catch(e){ console.error(`[room ${this.id}] Bot chat error:`, e) }
         }
 
+        this.scheduleBotMove()
+    }
 
-        if(data.type == 'promotionChoice'){
-            const { from, to } = data
-            let { promotion } = data
+    scheduleBotMove(){
+        const color = this.game.turn
+        const botId = this.bots[color]
 
-            //console.log('Promotion to ', promotion)
-            if(!this.isBotGame){
-                if(!this.pendingPromotion || this.pendingPromotion.from != from || this.pendingPromotion.to != to){
-                    socket.send(JSON.stringify({
-                        type: 'illegalMove',
-                        reason: 'Promotion mismatch'
-                    }))
+        if(!botId || this.botThinking || this.game.result || this.destroyed) return
 
-                    return
-                }
+        this.botThinking = true
+        const ply = this.game.history.length
+
+        setTimeout(async _ => {
+            let move = null
+            try {
+                move = await requestBotMove(botId, { fen: this.game.fen, turn: color, enPassant: this.game.enPassant })
+            }
+            catch(e){
+                console.error(`[room ${this.id}] Bot ${botId} failed:`, e.message)
             }
 
-            const board = parseFen(this.gameState.fen)
+            this.botThinking = false
 
-            promotion = board[from].color == 'white' ? promotion.toUpperCase() : promotion.toLowerCase()
+            // The room may have closed or the game ended while the bot was thinking.
+            if(this.destroyed || this.game.result || this.game.history.length != ply) return
 
-            const movingPiece = board[from]
-            let capturedPiece = board[to]?.piece || ''
-            let epCaptureCell = null
+            // Bots that always promote to a queen can omit the piece.
+            const fenBefore = this.game.fen
+            const res = move ? this.game.play(color, move.from, move.to, move.promotion || 'q') : { ok: false }
 
-            board[to] = {
-                piece: promotion,
-                color: movingPiece.color,
-                cell: to,
-                coords: [...board[to].coords]
+            if(!res.ok){
+                console.error(`[room ${this.id}] Bot ${botId} produced no legal move; it resigns.`)
+                return this.endGame(this.game.resign(color))
             }
 
-            board[from] = {
-                piece: '',
-                color: '',
-                cell: from,
-                coords: [...movingPiece.coords]
-            }
+            this.afterMove(res.move, fenBefore, color)
+        }, BOT_MOVE_DELAY_MS)
+    }
 
-            this.pendingPromotion = null
+    handleResign(socket){
+        if(!this.isPlayer(socket)) return
+        this.endGame(this.game.resign(socket.color))
+    }
 
-            this.gameState.fen = boardToFen(board)
+    handleOfferDraw(socket){
+        if(!this.isPlayer(socket) || this.isBotGame || this.game.result || this.drawOffer) return
+        this.drawOffer = socket.color
+        this.broadcast({ type: 'drawOffered', by: socket.color })
+    }
 
-            const whiteCheck = isKingAttacked(board, 'white', this.gameState.enPassant)
-            const blackCheck = isKingAttacked(board, 'black', this.gameState.enPassant)
+    handleAcceptDraw(socket){
+        if(!this.isPlayer(socket) || !this.drawOffer || this.drawOffer == socket.color) return
+        this.endGame(this.game.agreeDraw())
+    }
 
-            const whiteKing = board.find(p => p.piece.toLowerCase() == 'k' && p.color == 'white')
-            const blackKing = board.find(p => p.piece.toLowerCase() == 'k' && p.color == 'black')
+    handleDeclineDraw(socket){
+        if(!this.isPlayer(socket) || !this.drawOffer || this.drawOffer == socket.color) return
+        this.drawOffer = null
+        this.broadcast({ type: 'drawDeclined', by: socket.color })
+    }
 
-            const nextColor = this.gameState.turn == 'white' ? 'black' : 'white'
-            const gameOver = getGameStatus(board, nextColor, this.gameState.enPassant)
-
-            if(gameOver) this.finished = true
-
-            this.gameState.turn = this.gameState.turn == 'white' ? 'black' : 'white'
-
-            //console.log('gameOver', gameOver)
-
-            this.broadcastExcept(socket, {
-                type: 'move',
-                fen: this.gameState.fen,
-                from,
-                to,
-                captured: capturedPiece || null,
-                capturedCell: to,
-                promotion: promotion,
-                check: whiteCheck ? whiteKing.cell : blackCheck ? blackKing.cell : null,
-                turn: this.gameState.turn,
-                gameOver
-            })
-
-            if(socket.send){ // For bot games, we don't need to send to itself
-                socket.send(JSON.stringify({
-                    type: 'move',
-                    fen: this.gameState.fen,
-                    from,
-                    to,
-                    captured: capturedPiece || null,
-                    capturedCell: to,
-                    promotion: promotion,
-                    check: whiteCheck ? whiteKing.cell : blackCheck ? blackKing.cell : null,
-                    turn: this.gameState.turn,
-                    gameOver
-                }))
-            }
-
-            let botFunc = null
-
-            if(this.botStrategies && this.botStrategies[this.gameState.turn]){
-                botFunc = this.botStrategies[this.gameState.turn]
-            }
-            else if(this.botStrategy && typeof this.botStrategy == 'function'){
-                botFunc = this.botStrategy
-            }
-
-            if(!this.finished && this.isBotGame && botFunc && this.gameState.turn != this.playerColor){
-                setTimeout(_ => {
-                    const botMove = botFunc({
-                        fen: this.gameState.fen,
-                        turn: this.gameState.turn,
-                        enPassant: this.gameState.enPassant
-                    })
-
-                    if(!botMove) return
-
-                    this.handleMessage({ color: this.gameState.turn }, {
-                        type: 'attemptMove',
-                        from: botMove.from,
-                        to: botMove.to,
-                        promotion: botMove.promotion
-                    })
-                }, 400)
-            }
-
-            return
+    // Leaving mid-game is a resignation; leaving after it ends is just leaving.
+    handleLeave(socket){
+        if(this.isPlayer(socket) && !this.game.result && this.game.history.length && !this.isBotVsBot){
+            this.endGame(this.game.resign(socket.color))
         }
 
+        this.players = this.players.filter(p => p != socket)
+        this.spectators = this.spectators.filter(s => s != socket)
+        socket.room = null
 
-        if(data.type == 'leaveRoom'){
-            this.removeClient(socket)
+        if(!this.players.length && !this.spectators.length) return this.destroy()
+        if(this.isBotGame && !this.isBotVsBot && !this.players.length) return this.destroy()
 
-            if(!this.players.length && !this.spectators.length){
-                this.finished = true
-            }
-
-            return
-        }
+        this.broadcastPresence()
     }
 }
 

@@ -96,6 +96,21 @@ const whitePawnStartCells = [56, 61, 62, 66, 68, 71, 74, 76, 80]
 const blackPawnStartCells = [10, 14, 16, 19, 22, 24, 28, 29, 34]
 
 const coordIndexMap = {}
+coordinates.forEach((c, i) => { coordIndexMap[c.join(',')] = i })
+
+// Pawns promote on the far edge of the board: every cell with no cell directly in front of it.
+// Derived from the geometry rather than hand-listed (the old hand-written lists missed the corners).
+const promotionCells = {
+    white: coordinates.map((c, i) => coordIndexMap[`${c[0]},${c[1] - 1},${c[2] + 1}`] == undefined ? i : -1).filter(i => i >= 0),
+    black: coordinates.map((c, i) => coordIndexMap[`${c[0]},${c[1] + 1},${c[2] - 1}`] == undefined ? i : -1).filter(i => i >= 0)
+}
+
+// Gliński notation: files a-l (no j), ranks 1-11 counted from White's side.
+const FILES = 'abcdefghikl'
+const cellName = index => {
+    const [q, r] = coordinates[index]
+    return FILES[q + 5] + (6 - r - Math.max(0, q))
+}
 
 const cloneBoard = board => {
     return board.map(p => ({
@@ -513,4 +528,4 @@ const getGameStatus = (board, color, enPassant) => {
     return isKingAttacked(board, color, enPassant) ? 'checkmate' : 'stalemate'
 }
 
-module.exports = {parseFen, generateLegalMoves, coordToIndex, generateFilteredLegals, isKingAttacked, cloneBoard, applyMove, boardToFen, getGameStatus}
+module.exports = {promotionCells, cellName, NUM_CELLS: coordinates.length, parseFen, generateLegalMoves, coordToIndex, generateFilteredLegals, isKingAttacked, cloneBoard, applyMove, boardToFen, getGameStatus}

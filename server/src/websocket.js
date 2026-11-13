@@ -1,213 +1,190 @@
 const { WebSocketServer } = require('ws')
 const matchmaker = require('./rooms/matchmaker')
-const { getBotList, getBotByName } = require('./ai/botManager')
+const { getBotList, hasBot } = require('./ai/botManager')
 const { runTournament } = require('./ai/tournament')
 const { runEvolution, materializeGenome } = require('./ai/evolve')
+const { PlayerStore } = require('./players/playerStore')
+
+const profiles = new PlayerStore(process.env.PLAYERS_FILE || undefined)
+matchmaker.profiles = profiles
+
+const MAX_REGISTRATIONS_PER_CONNECTION = 3
+
+const LAB_ENABLED = process.env.ENABLE_BOT_LAB == '1'
+let labJobRunning = false
 
 const getBotMeta = id => {
     const meta = getBotList().find(b => b.id == id)
-    return meta ? { id: meta.id, name: meta.name, elo: meta.elo } : null
+    return meta ? { id: meta.id, name: meta.name, elo: meta.elo, icon: meta.icon } : null
+}
+
+const send = (socket, msg) => {
+    if(socket.readyState == 1) socket.send(JSON.stringify(msg))
+}
+
+const joinRoom = (socket, room) => {
+    if(socket.room && socket.room != room) socket.room.handleMessage(socket, { type: 'leaveRoom' })
+
+    socket.room = room
+    room.addClient(socket)
+    send(socket, { type: 'roomJoined', code: room.id })
+}
+
+const runLabJob = (socket, job, label) => {
+    if(!LAB_ENABLED) return send(socket, { type: 'error', message: 'Bot lab is disabled on this server' })
+    if(labJobRunning) return send(socket, { type: 'error', message: 'Another tournament or training run is already in progress' })
+
+    labJobRunning = true
+    job()
+        .catch(e => {
+            console.error(`[websocket] ${label} error:`, e)
+            send(socket, { type: 'error', message: `${label} failed: ${e.message}` })
+        })
+        .finally(_ => { labJobRunning = false })
+}
+
+const handlers = {
+    // Restores a saved profile: { playerId, token } from the browser's storage.
+    hello(socket, data){
+        const player = profiles.authenticate(data.playerId, data.token)
+        if(!player) return send(socket, { type: 'profileInvalid' })
+
+        socket.profileId = player.id
+        send(socket, { type: 'profile', player })
+    },
+
+    register(socket, data){
+        if(socket.profileId) return send(socket, { type: 'profileError', message: 'You already have a profile' })
+
+        socket.registrations = (socket.registrations || 0) + 1
+        if(socket.registrations > MAX_REGISTRATIONS_PER_CONNECTION){
+            return send(socket, { type: 'profileError', message: 'Too many attempts. Refresh and try again.' })
+        }
+
+        const res = profiles.register(data.name)
+        if(res.error) return send(socket, { type: 'profileError', message: res.error })
+
+        socket.profileId = res.player.id
+        send(socket, { type: 'registered', player: res.player, token: res.token })
+    },
+
+    rename(socket, data){
+        if(!socket.profileId) return send(socket, { type: 'profileError', message: 'Create a profile first' })
+
+        const res = profiles.rename(socket.profileId, data.name)
+        if(res.error) return send(socket, { type: 'profileError', message: res.error })
+
+        send(socket, { type: 'profile', player: res.player })
+    },
+
+    getLeaderboard(socket){
+        send(socket, { type: 'leaderboard', players: profiles.leaderboard(25) })
+    },
+
+    getBotList(socket){
+        send(socket, { type: 'botList', bots: getBotList(), labEnabled: LAB_ENABLED })
+    },
+
+    startBotGame(socket, data){
+        if(!hasBot(data.botId)) return send(socket, { type: 'error', message: 'Bot not found' })
+
+        const playerColor = data.playerColor == 'black' ? 'black' : 'white'
+        const botColor = playerColor == 'white' ? 'black' : 'white'
+
+        const room = matchmaker.createRoom({
+            bots: { [botColor]: data.botId },
+            botMeta: { [botColor]: getBotMeta(data.botId) }
+        })
+
+        joinRoom(socket, room)
+    },
+
+    startBotVsBot(socket, data){
+        if(!hasBot(data.botA) || !hasBot(data.botB)) return send(socket, { type: 'error', message: 'Bot not found' })
+
+        const room = matchmaker.createRoom({
+            bots: { white: data.botA, black: data.botB },
+            botMeta: { white: getBotMeta(data.botA), black: getBotMeta(data.botB) }
+        })
+
+        send(socket, { type: 'roomCreated', code: room.id })
+        joinRoom(socket, room)
+    },
+
+    createRoom(socket){
+        const room = matchmaker.createRoom()
+        send(socket, { type: 'roomCreated', code: room.id })
+        joinRoom(socket, room)
+    },
+
+    joinRoom(socket, data){
+        const room = matchmaker.getRoom(data.code)
+        if(!room) return send(socket, { type: 'error', message: 'Room not found' })
+        joinRoom(socket, room)
+    },
+
+    startTournament(socket, data){
+        const botIds = Array.isArray(data.botIds) ? data.botIds.filter(hasBot) : []
+        if(botIds.length < 2) return send(socket, { type: 'error', message: 'Pick at least 2 bots for a tournament' })
+
+        const gamesPerPairing = Math.min(10, Math.max(1, +data.gamesPerPairing || 2))
+
+        runLabJob(socket, async _ => {
+            const summary = await runTournament({
+                botIds,
+                gamesPerPairing,
+                onProgress: progress => send(socket, { type: 'tournamentProgress', ...progress })
+            })
+            send(socket, { type: 'tournamentComplete', ...summary })
+        }, 'Tournament')
+    },
+
+    startTraining(socket, data){
+        const generations = Math.min(30, Math.max(1, +data.generations || 6))
+        const populationSize = Math.min(20, Math.max(4, +data.populationSize || 8))
+        const gamesPerMatch = Math.min(4, Math.max(1, +data.gamesPerMatch || 1))
+
+        runLabJob(socket, async _ => {
+            const best = await runEvolution({
+                generations, populationSize, gamesPerMatch,
+                onProgress: progress => send(socket, { type: 'trainingProgress', ...progress })
+            })
+            const created = materializeGenome(best.genome, { generations, populationSize })
+            send(socket, { type: 'trainingComplete', bot: created, fitness: best.fitness, bots: getBotList() })
+        }, 'Training')
+    }
 }
 
 module.exports = function attachWebSocket(server){
-    //console.log('Inside attachwebsocket')
-    const wss = new WebSocketServer({ server })
+    const wss = new WebSocketServer({ server, maxPayload: 16 * 1024 })
 
     wss.on('connection', socket => {
-        console.log('Client connected')
         socket.room = null
 
-        socket.on('error', e => {
-            console.error('Websocket error:', e)
-        })
+        socket.on('error', e => console.error('Websocket error:', e.message))
 
         socket.on('message', msg => {
-            let data = null
+            let data
             try { data = JSON.parse(msg) }
             catch(e){ return }
 
-            //console.log('WS received message:', data)
-
-            if(data.type == 'getBotList'){
-                socket.send(JSON.stringify({
-                    type: 'botList',
-                    bots: getBotList()
-                }))
-
-                //console.log("[websocket.js] Sending Bot list:", getBotList())
-
-                return
+            if(!data || typeof data.type != 'string') return
+            
+            try {
+                if(Object.prototype.hasOwnProperty.call(handlers, data.type)) handlers[data.type](socket, data)
+                else socket.room?.handleMessage(socket, data)
             }
-
-            if(data.type == 'startBotGame'){
-                console.log('[websocket.js] bot id is', data)
-                const botId = data.botId
-                const strategy = getBotByName(botId)
-
-                console.log(strategy)
-
-                if(!strategy){
-                    console.warn(`[websocket.js] Bot not found:`, botId)
-                    socket.send(JSON.stringify({ type: 'error', message: 'bot not found' }))
-                    return
-                }
-
-                const playerColor = data.playerColor || 'white'
-                const botColor = playerColor == 'white' ? 'black' : 'white'
-
-                const room = matchmaker.createRoom()
-                room.isBotGame = true
-                room.botStrategy = strategy
-                room.botStrategies = undefined
-                room.playerColor = playerColor
-                room.botMeta = { [botColor]: getBotMeta(botId) }
-
-                room.addClient(socket)
-                socket.room = room
-
-                console.log('[WS] Started bot game with ' + botId + '. Socket color:', socket.color)
-
-                //socket.send(JSON.stringify({ type: 'assignColor', color: socket.color }))
-                //socket.send(JSON.stringify({ type: 'init', fen: room.gameState.fen, turn: room.gameState.turn }))
-
-                socket.send(JSON.stringify({
-                    type: 'roomCreated',
-                    code: room.id
-                }))
-                socket.send(JSON.stringify({ type: 'roomJoined', code: room.id }))
-        
-                return
-            }
-
-            if(data.type == 'startBotVsBot'){
-                const { botA, botB } = data
-
-                const strategyA = getBotByName(botA)
-                const strategyB = getBotByName(botB)
-
-                if(!strategyA || !strategyB){
-                    socket.send(JSON.stringify({ type: 'error', message: 'bot not found' }))
-                    return
-                }
-
-                const room = matchmaker.createRoom()
-
-                room.isBotGame = true
-                room.botStrategies = {
-                    white: strategyA,
-                    black: strategyB
-                }
-                room.botMeta = { white: getBotMeta(botA), black: getBotMeta(botB) }
-
-                room.addClient(socket)
-                socket.room = room
-
-                socket.send(JSON.stringify({ type: 'roomCreated', code: room.id }))
-                socket.send(JSON.stringify({ type: 'roomJoined', code: room.id }))
-                console.log(`Started Bot vs Bot: ${botA} (white) vs ${botB} (black)`)
-
-                return
-            }
-
-            if(data.type == 'startTournament'){
-                const { botIds, gamesPerPairing } = data
-
-                if(!Array.isArray(botIds) || botIds.length < 2){
-                    socket.send(JSON.stringify({ type: 'error', message: 'Pick at least 2 bots for a tournament' }))
-                    return
-                }
-
-                runTournament({
-                    botIds,
-                    gamesPerPairing: gamesPerPairing || 2,
-                    onProgress: progress => {
-                        if(socket.readyState == 1) socket.send(JSON.stringify({ type: 'tournamentProgress', ...progress }))
-                    }
-                }).then(summary => {
-                    if(socket.readyState == 1) socket.send(JSON.stringify({ type: 'tournamentComplete', ...summary }))
-                }).catch(e => {
-                    console.error('[websocket.js] Tournament error:', e)
-                    if(socket.readyState == 1) socket.send(JSON.stringify({ type: 'error', message: 'Tournament failed: ' + e.message }))
-                })
-
-                return
-            }
-
-            if(data.type == 'startTraining'){
-                const { generations, populationSize, gamesPerMatch } = data
-
-                runEvolution({
-                    generations: generations || 6,
-                    populationSize: populationSize || 8,
-                    gamesPerMatch: gamesPerMatch || 1,
-                    onProgress: progress => {
-                        if(socket.readyState == 1) socket.send(JSON.stringify({ type: 'trainingProgress', ...progress }))
-                    }
-                }).then(best => {
-                    const created = materializeGenome(best.genome, { generations: generations || 6, populationSize: populationSize || 8 })
-                    if(socket.readyState == 1){
-                        socket.send(JSON.stringify({
-                            type: 'trainingComplete',
-                            bot: created,
-                            fitness: best.fitness,
-                            bots: getBotList()
-                        }))
-                    }
-                }).catch(e => {
-                    console.error('[websocket.js] Training error:', e)
-                    if(socket.readyState == 1) socket.send(JSON.stringify({ type: 'error', message: 'Training failed: ' + e.message }))
-                })
-
-                return
-            }
-
-
-            if(data.type == 'createRoom'){
-                const room = matchmaker.createRoom()
-                socket.room = room
-                room.addClient(socket)
-
-                socket.send(JSON.stringify({
-                    type: 'roomCreated',
-                    code: room.id
-                }))
-                socket.send(JSON.stringify({ type: 'roomJoined', code: room.id }))
-
-                return
-            }
-
-            if(data.type == 'joinRoom'){
-                const room = matchmaker.getRoom(data.code)
-
-                if(!room){
-                    socket.send(JSON.stringify({ type: 'error', message: 'Room not found' }))
-                    return
-                }
-
-                socket.room = room
-                room.addClient(socket)
-
-                socket.send(JSON.stringify({ type: 'roomJoined', code: room.id }))
-
-                return
-            }
-
-            if(socket.room){
-                //console.log('ws forwarding message to room handler')
-                socket.room.handleMessage(socket, data)
-            }
-            else {
-                console.warn('ws socket has no room assigned')
+            catch(e){
+                console.error(`[websocket] Error handling "${data.type}":`, e)
+                send(socket, { type: 'error', message: 'Something went wrong handling that request' })
             }
         })
 
         socket.on('close', _ => {
-            if(socket.room){
-                socket.room.removeClient(socket)
-            }
+            socket.room?.removeClient(socket)
+            socket.room = null
         })
     })
 
     return wss
-
 }

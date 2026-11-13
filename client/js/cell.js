@@ -59,32 +59,42 @@ export class Cell {
             this.ctx.translate(-this.x, -this.y)
         }
 
-        if(this.hovering && this.occupied && this.occupiedByMyColor(colorPerspective) && !Game.draggedPiece && Game.turn == colorPerspective){
-            drawHexagon(this.x, this.y, this.size - 2, '#00000001', true, '#264653CC', 4, this.ctx)
-        }
-
-        if(this.isLegalTarget){
-            if(!this.occupied){
-                drawHexagon(this.x, this.y, this.size, '#2a9d90a2', false, 'black', 0, this.ctx)
-            }
-            if(this.occupied && this.occupiedBy.toLowerCase() != 'k'){
-                drawHexagon(this.x, this.y, this.size, '#c44436b6', false, 'black', 0, this.ctx)
-            }
-        }
-
-        if(this.num == Game.check){
-            drawHexagon(this.x, this.y, this.size - 2, '#b0000c66' , true, '#FF1744FF', 4, this.ctx)
-        }
-
+        // Last move: warm gold wash on both cells (drawn first so other markers sit on top).
         if(Game.lastMove?.from == this.num){
-            drawHexagon(this.x, this.y, this.size, '#5E60CECC', false, 'black', 0, this.ctx)
+            drawHexagon(this.x, this.y, this.size, 'rgba(233, 196, 106, 0.45)', false, 'black', 0, this.ctx)
         }
 
         if(Game.lastMove?.to == this.num){
-            drawHexagon(this.x, this.y, this.size, '#3A0CA3CC', false, 'black', 0, this.ctx)
+            drawHexagon(this.x, this.y, this.size, 'rgba(233, 196, 106, 0.75)', false, 'black', 0, this.ctx)
         }
 
-        
+        if(this.num == Game.check){
+            const glow = this.ctx.createRadialGradient(this.x, this.y, this.size * 0.15, this.x, this.y, this.size)
+            glow.addColorStop(0, 'rgba(214, 48, 30, 0.85)')
+            glow.addColorStop(1, 'rgba(214, 48, 30, 0)')
+            drawHexagon(this.x, this.y, this.size, glow, false, 'black', 0, this.ctx)
+        }
+
+        if(this.hovering && this.occupied && this.occupiedByMyColor(colorPerspective) && !Game.draggedPiece && Game.turn == colorPerspective){
+            drawHexagon(this.x, this.y, this.size - 3, 'rgba(255, 255, 255, 0.18)', true, 'rgba(59, 39, 24, 0.65)', 3, this.ctx)
+        }
+
+        if(this.isLegalTarget){
+            if(this.hovering && Game.draggedPiece){
+                drawHexagon(this.x, this.y, this.size - 3, 'rgba(255, 255, 255, 0.25)', true, 'rgba(59, 39, 24, 0.55)', 3, this.ctx)
+            }
+
+            if(!this.occupied){
+                this.ctx.beginPath()
+                this.ctx.arc(this.x, this.y, this.size * 0.22, 0, Math.PI * 2)
+                this.ctx.fillStyle = 'rgba(59, 39, 24, 0.32)'
+                this.ctx.fill()
+            }
+            else if(this.occupiedBy.toLowerCase() != 'k'){
+                drawHexagon(this.x, this.y, this.size - 4, 'rgba(0, 0, 0, 0)', true, 'rgba(59, 39, 24, 0.4)', 6, this.ctx)
+            }
+        }
+
         //Debug
         if(showCellNumbers){
             this.ctx.fillStyle = '#000'

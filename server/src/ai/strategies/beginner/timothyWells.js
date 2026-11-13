@@ -1,9 +1,6 @@
 const { parseFen, generateFilteredLegals } = require('../../../game/moves')
 
-const promotionCells = {
-    white: [0,  1,  2,  3,  5,  6,  9,  10, 14],
-    black: [76, 80, 81, 84, 85, 87, 88, 89, 90]
-}
+const { promotionCells } = require('../../../game/moves')
 
 function strategy({ fen, turn, enPassant }) {
     const board = parseFen(fen)

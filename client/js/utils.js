@@ -16,13 +16,7 @@ export const Smooth = (pos, dest, time) => {
     return (dest - pos) / time
 }
 
-export const setSystemMessage = (text, type = '') => {
+export const setSystemMessage = text => {
     const el = document.getElementById('system-text')
-    if (!el) return
-
-    //console.log('Should set', text)
-
-    //el.className = ''
-    if (type) el.classList.add(`system-${type}`)
-    el.textContent = text
+    if (el && el.textContent != text) el.textContent = text
 }

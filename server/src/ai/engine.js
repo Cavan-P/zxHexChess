@@ -1,4 +1,4 @@
-const { parseFen, generateFilteredLegals, cloneBoard, applyMove, isKingAttacked } = require('../game/moves')
+const { parseFen, generateFilteredLegals, cloneBoard, applyMove, isKingAttacked, promotionCells } = require('../game/moves')
 
 const pieceValues = {
     p: 1,
@@ -13,11 +13,6 @@ const MATE = 10000000
 const CHECK_BONUS = 2
 const HANG_PENALTY_MULT = 1.2
 const CENTER = 5 // hex board radius, cell [0,0,0] is the center
-
-const promotionCells = {
-    white: [0,  1,  2,  3,  5,  6,  9,  10, 14],
-    black: [76, 80, 81, 84, 85, 87, 88, 89, 90]
-}
 
 const other = c => c == 'white' ? 'black' : 'white'
 
@@ -222,12 +217,27 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
 // Parses the FEN, runs a timeboxed alpha-beta search, and returns a ready-to-play move.
 // Falls back to any legal move if the search times out before finishing depth 1 (e.g. a cold start),
 // so a bot never silently stalls the game by returning nothing.
-const searchBot = ({ fen, turn, enPassant, maxDepth, timeLimitMs, evaluate }) => {
+//
+// Two optional "personality" knobs make weaker but still sensible opponents:
+//   noise          - random error (in pawns) added to every position the bot evaluates, so it
+//                    misjudges close positions the way a human does
+//   blunderChance  - probability of skipping the search and playing a random legal move
+const searchBot = ({ fen, turn, enPassant, maxDepth, timeLimitMs, evaluate, noise = 0, blunderChance = 0 }) => {
     const board = parseFen(fen)
-    const move = iterativeDeepening(board, turn, enPassant, maxDepth, timeLimitMs, evaluate)
-        || generateAllMoves(board, turn, enPassant)[0]
+    const legal = generateAllMoves(board, turn, enPassant)
+    if(!legal.length) return null
 
-    if(!move) return null
+    let move = null
+
+    if(blunderChance && Math.random() < blunderChance){
+        move = legal[Math.floor(Math.random() * legal.length)]
+    }
+    else {
+        const noisyEvaluate = noise
+            ? (b, color, ep) => evaluate(b, color, ep) + (Math.random() * 2 - 1) * noise
+            : evaluate
+        move = iterativeDeepening(board, turn, enPassant, maxDepth, timeLimitMs, noisyEvaluate) || legal[0]
+    }
 
     const piece = board[move.from]
     if(piece?.piece?.toLowerCase() == 'p' && promotionCells[turn].includes(move.to)){
@@ -237,12 +247,32 @@ const searchBot = ({ fen, turn, enPassant, maxDepth, timeLimitMs, evaluate }) =>
     return move
 }
 
+const EVALUATORS = {
+    material: evaluateMaterial,
+    central: evaluateCentral,
+    positional: evaluatePositional,
+    master: evaluateMaster
+}
+
+// Builds a complete bot module from a profile and search settings, e.g.
+//   makeEngineBot({ id, name, description, category, icon, elo }, { maxDepth: 2, timeLimitMs: 800, eval: 'central', noise: 0.5 })
+const makeEngineBot = (profile, { eval: evalName = 'material', ...search }) => {
+    const evaluate = EVALUATORS[evalName]
+    if(!evaluate) throw new Error(`Unknown evaluator "${evalName}" for bot ${profile.id}`)
+
+    return {
+        ...profile,
+        play: ({ fen, turn, enPassant }) => searchBot({ fen, turn, enPassant, evaluate, ...search })
+    }
+}
+
 module.exports = {
     pieceValues,
     promotionCells,
     generateAllMoves,
     iterativeDeepening,
     searchBot,
+    makeEngineBot,
     evaluateWeighted,
     DEFAULT_WEIGHTS,
     evaluateMaterial,

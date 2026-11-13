@@ -1,45 +1,43 @@
 import { Game } from "./game.js";
 
-const getLogicalMousePos = (x, y) => {
-    if(Game.playerColor != 'black') return { x, y }
+// Converts a pointer position on the page into the board's logical coordinate space,
+// undoing the canvas scale/offset and the 180° flip used when playing Black.
+const toBoardCoords = e => {
+    const rect = Game.canvas.getBoundingClientRect()
+    const { scale, ox, oy, dpr } = Game.view
 
-    const cx = Game.boardCenter.x
-    const cy = Game.boardCenter.y
+    let x = ((e.clientX - rect.left) * dpr - ox) / scale
+    let y = ((e.clientY - rect.top) * dpr - oy) / scale
 
-    return {
-        x: cx - (x - cx),
-        y: cy - (y - cy)
+    if(Game.playerColor == 'black'){
+        x = 2 * Game.boardCenter.x - x
+        y = 2 * Game.boardCenter.y - y
     }
+
+    return { x, y }
 }
 
 export const setupInput = _ => {
+    const updatePosition = e => {
+        const { x, y } = toBoardCoords(e)
+        Game.mouse.x = x
+        Game.mouse.y = y
+    }
 
-    document.addEventListener('mousemove', e => {
-        const rect = Game.canvas.getBoundingClientRect()
+    // Pointer events cover mouse, touch and pen, so the board also works on tablets and phones.
+    document.addEventListener('pointermove', updatePosition)
 
-        const rawX = e.clientX - rect.left
-        const rawY = e.clientY - rect.top
-
-        if(Game.playerColor == 'black'){
-            const cx = Game.boardCenter.x
-            const cy = Game.boardCenter.y
-
-            Game.mouse.x = cx - (rawX - cx)
-            Game.mouse.y = cy - (rawY - cy)
-        }
-        else{
-            Game.mouse.x = rawX
-            Game.mouse.y = rawY
-        }
-
-        
-    
-    })
-
-    document.addEventListener('mousedown', _ => {
+    Game.canvas.addEventListener('pointerdown', e => {
+        updatePosition(e)
         Game.mouse.pressed = true
     })
-    document.addEventListener('mouseup', _ => {
+
+    document.addEventListener('pointerup', e => {
+        updatePosition(e)
+        Game.mouse.pressed = false
+    })
+
+    document.addEventListener('pointercancel', _ => {
         Game.mouse.pressed = false
     })
 }
