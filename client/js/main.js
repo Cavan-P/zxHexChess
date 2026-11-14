@@ -110,6 +110,7 @@ const status = _ => {
 const statusEl = document.getElementById('system-text')
 let lastTone = null
 let lastTurn = null
+let lastFen = null
 
 const updateStatus = _ => {
     const [text, tone] = status()
@@ -121,8 +122,10 @@ const updateStatus = _ => {
         lastTone = tone
     }
 
-    if(Game.turn != lastTurn){
+    // Re-render the player rows (turn indicator, captured pieces, material) when anything changes.
+    if(Game.turn != lastTurn || Game.fen != lastFen){
         lastTurn = Game.turn
+        lastFen = Game.fen
         Game.updatePlayers?.()
     }
 }

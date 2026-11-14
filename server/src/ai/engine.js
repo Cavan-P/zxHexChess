@@ -1,4 +1,4 @@
-const { parseFen, boardToFen, generateFilteredLegals, generateLegalMoves, cloneBoard, applyMove, isKingAttacked, promotionCells } = require('../game/moves')
+const { parseFen, boardToFen, generateFilteredLegals, generateLegalMoves, isKingAttacked, promotionCells } = require('../game/moves')
 
 const pieceValues = {
     p: 1,
@@ -52,6 +52,11 @@ const exposure = (cell, color, value, cheapest) => {
 }
 
 const hexDistanceFromCenter = coords => Math.max(Math.abs(coords[0]), Math.abs(coords[1]), Math.abs(coords[2]))
+const hexDistance = (a, b) => hexDistanceFromCenter([a[0] - b[0], a[1] - b[1], a[2] - b[2]])
+
+// How far up the board a pawn has come, 1 (home edge) to 11 (promotion edge), from its own side.
+// Black's view is the board turned 180 degrees, i.e. every coordinate negated.
+const pawnRank = ([q, r], color) => color == 'white' ? 6 - r - Math.max(0, q) : 6 + r - Math.max(0, -q)
 
 const generateAllMoves = (board, turn, enPassant) => {
     const moves = []
@@ -88,6 +93,10 @@ const evaluateWeighted = (board, maximizingColor, enPassant, weights, toMove = o
     const { cheapest, mobility } = coverageMap(board, enPassant, weights.pieceValues)
     const enemyColor = other(maximizingColor)
     const worstExposure = { white: 0, black: 0 }
+    const material = { white: 0, black: 0 }        // everything but kings
+    const officers = { white: 0, black: 0 }        // everything but kings and pawns
+    const kings = {}
+    const pawnAdvance = weights.pawnAdvanceWeight ?? 0.03
 
     if(weights.mobilityWeight){
         score += (mobility[maximizingColor] - mobility[enemyColor]) * weights.mobilityWeight
@@ -103,6 +112,16 @@ const evaluateWeighted = (board, maximizingColor, enPassant, weights, toMove = o
 
         const v = lower == 'k' ? 0 : (weights.pieceValues[lower] || 0)
         score += sign * v
+        material[cell.color] += v
+        if(lower == 'k') kings[cell.color] = cell.coords
+        else if(lower != 'p') officers[cell.color] += v
+
+        // Pawns are worth a little more the closer they get to promoting, so bots have a reason
+        // to push them (and a plan in endgames) instead of shuffling pieces around.
+        if(lower == 'p'){
+            const rank = pawnRank(cell.coords, cell.color)
+            score += sign * ((rank - 1) * pawnAdvance + (rank >= 9 ? 0.25 : 0))
+        }
 
         if(v){
             const lost = exposure(i, cell.color, v, cheapest)
@@ -119,6 +138,22 @@ const evaluateWeighted = (board, maximizingColor, enPassant, weights, toMove = o
     const victim = toMove == maximizingColor ? enemyColor : maximizingColor
     const threatened = worstExposure[victim] * (weights.hangingPenaltyMult / HANG_PENALTY_MULT) * 0.8
     score += victim == maximizingColor ? -threatened : threatened
+
+    // "Mop-up": when one side is clearly ahead and the other has little left, the winner wants the
+    // losing king on the edge of the board and its own king close by - that's how mates happen.
+    // Without this a winning bot sees no way to make progress and drifts (or repeats into a draw).
+    const lead = material[maximizingColor] - material[enemyColor]
+    if(Math.abs(lead) >= 4 && kings.white && kings.black){
+        const winner = lead > 0 ? maximizingColor : enemyColor
+        const loser = other(winner)
+        if(officers[loser] <= 10){
+            const mopUp = (weights.mopUpWeight ?? 1) * (
+                0.15 * hexDistanceFromCenter(kings[loser]) +
+                0.1 * (2 * CENTER - hexDistance(kings[winner], kings[loser]))
+            )
+            score += winner == maximizingColor ? mopUp : -mopUp
+        }
+    }
 
     if(weights.kingSafetyWeight){
         const king = board.find(p => p.piece?.toLowerCase() == 'k' && p.color == maximizingColor)
@@ -152,34 +187,90 @@ const evaluatePositional = (board, maximizingColor, enPassant, toMove) => evalua
 // Positional eval + keeping friendly pieces near your own king
 const evaluateMaster = (board, maximizingColor, enPassant, toMove) => evaluateWeighted(board, maximizingColor, enPassant, MASTER_WEIGHTS, toMove)
 
-const moveHeuristic = (board, move, turn, enPassant) => {
-    let h = 0
+// Is `color`'s king attacked? Instead of generating moves for every enemy piece, stand on the
+// king's cell and move outward as each piece type: if a rook-move from the king lands on an enemy
+// rook or queen, that piece attacks the king, and likewise for bishops, knights, kings and pawns.
+// (Every Gliński piece attacks symmetrically, so this is exact.) About 5 move generations instead of ~16.
+const SUPER_PIECES = [['r', 'rq'], ['b', 'bq'], ['n', 'n'], ['k', 'k'], ['p', 'p']]
 
-    const target = board[move.to]
-    if(target?.piece){
-        h += (pieceValues[target.piece.toLowerCase()] || 0) * 100
+const kingAttacked = (board, color) => {
+    let kingCell = -1
+    for(let i = 0; i < board.length; i++){
+        const c = board[i]
+        if(c.color == color && (c.piece == 'k' || c.piece == 'K')){ kingCell = i; break }
     }
+    if(kingCell < 0) return false
 
-    const clone = cloneBoard(board)
-    const nextBoard = applyMove(clone, move.from, move.to)
-    const enemy = other(turn)
-
-    if(isKingAttacked(nextBoard, enemy, enPassant)) h += 10000
-
-    return h
+    const probe = board.slice()
+    for(const [as, attackers] of SUPER_PIECES){
+        probe[kingCell] = { ...board[kingCell], piece: as }
+        for(const to of generateLegalMoves(probe, kingCell, color, null)){
+            const target = board[to]
+            if(target.piece && target.color != color && attackers.includes(target.piece.toLowerCase())) return true
+        }
+    }
+    return false
 }
+
+// Plays a move on a copy of the board, sharing every untouched cell with the original (search
+// never mutates cells, so copying all 91 of them for every move was pure overhead).
+const playOnCopy = (board, from, to) => {
+    const next = board.slice()
+    const moving = board[from]
+    next[to] = { piece: moving.piece, color: moving.color, cell: to, coords: board[to].coords }
+    next[from] = { piece: '', color: '', cell: from, coords: moving.coords }
+    return next
+}
+
+// Pseudo-legal moves (may leave the king in check; the search rejects those when it gets there).
+const pseudoMoves = (board, turn, enPassant) => {
+    const moves = []
+    for(let i = 0; i < board.length; i++){
+        if(board[i].color != turn) continue
+        for(const to of generateLegalMoves(board, i, turn, enPassant)) moves.push({ from: i, to })
+    }
+    return moves
+}
+
+const hasLegalMove = (board, turn) => pseudoMoves(board, turn, null).some(m => !kingAttacked(playOnCopy(board, m.from, m.to), turn))
+
+// Captures first, most valuable victim with the least valuable attacker ("MVV-LVA").
+const orderScore = (board, move) => {
+    const victim = board[move.to].piece
+    if(!victim) return 0
+    const attacker = board[move.from].piece.toLowerCase()
+    return 100 * (pieceValues[victim.toLowerCase()] || 0) - (pieceValues[attacker] || 0) + 1000
+}
+
+const TT_EXACT = 0, TT_LOWER = 1, TT_UPPER = 2
 
 // Repeating an earlier position counts as a draw, scored just below level so a bot that's ahead
 // avoids it (no more shuffling the same piece back and forth) and a bot that's behind welcomes it.
 const REPETITION_SCORE = -0.1
 
-// Moving a piece straight back to where it just came from is rarely the best idea; this nudge
-// stops bots from shuffling one piece back and forth when nothing else stands out.
-const UNDO_PENALTY = 0.5
+// Moving a piece back onto a cell it stood on in its last few moves (A->B->A, or A->B->C->A) is
+// rarely the best idea; this nudge stops bots from shuffling pieces around when nothing stands out.
+const SHUFFLE_PENALTY = 0.75
 
 // `seen` (optional) is a Set of "fen|turn" keys for positions that already happened in the game.
-// `lastOwnMove` (optional) is the side to move's previous move, { from, to }.
-const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLimitMs, evaluate, seen = null, lastOwnMove = null) => {
+// `recentOwnMoves` (optional) is the side to move's last few moves, oldest first, as [{ from, to }].
+// `quiescence` (optional) keeps searching captures past the depth limit (see `quiesce`).
+const QUIESCENCE_DEPTH = 6
+
+const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLimitMs, evaluate, seen = null, recentOwnMoves = [], quiescence = false) => {
+    // Cells each of our pieces has recently stood on, traced back through our own recent moves.
+    const recentCells = from => {
+        const cells = new Set()
+        let cell = from
+        for(let i = recentOwnMoves.length - 1; i >= 0; i--){
+            if(recentOwnMoves[i].to == cell){
+                cell = recentOwnMoves[i].from
+                cells.add(cell)
+            }
+        }
+        return cells
+    }
+
     let bestMove = null
     const startTime = Date.now()
 
@@ -187,48 +278,115 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
     // one-move search, or it would fall back to an arbitrary move (and shuffle the same piece).
     let enforceTime = false
 
+    // Transposition table: positions already searched this move, keyed by board + side to move.
+    // The same position is often reached by different move orders; this skips re-searching it and
+    // remembers which move was best, so later passes try that move first.
+    const table = new Map()
+    const sameMove = (a, b) => a && b && a.from == b.from && a.to == b.to
+
+    const staticScore = (board, turn, maximizingColor, enPassant) => {
+        let s = evaluate(board, maximizingColor, enPassant, turn)
+        if(kingAttacked(board, other(turn))) s += CHECK_BONUS
+        return s
+    }
+
+    // Quiescence search: at the depth limit, keep playing out captures until the position is
+    // quiet, so the bot never stops halfway through a trade ("I won a pawn!" - and then the
+    // recapture it didn't look at takes a knight). The side to move may also "stand pat" and
+    // decline to capture, so this only ever finds captures that actually help.
+    const quiesce = (board, turn, alpha, beta, maximizingColor, ply, qDepth) => {
+        if(enforceTime && Date.now() - startTime > timeLimitMs) return { timeout: true }
+        if(kingAttacked(board, other(turn))) return { illegal: true }
+
+        const maximizing = turn == maximizingColor
+        const standPat = staticScore(board, turn, maximizingColor, null)
+
+        if(kingAttacked(board, turn) && !hasLegalMove(board, turn)){
+            return { score: turn != maximizingColor ? (MATE - ply) : (-MATE + ply) }
+        }
+
+        if(!qDepth) return { score: standPat }
+
+        let value = standPat
+        if(maximizing){ if(value >= beta) return { score: value }; alpha = Math.max(alpha, value) }
+        else { if(value <= alpha) return { score: value }; beta = Math.min(beta, value) }
+
+        const captures = pseudoMoves(board, turn, null).filter(m => board[m.to].piece)
+        captures.sort((a, b) => orderScore(board, b) - orderScore(board, a))
+
+        for(const move of captures){
+            const r = quiesce(playOnCopy(board, move.from, move.to), other(turn), alpha, beta, maximizingColor, ply + 1, qDepth - 1)
+            if(r.timeout) return r
+            if(r.illegal) continue
+
+            if(maximizing ? r.score > value : r.score < value) value = r.score
+            if(maximizing) alpha = Math.max(alpha, value)
+            else beta = Math.min(beta, value)
+            if(beta <= alpha) break
+        }
+
+        return { score: value }
+    }
+
     const search = (board, turn, enPassant, depth, alpha, beta, maximizingColor, ply) => {
         if(enforceTime && Date.now() - startTime > timeLimitMs) return { timeout: true }
 
-        if(ply == 1 && seen?.size && seen.has(`${boardToFen(board)}|${turn}`)) return { score: REPETITION_SCORE, move: null }
+        // The previous move left its own king in check: not a legal position.
+        if(ply > 0 && kingAttacked(board, other(turn))) return { illegal: true }
 
-        const inCheck = isKingAttacked(board, turn, enPassant)
+        // Any position (at any depth) that already happened in the game counts as a draw by
+        // repetition - including ones the opponent could steer back into with their reply.
+        const fen = ply > 0 ? boardToFen(board) : null
+        if(fen && seen?.size && seen.has(`${fen}|${turn}`)) return { score: REPETITION_SCORE, move: null }
+
+        const inCheck = kingAttacked(board, turn)
         const mateScore = _ => turn != maximizingColor ? (MATE - ply) : (-MATE + ply)
 
+        if(!depth && quiescence && ply > 0) return quiesce(board, turn, alpha, beta, maximizingColor, ply, QUIESCENCE_DEPTH)
+
         if(!depth){
-            // Full mate detection needs every legal move, so at leaves only do it when in check
+            // Full mate detection needs a legal move search, so at leaves only do it when in check
             // (a stalemate at a leaf is rare enough to ignore).
-            if(inCheck && !generateAllMoves(board, turn, enPassant).length) return { score: mateScore(), move: null }
+            if(inCheck && !hasLegalMove(board, turn)) return { score: mateScore(), move: null }
 
             let s = evaluate(board, maximizingColor, enPassant, turn)
 
             const enemy = other(turn)
-            if(isKingAttacked(board, enemy, enPassant)) s += CHECK_BONUS
+            if(kingAttacked(board, enemy)) s += CHECK_BONUS
 
             return { score: s, move: null }
         }
 
-        const moves = generateAllMoves(board, turn, enPassant)
-        if(!moves.length) return { score: inCheck ? mateScore() : 0, move: null }
+        const key = fen ? fen + turn : null
+        const cached = key && table.get(key)
+        if(cached && cached.depth >= depth){
+            if(cached.flag == TT_EXACT) return { score: cached.score, move: cached.move }
+            if(cached.flag == TT_LOWER && cached.score >= beta) return { score: cached.score, move: cached.move }
+            if(cached.flag == TT_UPPER && cached.score <= alpha) return { score: cached.score, move: cached.move }
+        }
 
-        // Score each move once for ordering (captures and checks first), then sort.
-        const ordering = new Map(moves.map(m => [m, moveHeuristic(board, m, turn, enPassant)]))
+        const moves = pseudoMoves(board, turn, ply == 0 ? enPassant : null)
+        const hint = cached?.move || (ply == 0 ? bestMove : null)
+        const ordering = new Map(moves.map(m => [m, sameMove(m, hint) ? 1e9 : orderScore(board, m)]))
         moves.sort((a, b) => ordering.get(b) - ordering.get(a))
 
+        const alphaStart = alpha, betaStart = beta
         let bestLocal = null
+        let legalCount = 0
         const maximizing = turn == maximizingColor
         let value = maximizing ? -Infinity : Infinity
 
         for(const move of moves){
-            const clone = cloneBoard(board)
-            const nextBoard = applyMove(clone, move.from, move.to)
+            const nextBoard = playOnCopy(board, move.from, move.to)
 
-            const r = search(nextBoard, other(turn), enPassant, depth - 1, alpha, beta, maximizingColor, ply + 1)
+            // En passant only lasts one move, so children search without it.
+            const r = search(nextBoard, other(turn), null, depth - 1, alpha, beta, maximizingColor, ply + 1)
             if(r.timeout) return r
+            if(r.illegal) continue
+            legalCount++
 
             let score = r.score
-            const undoesLastMove = ply == 0 && lastOwnMove && move.from == lastOwnMove.to && move.to == lastOwnMove.from && !board[move.to].piece
-            if(undoesLastMove) score -= UNDO_PENALTY
+            if(ply == 0 && !board[move.to].piece && recentCells(move.from).has(move.to)) score -= SHUFFLE_PENALTY
 
             if(maximizing ? score > value : score < value){
                 value = score
@@ -243,6 +401,13 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
             }
 
             if(beta <= alpha) break
+        }
+
+        if(!legalCount) return { score: inCheck ? mateScore() : 0, move: null }
+
+        if(key){
+            const flag = value <= alphaStart ? TT_UPPER : value >= betaStart ? TT_LOWER : TT_EXACT
+            table.set(key, { depth, score: value, flag, move: bestLocal })
         }
 
         return { score: value, move: bestLocal }
@@ -267,7 +432,7 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
 //   noise          - random error (in pawns) added to every position the bot evaluates, so it
 //                    misjudges close positions the way a human does
 //   blunderChance  - probability of skipping the search and playing a random legal move
-const searchBot = ({ fen, turn, enPassant, seen = null, lastOwnMove = null, maxDepth, timeLimitMs, evaluate, noise = 0, blunderChance = 0 }) => {
+const searchBot = ({ fen, turn, enPassant, seen = null, recentOwnMoves = null, lastOwnMove = null, maxDepth, timeLimitMs, evaluate, noise = 0, blunderChance = 0, quiescence = false }) => {
     const board = parseFen(fen)
     const legal = generateAllMoves(board, turn, enPassant)
     if(!legal.length) return null
@@ -282,7 +447,8 @@ const searchBot = ({ fen, turn, enPassant, seen = null, lastOwnMove = null, maxD
             ? (b, color, ep, toMove) => evaluate(b, color, ep, toMove) + (Math.random() * 2 - 1) * noise
             : evaluate
         const seenSet = Array.isArray(seen) ? new Set(seen) : null
-        move = iterativeDeepening(board, turn, enPassant, maxDepth, timeLimitMs, noisyEvaluate, seenSet, lastOwnMove) || legal[0]
+        const recent = recentOwnMoves || (lastOwnMove ? [lastOwnMove] : [])
+        move = iterativeDeepening(board, turn, enPassant, maxDepth, timeLimitMs, noisyEvaluate, seenSet, recent, quiescence) || legal[0]
     }
 
     const piece = board[move.from]
@@ -308,11 +474,12 @@ const makeEngineBot = (profile, { eval: evalName = 'material', ...search }) => {
 
     return {
         ...profile,
-        play: ({ fen, turn, enPassant, seen, lastOwnMove }) => searchBot({ fen, turn, enPassant, seen, lastOwnMove, evaluate, ...search })
+        play: state => searchBot({ ...state, evaluate, ...search })
     }
 }
 
 module.exports = {
+    kingAttacked,
     pieceValues,
     promotionCells,
     generateAllMoves,

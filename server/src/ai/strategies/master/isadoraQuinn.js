@@ -8,5 +8,5 @@ module.exports = makeEngineBot({
     icon: "fa-crown",
     elo: 1750
 }, {
-    maxDepth: 5, timeLimitMs: 4000, eval: 'positional'
+    maxDepth: 5, timeLimitMs: 4000, eval: 'positional', quiescence: true
 })

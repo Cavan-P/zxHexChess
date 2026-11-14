@@ -140,9 +140,9 @@ const materializeGenome = (genome, meta = {}) => {
 // Weights discovered via self-play evolutionary training (generations=${meta.generations ?? '?'}, population=${meta.populationSize ?? '?'}).
 const weights = ${weightsLiteral}
 
-function strategy({ fen, turn, enPassant, seen, lastOwnMove }) {
+function strategy(state) {
     return searchBot({
-        fen, turn, enPassant, seen, lastOwnMove,
+        ...state,
         maxDepth: ${PLAY_DEPTH},
         timeLimitMs: ${PLAY_TIME_MS},
         evaluate: (board, color, ep, toMove) => evaluateWeighted(board, color, ep, weights, toMove)

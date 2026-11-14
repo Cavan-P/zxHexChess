@@ -12,7 +12,7 @@ const playGame = async ({ playA, playB, maxPlies = 300, noProgressLimit = 100, f
     for(let ply = 0; ply < maxPlies; ply++){
         const turn = game.turn
         const play = turn == 'white' ? playA : playB
-        const move = play({ fen: game.fen, turn, enPassant: game.enPassant, seen: game.seenPositions(), lastOwnMove: game.lastMoveBy(turn) })
+        const move = play({ fen: game.fen, turn, enPassant: game.enPassant, seen: game.seenPositions(), recentOwnMoves: game.recentMovesBy(turn) })
 
         const res = move ? game.play(turn, move.from, move.to, move.promotion || 'q') : { ok: false }
         if(!res.ok){

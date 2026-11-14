@@ -10,7 +10,10 @@ const weights = {
     hanging: 0.2
 }
 
-const pickMove = ({ board, moves, color, enPassant }) => {
+// Big enough to outweigh any single preference, so a bot only loops a piece if it truly must.
+const SHUFFLE_PENALTY = 5
+
+const pickMove = ({ board, moves, color, enPassant, recentOwnMoves }) => {
     const scored = []
 
     for(const move of moves){
@@ -25,6 +28,7 @@ const pickMove = ({ board, moves, color, enPassant }) => {
         const hangingScore = heuristics.hangingPenalty(newBoard, color, move.to, enPassant) * weights.hanging
     
         score = captureScore + checkScore + materialScore + hangingScore + queenScore
+        score -= heuristics.revisitsCell(board, move, recentOwnMoves) * SHUFFLE_PENALTY
 
         scored.push({ move, score })
     }
@@ -42,7 +46,7 @@ const pickMove = ({ board, moves, color, enPassant }) => {
 
 const { promotionCells } = require('../../../game/moves')
 
-function strategy({ fen, turn, enPassant }) {
+function strategy({ fen, turn, enPassant, recentOwnMoves = [] }) {
     const board = parseFen(fen)
     const moves = []
 
@@ -55,7 +59,7 @@ function strategy({ fen, turn, enPassant }) {
         })
     })
 
-    const chosen = pickMove({ board, moves, color: turn, enPassant })
+    const chosen = pickMove({ board, moves, color: turn, enPassant, recentOwnMoves })
 
     if(promotionCells[turn].includes(chosen.to)){
         return {...chosen, promotion: 'q'}

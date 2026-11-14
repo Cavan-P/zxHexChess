@@ -332,7 +332,7 @@ class Room {
         setTimeout(async _ => {
             let move = null
             try {
-                move = await requestBotMove(botId, { fen: this.game.fen, turn: color, enPassant: this.game.enPassant, seen: this.game.seenPositions(), lastOwnMove: this.game.lastMoveBy(color) })
+                move = await requestBotMove(botId, { fen: this.game.fen, turn: color, enPassant: this.game.enPassant, seen: this.game.seenPositions(), recentOwnMoves: this.game.recentMovesBy(color) })
             }
             catch(e){
                 console.error(`[room ${this.id}] Bot ${botId} failed:`, e.message)

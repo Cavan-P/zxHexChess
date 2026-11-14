@@ -7,7 +7,7 @@
     "gamesPlayed": 2
   },
   "derekSanders": {
-    "elo": 500,
+    "elo": 460,
     "wins": 4,
     "losses": 0,
     "draws": 2,
@@ -49,7 +49,7 @@
     "gamesPlayed": 0
   },
   "elenaVoss": {
-    "elo": 1300,
+    "elo": 1400,
     "wins": 0,
     "losses": 0,
     "draws": 0,

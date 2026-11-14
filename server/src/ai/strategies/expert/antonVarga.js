@@ -6,7 +6,7 @@ module.exports = makeEngineBot({
     description: "ATTACK! Sharp lines, four moves deep, straight at your king. Defending is someone else's hobby.",
     category: "Expert",
     icon: "fa-chess-queen",
-    elo: 1400
+    elo: 1300
 }, {
-    maxDepth: 4, timeLimitMs: 3500, eval: 'central'
+    maxDepth: 4, timeLimitMs: 3500, eval: 'central', quiescence: true
 })

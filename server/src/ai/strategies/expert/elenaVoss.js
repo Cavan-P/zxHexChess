@@ -1,11 +1,12 @@
 const { searchBot, evaluatePositional } = require('../../engine')
 
-function strategy({ fen, turn, enPassant, seen, lastOwnMove }) {
+function strategy(state) {
     return searchBot({
-        fen, turn, enPassant, seen, lastOwnMove,
+        ...state,
         maxDepth: 4,
         timeLimitMs: 3000,
-        evaluate: evaluatePositional
+        evaluate: evaluatePositional,
+        quiescence: true
     })
 }
 
@@ -15,6 +16,6 @@ module.exports = {
     description: "Calculates the long lines so you don't have to. An undefended piece is basically an invitation.",
     category: 'Expert',
     icon: 'fa-chess-queen',
-    elo: 1300,
+    elo: 1400,
     play: strategy
 }

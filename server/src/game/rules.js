@@ -52,6 +52,11 @@ class GameState {
         return parseFen(this.fen)
     }
 
+    // The given side's last `count` moves, oldest first, as [{ from, to }].
+    recentMovesBy(color, count = 6){
+        return this.history.filter(m => m.color == color).slice(-count).map(m => ({ from: m.from, to: m.to }))
+    }
+
     // The given side's most recent move ({ from, to }), or null.
     lastMoveBy(color){
         for(let i = this.history.length - 1; i >= 0; i--){

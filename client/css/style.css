@@ -211,6 +211,38 @@
     }
     .tier-progress.is-complete { background: var(--success); color: #fff; }
 
+    .captured-strip {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        row-gap: 1px;
+        min-height: 1.1rem;
+        margin-top: 1px;
+    }
+    .captured-strip:empty { display: none; }
+
+    .captured-piece {
+        display: inline-block;
+        width: 1.2rem;
+        height: 1.2rem;
+        flex: none;
+        filter: drop-shadow(0 1px 0 rgba(255, 255, 255, .6));
+    }
+    /* White pieces need a dark edge to stand out on the light panel. */
+    .captured-piece.is-white {
+        filter: drop-shadow(0 0 0.6px rgba(43, 27, 15, .9)) drop-shadow(0 0 0.6px rgba(43, 27, 15, .9));
+    }
+    /* Repeats of the same piece tuck in behind each other, like a little stack. */
+    .captured-piece.is-stacked { margin-left: -0.55rem; }
+
+    .material-lead {
+        margin-left: 0.35rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--text-main);
+        font-variant-numeric: tabular-nums;
+    }
+
     .elo-badge {
         display: inline-block;
         padding: 0.05rem 0.45rem;

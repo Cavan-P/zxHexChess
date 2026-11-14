@@ -8,5 +8,5 @@ module.exports = makeEngineBot({
     icon: "fa-chess-king",
     elo: 2000
 }, {
-    maxDepth: 6, timeLimitMs: 7000, eval: 'master'
+    maxDepth: 6, timeLimitMs: 7000, eval: 'master', quiescence: true
 })

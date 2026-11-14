@@ -1,6 +1,20 @@
 const { applyMove, isKingAttacked, generateFilteredLegals } = require('../game/moves')
 
 
+// 1 if the move puts a piece back onto a cell it stood on in the side's recent moves (A->B->A or
+// A->B->C->A) without capturing anything, else 0. Used to stop bots shuffling pieces in loops.
+module.exports.revisitsCell = (board, move, recentOwnMoves = []) => {
+    if(board[move.to].piece) return 0
+    let cell = move.from
+    for(let i = recentOwnMoves.length - 1; i >= 0; i--){
+        if(recentOwnMoves[i].to == cell){
+            cell = recentOwnMoves[i].from
+            if(cell == move.to) return 1
+        }
+    }
+    return 0
+}
+
 // In-place Fisher-Yates shuffle.
 module.exports.shuffle = list => {
     for(let i = list.length - 1; i > 0; i--){

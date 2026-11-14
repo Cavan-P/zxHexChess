@@ -59,6 +59,34 @@ const renderBotCard = (bot, { selected = false, compact = false, beaten = false,
 
 const SPRITE_COLUMNS = { k: 0, q: 1, b: 2, n: 3, r: 4, p: 5 }
 
+// Gliński starting army, and piece values for the material count.
+const START_COUNT = { p: 9, n: 2, b: 3, r: 2, q: 1 }
+const VALUES = { p: 1, n: 3, b: 3, r: 5, q: 9 }
+const CAPTURE_ORDER = ['q', 'r', 'b', 'n', 'p']
+
+// From the position alone: which enemy pieces each side has captured, and each side's material
+// total. Promotions can leave a side with "more" of a piece than it started with; that never
+// shows as a captured piece, but the material score still counts it correctly.
+const materialFromFen = fen => {
+    const count = { white: { p: 0, n: 0, b: 0, r: 0, q: 0 }, black: { p: 0, n: 0, b: 0, r: 0, q: 0 } }
+    for(const ch of fen || ''){
+        const lower = ch.toLowerCase()
+        if(!(lower in START_COUNT)) continue
+        count[ch == lower ? 'black' : 'white'][lower]++
+    }
+
+    const total = color => Object.entries(count[color]).reduce((sum, [p, n]) => sum + n * VALUES[p], 0)
+    const capturedBy = color => {
+        const enemy = color == 'white' ? 'black' : 'white'
+        return CAPTURE_ORDER.flatMap(p => Array(Math.max(0, START_COUNT[p] - count[enemy][p])).fill(p))
+    }
+
+    return {
+        white: { captured: capturedBy('white'), total: total('white') },
+        black: { captured: capturedBy('black'), total: total('black') }
+    }
+}
+
 // Paints a piece from the sprite sheet into an element (used by the promotion dialog).
 const paintSprite = (node, piece, color) => {
     const col = SPRITE_COLUMNS[piece]
@@ -190,6 +218,28 @@ export const setupRoomMenu = _ => {
         const topColor = bottomColor == 'white' ? 'black' : 'white'
         const seated = Game.playerColor == 'white' || Game.playerColor == 'black'
 
+        const material = materialFromFen(Game.fen)
+
+        // A row of little icons for the pieces this side has taken, plus "+N" if it's ahead.
+        const capturedStrip = color => {
+            const enemy = color == 'white' ? 'black' : 'white'
+            const { captured, total } = material[color]
+            const lead = total - material[enemy].total
+
+            const strip = el('span', 'captured-strip')
+            let previous = null
+            for(const piece of captured){
+                const icon = el('span', `captured-piece${piece == previous ? ' is-stacked' : ''}${enemy == 'white' ? ' is-white' : ''}`)
+                icon.title = piece
+                paintSprite(icon, piece, enemy)
+                Object.assign(icon.style, { width: '', height: '', display: '' })
+                strip.append(icon)
+                previous = piece
+            }
+            if(lead > 0) strip.append(el('span', 'material-lead', `+${lead}`))
+            return strip
+        }
+
         const renderRow = (row, color) => {
             const side = info[color]
             const present = Game.presence ? Game.presence[color] : true
@@ -207,7 +257,10 @@ export const setupRoomMenu = _ => {
 
             const label = el('span', `min-w-0 truncate text-sm font-semibold ${side.type != 'bot' && !present ? 'text-(--text-muted) italic font-medium' : 'text-(--text-strong)'}`, name)
 
-            row.replaceChildren(swatch, label)
+            const text = el('span', 'flex min-w-0 flex-col')
+            text.append(label, capturedStrip(color))
+
+            row.replaceChildren(swatch, text)
             if(side.elo != null && present) row.append(el('span', 'elo-badge', ratingLabel(side.elo, side.provisional)))
             row.append(el('span', 'turn-dot'))
 

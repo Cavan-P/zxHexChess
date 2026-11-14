@@ -8,5 +8,5 @@ module.exports = makeEngineBot({
     icon: "fa-chess-rook",
     elo: 1150
 }, {
-    maxDepth: 3, timeLimitMs: 2500, eval: 'master'
+    maxDepth: 3, timeLimitMs: 2500, eval: 'master', quiescence: true
 })
