@@ -129,3 +129,28 @@ test('engine bots do not loop pieces in a long game between equals', _ => {
 
     assert.ok(loops <= ownMoves * 0.05, `${loops} looping moves out of ${ownMoves}`)
 })
+
+test('the fast table-driven move generator matches the rules engine exactly', _ => {
+    const { fastMoves } = require('../src/ai/fastMoves')
+    const { generateLegalMoves } = require('../src/game/moves')
+    const rand = rng(99)
+    const letters = 'pnbrqkPNBRQK'
+    let compared = 0
+
+    for(let n = 0; n < 400; n++){
+        const cells = Array(NUM_CELLS).fill('').map(_ => rand() < 0.35 ? letters[Math.floor(rand() * 12)] : '')
+        const board = parseFen(boardToFen(cells.map(piece => ({ piece }))))
+        if(n % 3 == 0) board.forEach(c => { if(c.piece && rand() < 0.5) c.color = 'neutral' })
+        const ep = rand() < 0.3 ? { captureCell: Math.floor(rand() * NUM_CELLS), pawnCell: 0, color: rand() < 0.5 ? 'white' : 'black' } : null
+
+        for(let i = 0; i < NUM_CELLS; i++){
+            if(!board[i].piece) continue
+            for(const color of ['white', 'black']){
+                const sort = list => [...list].sort((a, b) => a - b).join()
+                assert.strictEqual(sort(fastMoves(board, i, color, ep)), sort(generateLegalMoves(board, i, color, ep)), `${board[i].piece} on ${cellName(i)} as ${color}`)
+                compared++
+            }
+        }
+    }
+    assert.ok(compared > 10000)
+})

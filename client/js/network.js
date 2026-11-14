@@ -1,6 +1,7 @@
 import { Game } from "./game.js"
 import { addChatMessage, addSystemMessage } from "./chat.js"
 import { setSystemMessage } from "./utils.js"
+import { play } from "./sound.js"
 
 const host = window.location.hostname
 const isLocal = host == 'localhost' || host == '127.0.0.1'
@@ -36,10 +37,12 @@ export const setupNetwork = onFenInit => {
                 return
 
             case 'roomJoined':
+                Game.endSoundPlayed = false
                 Game.onRoomJoined?.(data)
                 if(data.code) setRoomCodeDisplay(data.code)
                 onFenInit(Game.fen)
                 if(Game.result) handleGameOver(Game.result, { quiet: true })
+                else play('start')
                 return
 
             case 'error':
@@ -55,6 +58,9 @@ export const setupNetwork = onFenInit => {
                 Game.check = data.lastMove?.check ?? null
                 Game.drawOffer = null
                 Game.opponentAway = false
+                Game.positions = data.positions || [data.fen]
+                Game.plyMoves = data.plyMoves || []
+                Game.viewPly = null
                 Game.onHistory?.(data.history || [])
                 Game.updatePlayers?.()
                 return
@@ -77,6 +83,7 @@ export const setupNetwork = onFenInit => {
             case 'chat':
                 addChatMessage(data.username, data.payload, false, { bot: data.bot })
                 if(data.bot) Game.onBotSpeech?.(data)
+                else play('notify')          // bot chatter stays quiet; people get a ping
                 return
 
             case 'move': return handleMove(data)
@@ -97,6 +104,7 @@ export const setupNetwork = onFenInit => {
                 return Game.onLegalMoves?.(data.from, data.moves)
 
             case 'illegalMove':
+                play('illegal')
                 if(Game.pendingMove){
                     const { piece, originalX, originalY } = Game.pendingMove
                     piece.targetX = originalX
@@ -123,7 +131,10 @@ export const setupNetwork = onFenInit => {
             case 'rematchOffered':
                 Game.rematchOffer = data.by
                 Game.onDrawOfferChanged?.()
-                if(data.by != Game.playerColor) addSystemMessage('Your opponent wants a rematch.')
+                if(data.by != Game.playerColor){
+                    addSystemMessage('Your opponent wants a rematch.')
+                    play('notify')
+                }
                 return
 
             case 'rematchUnavailable':
@@ -135,6 +146,7 @@ export const setupNetwork = onFenInit => {
             case 'drawOffered':
                 Game.drawOffer = data.by
                 Game.onDrawOfferChanged?.()
+                if(data.by != Game.playerColor) play('notify')
                 return
 
             case 'drawDeclined':
@@ -182,17 +194,34 @@ export const setupNetwork = onFenInit => {
     }
 }
 
+// Which sound a move makes: promotion > check > capture > plain move.
+const moveSound = data => data.promotion ? 'promote' : data.check != null ? 'check' : data.captured ? 'capture' : 'move'
+
 const handleMove = data => {
     if(Game.state == 'idle') return
-    Game.selectedPiece = null
+    if(!data.result) play(moveSound(data))     // a game-ending move gets the end-of-game sound instead
     Game.turn = data.turn
     Game.legalMap = data.legal || null
     Game.pendingMove = null
-    Game.check = data.check
     Game.drawOffer = null
     Game.onDrawOfferChanged?.()
 
     const { from, to, fen } = data
+    Game.positions?.push(fen)
+    Game.plyMoves?.push({ from, to, check: data.check })
+
+    // Looking back at an earlier position: record the move but leave the board alone. Returning to
+    // the live position (End / the ⏭ button) catches the board up.
+    if(Game.viewPly != null){
+        Game.fen = fen
+        Game.onMovePlayed?.(data.notation)
+        Game.onReviewChanged?.()
+        if(data.result) handleGameOver(data.result)
+        return
+    }
+
+    Game.selectedPiece = null
+    Game.check = data.check
     Game.lastMove = { from, to }
     Game.onMovePlayed?.(data.notation)
     Game.updatePlayers?.()
@@ -333,6 +362,13 @@ const handleGameOver = (result, { quiet = false, ratings } = {}) => {
     Game.onGameOver?.()
 
     if(quiet) return
+
+    // Once per game (the result can arrive twice: with the final move, then on its own).
+    if(!Game.endSoundPlayed){
+        Game.endSoundPlayed = true
+        const seated = Game.playerColor == 'white' || Game.playerColor == 'black'
+        play(!result.winner ? 'draw' : !seated || result.winner == Game.playerColor ? 'win' : 'loss')
+    }
 
     const icon = !result.winner ? 'fa-handshake' : result.winner == Game.playerColor ? 'fa-trophy' : 'fa-chess-king'
     document.getElementById('game-over-icon').replaceChildren(Object.assign(document.createElement('i'), { className: `fa-solid ${icon}` }))

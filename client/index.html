@@ -53,7 +53,7 @@
         <nav class="flex items-center gap-1 sm:gap-2">
           <a href="#ladder" class="btn btn-ghost btn-sm"><i class="fa-solid fa-ranking-star"></i><span class="hidden sm:inline">Leaderboard</span></a>
           <a href="#rules" class="btn btn-ghost btn-sm"><i class="fa-regular fa-circle-question"></i><span class="hidden sm:inline">How to play</span></a>
-          <button class="theme-open btn btn-ghost btn-sm" aria-label="Theme"><i class="fa-solid fa-palette"></i></button>
+          <button class="theme-open btn btn-ghost btn-sm" aria-label="Look and sound settings" title="Look & sound"><i class="fa-solid fa-sliders"></i></button>
           <button id="profile-chip" class="btn btn-secondary btn-sm hidden max-w-[11rem] gap-2 pl-1.5" aria-label="Your profile">
             <span id="profile-chip-avatar" class="grid h-6 w-6 flex-none place-items-center rounded-full bg-(--accent-primary) text-xs font-bold text-(--text-chat)"></span>
             <span id="profile-chip-name" class="truncate"></span>
@@ -321,7 +321,7 @@
             <button id="copy-room-btn" class="btn btn-ghost btn-sm" title="Copy room code" aria-label="Copy room code"><i class="fa-regular fa-copy"></i></button>
           </div>
           <span class="flex-1"></span>
-          <button class="theme-open btn btn-ghost btn-sm" aria-label="Theme"><i class="fa-solid fa-palette"></i></button>
+          <button class="theme-open btn btn-ghost btn-sm" aria-label="Look and sound settings" title="Look & sound"><i class="fa-solid fa-sliders"></i></button>
           <button id="leave-btn" class="btn btn-ghost btn-sm"><i class="fa-solid fa-arrow-right-from-bracket"></i><span>Leave</span></button>
         </div>
 
@@ -359,10 +359,16 @@
 
         <!-- Moves + chat -->
         <div class="card flex min-h-0 flex-col overflow-hidden wide:flex-1">
-          <div class="flex items-center justify-between border-b border-(--border-soft) px-3 py-2">
+          <div class="flex items-center justify-between border-b border-(--border-soft) py-1 pr-1 pl-3">
             <h2 class="text-xs font-semibold tracking-widest text-(--text-muted) uppercase">Moves</h2>
+            <div class="flex" role="group" aria-label="Step through the game">
+              <button id="review-first" class="btn btn-ghost btn-sm px-2!" title="First position (Home)" aria-label="First position"><i class="fa-solid fa-backward-fast"></i></button>
+              <button id="review-prev" class="btn btn-ghost btn-sm px-2!" title="Previous move (←)" aria-label="Previous move"><i class="fa-solid fa-chevron-left"></i></button>
+              <button id="review-next" class="btn btn-ghost btn-sm px-2!" title="Next move (→)" aria-label="Next move"><i class="fa-solid fa-chevron-right"></i></button>
+              <button id="review-last" class="btn btn-ghost btn-sm px-2!" title="Live position (End)" aria-label="Live position"><i class="fa-solid fa-forward-fast"></i></button>
+            </div>
           </div>
-          <ol id="move-list" class="move-list grid max-h-36 min-h-12 grid-cols-[2.25rem_1fr_1fr] content-start gap-x-1 overflow-y-auto px-2 py-1.5 font-mono text-xs text-(--text-chat) wide:max-h-[30%]"></ol>
+          <ol id="move-list" class="move-list grid max-h-36 min-h-12 grid-cols-[2.25rem_1fr_1fr] content-start gap-x-1 overflow-y-auto px-2 py-1.5 font-mono text-xs text-(--text-strong) wide:max-h-[30%]"></ol>
 
           <div class="flex items-center justify-between border-y border-(--border-soft) px-3 py-2">
             <h2 class="text-xs font-semibold tracking-widest text-(--text-muted) uppercase">Chat</h2>
@@ -397,8 +403,8 @@
     <div id="theme-modal" class="modal-backdrop hidden">
       <div class="modal relative text-left">
         <button id="theme-close" class="btn btn-ghost btn-sm absolute top-3 right-3" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
-        <p class="eyebrow mb-1">Appearance</p>
-        <h2 class="font-display mb-4 text-2xl font-semibold">Theme</h2>
+        <p class="eyebrow mb-1">Settings</p>
+        <h2 class="font-display mb-4 text-2xl font-semibold">Look &amp; sound</h2>
 
         <div id="theme-schemes" class="mb-5 grid grid-cols-2 gap-2"></div>
 
@@ -422,6 +428,16 @@
           <div class="segmented" role="group" aria-label="Board coordinates">
             <button data-theme-coords="on">Show</button>
             <button data-theme-coords="off">Hide</button>
+          </div>
+        </div>
+        <div class="mt-3 flex items-center justify-between gap-3">
+          <span class="text-sm font-medium">Sound</span>
+          <div class="flex items-center gap-2">
+            <input id="sound-volume" type="range" min="0" max="1" step="0.05" class="w-24 accent-(--accent-deep)" aria-label="Volume" />
+            <div class="segmented" role="group" aria-label="Sound">
+              <button data-sound="on"><i class="fa-solid fa-volume-high"></i></button>
+              <button data-sound="off"><i class="fa-solid fa-volume-xmark"></i></button>
+            </div>
           </div>
         </div>
       </div>

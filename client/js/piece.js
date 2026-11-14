@@ -135,14 +135,15 @@ export class Piece {
         this.hovering = this.checkMouseHover()
         this.size += Smooth(this.size, this.targetSize, this.scaleSpeed)
 
-        this.x += Smooth(this.x, this.targetX, this.slideSpeed)
-        this.y += Smooth(this.y, this.targetY, this.slideSpeed)
+        const glide = Game.slideDivisor || this.slideSpeed
+        this.x += Smooth(this.x, this.targetX, glide)
+        this.y += Smooth(this.y, this.targetY, glide)
 
         if(Math.abs(this.x - this.targetX) < 0.5) this.x = this.targetX
         if(Math.abs(this.y - this.targetY) < 0.5) this.y = this.targetY
 
 
-        if(Game.state == 'gameOver' || Game.playerColor != Game.turn) return
+        if(Game.state == 'gameOver' || Game.playerColor != Game.turn || Game.viewPly != null) return
 
         if(Game.draggedPiece && Game.draggedPiece != this) return
 

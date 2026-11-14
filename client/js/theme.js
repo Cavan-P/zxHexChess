@@ -1,4 +1,5 @@
 import { Game } from './game.js'
+import { play, soundPrefs, setSoundPrefs } from './sound.js'
 
 // Colour schemes, each with a light and a dark mode. All colours live in css/style.css as
 // variables under :root[data-scheme][data-mode]; this module picks which set is active and
@@ -141,6 +142,11 @@ const renderPicker = _ => {
     document.querySelectorAll('[data-theme-mode]').forEach(btn => btn.classList.toggle('is-active', btn.dataset.themeMode == prefs.mode))
     document.querySelectorAll('[data-theme-finish]').forEach(btn => btn.classList.toggle('is-active', btn.dataset.themeFinish == prefs.finish))
     document.querySelectorAll('[data-theme-coords]').forEach(btn => btn.classList.toggle('is-active', btn.dataset.themeCoords == prefs.coords))
+
+    const sound = soundPrefs()
+    document.querySelectorAll('[data-sound]').forEach(btn => btn.classList.toggle('is-active', (btn.dataset.sound == 'on') == sound.enabled))
+    const volume = $('sound-volume')
+    if(volume){ volume.value = sound.volume; volume.disabled = !sound.enabled }
 }
 
 export const setupThemePicker = _ => {
@@ -166,6 +172,15 @@ export const setupThemePicker = _ => {
     document.querySelectorAll('[data-theme-mode]').forEach(btn => btn.onclick = _ => applyTheme({ mode: btn.dataset.themeMode }))
     document.querySelectorAll('[data-theme-finish]').forEach(btn => btn.onclick = _ => applyTheme({ finish: btn.dataset.themeFinish }))
     document.querySelectorAll('[data-theme-coords]').forEach(btn => btn.onclick = _ => applyTheme({ coords: btn.dataset.themeCoords }))
+
+    document.querySelectorAll('[data-sound]').forEach(btn => btn.onclick = _ => {
+        setSoundPrefs({ enabled: btn.dataset.sound == 'on' })
+        renderPicker()
+        play('move')
+    })
+    // Dragging the volume previews it.
+    $('sound-volume').oninput = e => setSoundPrefs({ volume: +e.target.value })
+    $('sound-volume').onchange = _ => play('capture')
 
     const open = _ => { renderPicker(); modal.classList.remove('hidden') }
     const close = _ => modal.classList.add('hidden')

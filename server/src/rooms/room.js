@@ -129,6 +129,9 @@ class Room {
             fen: this.game.fen,
             turn: this.game.turn,
             history: this.game.history.map(m => m.notation),
+            // Every position and move so far, so a player can step back through the game.
+            positions: this.game.positions,
+            plyMoves: this.game.history.map(m => ({ from: m.from, to: m.to, check: m.check })),
             lastMove: this.game.history.at(-1) || null,
             result: this.game.result,
             legal: this.game.allLegalMoves(),

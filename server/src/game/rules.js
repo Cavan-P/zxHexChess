@@ -43,6 +43,7 @@ class GameState {
         this.enPassant = enPassant
         this.halfmoveClock = 0
         this.history = []          // [{ from, to, notation }]
+        this.positions = [fen]     // FEN before the first move and after every move (for reviewing)
         this.positionCounts = new Map()
         this.result = null         // { winner: 'white'|'black'|null, reason, score }
         this.countPosition()
@@ -181,6 +182,7 @@ class GameState {
 
         const move = { from, to, color, captured, capturedCell, promotion: promoting ? newPiece : null, check: kingCell, notation }
         this.history.push(move)
+        this.positions.push(this.fen)
 
         return { ok: true, move }
     }

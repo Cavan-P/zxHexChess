@@ -1,5 +1,6 @@
 import { Game } from './game.js'
 import { addSystemMessage } from './chat.js'
+import { showPly } from './review.js'
 import { ratingLabel, requestLeaderboard, getBeatenBots, markBotBeaten } from './profile.js'
 import { sendRematch, sendRoomCreate, sendRoomJoin, sendStartBotGame, sendBotVsBot, sendStartTournament, sendStartTraining, sendResign, sendOfferDraw, sendAcceptDraw, sendDeclineDraw, sendLeaveRoom } from './network.js'
 
@@ -377,19 +378,33 @@ export const setupRoomMenu = _ => {
             return
         }
 
-        for(let i = 0; i < history.length; i += 2){
-            const isLastRow = i + 2 >= history.length
-            moveList.append(
-                el('li', 'text-right text-(--text-muted)', `${i / 2 + 1}.`),
-                el('span', isLastRow && history.length % 2 == 1 ? 'bg-(--accent-primary)/50 font-semibold' : '', history[i]),
-                el('span', isLastRow && history.length % 2 == 0 ? 'bg-(--accent-primary)/50 font-semibold' : '', history[i + 1] || '')
-            )
+        // The move whose position is on screen is highlighted; click any move to jump to it.
+        const shown = Game.viewPly ?? history.length
+        const moveCell = ply => {
+            if(ply > history.length) return el('span')
+            const cell = el('span', `cursor-pointer hover:bg-(--accent-primary)/25 ${ply == shown ? 'bg-(--accent-primary)/50 font-semibold' : ''}`, history[ply - 1])
+            cell.onclick = _ => showPly(ply)
+            if(ply == shown) current = cell
+            return cell
         }
 
-        moveList.scrollTop = moveList.scrollHeight
+        let current = null
+        for(let i = 0; i < history.length; i += 2){
+            moveList.append(el('li', 'text-right text-(--text-muted)', `${i / 2 + 1}.`), moveCell(i + 1), moveCell(i + 2))
+        }
+
+        if(Game.viewPly == null) moveList.scrollTop = moveList.scrollHeight
+        else current?.scrollIntoView({ block: 'nearest' })
+
+        const reviewing = Game.viewPly != null
+        document.getElementById('review-first').disabled = shown == 0
+        document.getElementById('review-prev').disabled = shown == 0
+        document.getElementById('review-next').disabled = !reviewing
+        document.getElementById('review-last').disabled = !reviewing
     }
 
     Game.onHistory = moves => { history = [...moves]; renderMoveList() }
+    Game.onReviewChanged = _ => renderMoveList()
     Game.onMovePlayed = notation => { if(notation){ history.push(notation); renderMoveList() } }
 
     resignBtn.onclick = _ => {
@@ -436,6 +451,9 @@ export const setupRoomMenu = _ => {
 
         Game.draggedPiece = null
         Game.selectedPiece = null
+        Game.viewPly = null
+        Game.positions = []
+        Game.plyMoves = []
         Game.pendingMove = null
         Game.legalMoves = []
         Game.lastMove = null

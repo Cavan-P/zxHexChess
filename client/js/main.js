@@ -8,6 +8,8 @@ import { drawBoard, populateBoardFromFen, BOARD_WIDTH, BOARD_HEIGHT } from './bo
 import { setSystemMessage } from './utils.js'
 import { setupProfile, requestLeaderboard } from './profile.js'
 import { setupThemePicker } from './theme.js'
+import { setupReview } from './review.js'
+import { play } from './sound.js'
 
 // ------ GLOBALS ------
 
@@ -47,6 +49,7 @@ Game.onLegalMoves = (from, moves) => {
 Game.resyncBoard = fen => populateBoardFromFen(fen)
 
 setupThemePicker()
+setupReview()
 setupProfile()
 setupRoomMenu()
 setupInput()
@@ -84,6 +87,11 @@ Game.boardCenter = {
 // Returns [text, tone] for the status banner; tone picks its color.
 const status = _ => {
     if(Game.disconnected) return ['Disconnected from server. Refresh to reconnect.', 'check']
+    if(Game.viewPly != null){
+        const n = Game.viewPly
+        const label = n == 0 ? 'the starting position' : `move ${Math.ceil(n / 2)}${n % 2 ? '' : '…'}`
+        return [`Viewing ${label}. Tap the board or ⏭ to return.`, '']
+    }
     if(Game.state == 'gameOver' && Game.result) return [describeResult(Game.result).detail, 'over']
 
     const inCheck = Game.check != null && Game.cells[Game.check]?.occupiedBy == (Game.turn == 'white' ? 'K' : 'k')
@@ -104,6 +112,12 @@ const status = _ => {
     if(Game.turn != Game.playerColor){
         const bot = Game.matchInfo?.[Game.turn]
         return [bot?.type == 'bot' ? `${bot.name} is thinking…` : 'Opponent is thinking…', '']
+    }
+
+    const c = Game.clock
+    if(c && c.running == Game.playerColor){
+        const ms = c.remaining[Game.playerColor] - (performance.now() - Game.clockReceivedAt)
+        if(ms < lowThreshold(c)) return [`${inCheck ? 'Check! ' : ''}Your move: ${formatClock(ms)} left!`, 'check']
     }
 
     return inCheck ? ['Check! Your move.', 'check'] : ['Your move', 'turn']
@@ -219,17 +233,71 @@ const formatClock = ms => {
     return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`
 }
 
-const updateClocks = _ => {
+// Pieces glide more quickly as time gets short (and from the start in bullet), so the board
+// never makes you wait. Smaller = faster: 5 is the normal glide, 1 is instant.
+const updateAnimationSpeed = _ => {
     const c = Game.clock
-    if(!c) return
-    for(const node of document.querySelectorAll('.clock[data-color]')){
-        const color = node.dataset.color
-        const running = c.running == color && Game.state == 'playing'
-        const ms = c.remaining[color] - (running ? performance.now() - Game.clockReceivedAt : 0)
-        const text = formatClock(ms)
-        if(node.textContent != text) node.textContent = text
-        node.classList.toggle('is-running', running)
-        node.classList.toggle('is-low', ms < 20000)
+    if(!c || Game.state != 'playing'){ Game.slideDivisor = null; return }
+
+    const seated = Game.playerColor == 'white' || Game.playerColor == 'black'
+    const remaining = color => c.remaining[color] - (c.running == color ? performance.now() - Game.clockReceivedAt : 0)
+    const ms = seated ? remaining(Game.playerColor) : Math.min(remaining('white'), remaining('black'))
+
+    let divisor = c.initialMs <= 2 * 60000 ? 3 : 5
+    if(ms < 30000) divisor = Math.min(divisor, 3)
+    if(ms < 10000) divisor = 1.6
+    Game.slideDivisor = divisor
+}
+
+// "Low on time" scales with the time control: a tenth of the starting time, kept between 10 and
+// 30 seconds (10s in 1+0, 18s in 3+0, 30s from 5 minutes up). "Critical" is the last stretch.
+const lowThreshold = c => Math.max(10000, Math.min(30000, c.initialMs * 0.1))
+const criticalThreshold = c => Math.min(10000, lowThreshold(c) / 2)
+
+const layoutEl = document.getElementById('layout')
+let lastTickSecond = null
+let warnedThisGame = null
+
+const updateClocks = _ => {
+    updateAnimationSpeed()
+    const c = Game.clock
+    const seated = Game.playerColor == 'white' || Game.playerColor == 'black'
+    let mine = null
+
+    if(c){
+        for(const node of document.querySelectorAll('.clock[data-color]')){
+            const color = node.dataset.color
+            const running = c.running == color && Game.state == 'playing'
+            const ms = c.remaining[color] - (running ? performance.now() - Game.clockReceivedAt : 0)
+            const text = formatClock(ms)
+            if(node.textContent != text) node.textContent = text
+            node.classList.toggle('is-running', running)
+            node.classList.toggle('is-low', ms < lowThreshold(c))
+            node.classList.toggle('is-critical', ms < criticalThreshold(c))
+            if(seated && color == Game.playerColor) mine = { ms, running }
+        }
+    }
+
+    // The obvious cue: only for your own clock, and only while it's running.
+    const low = mine?.running && mine.ms < lowThreshold(c)
+    const critical = low && mine.ms < criticalThreshold(c)
+    layoutEl.classList.toggle('time-low', Boolean(low))
+    layoutEl.classList.toggle('time-critical', Boolean(critical))
+
+    if(!low){ lastTickSecond = null; return }
+
+    // One warning when you first drop into low time each game, then a tick every second at the end.
+    const gameKey = document.getElementById('room-display')?.textContent
+    if(warnedThisGame != gameKey){
+        warnedThisGame = gameKey
+        play('warning')
+    }
+    if(critical){
+        const second = Math.ceil(mine.ms / 1000)
+        if(second != lastTickSecond && second > 0){
+            lastTickSecond = second
+            play('tick')
+        }
     }
 }
 

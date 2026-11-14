@@ -1,4 +1,5 @@
-const { parseFen, boardToFen, generateFilteredLegals, generateLegalMoves, isKingAttacked, promotionCells } = require('../game/moves')
+const { parseFen, boardToFen, generateFilteredLegals, isKingAttacked, promotionCells } = require('../game/moves')
+const { fastMoves, forEachCover, rookRays, bishopRays, knightJumps, kingSteps, pawnCaptures } = require('./fastMoves')
 
 const pieceValues = {
     p: 1,
@@ -21,22 +22,29 @@ const other = c => c == 'white' ? 'black' : 'white'
 // on a copy where every piece is "neutral", so a piece guarding a friend counts as covering it.
 // Pseudo-legal moves ignore pins, which is fine for evaluation and far cheaper than the fully
 // legal generator (that one replays every move to test for check).
+// cheapest[colour][cell] is the value of that side's cheapest piece covering the cell (Infinity if
+// none). Reused buffers: evaluation is never re-entered, so there's no need to allocate per call.
+const NONE = Infinity
+const cheapestBuffers = { white: new Float64Array(91), black: new Float64Array(91) }
+
 const coverageMap = (board, enPassant, values) => {
-    const neutral = board.map(c => c.piece ? { ...c, color: 'neutral' } : c)
-    const cheapest = { white: new Map(), black: new Map() }
+    const cheapest = cheapestBuffers
+    cheapest.white.fill(NONE)
+    cheapest.black.fill(NONE)
     const mobility = { white: 0, black: 0 }
 
     for(let i = 0; i < board.length; i++){
         const cell = board[i]
         if(!cell?.piece) continue
 
+        const color = cell.color
         const value = cell.piece.toLowerCase() == 'k' ? 100 : (values[cell.piece.toLowerCase()] || 0)
-        const covers = cheapest[cell.color]
+        const covers = cheapest[color]
 
-        for(const to of generateLegalMoves(neutral, i, cell.color, enPassant)){
-            if(board[to].color != cell.color) mobility[cell.color]++
-            if(!covers.has(to) || value < covers.get(to)) covers.set(to, value)
-        }
+        forEachCover(board, i, color, enPassant, to => {
+            if(board[to].color != color) mobility[color]++
+            if(value < covers[to]) covers[to] = value
+        })
     }
 
     return { cheapest, mobility }
@@ -46,9 +54,9 @@ const coverageMap = (board, enPassant, values) => {
 // undefended, the difference if the attacker is cheaper, nothing otherwise.
 const exposure = (cell, color, value, cheapest) => {
     const enemy = other(color)
-    if(!cheapest[enemy].has(cell)) return 0
-    if(!cheapest[color].has(cell)) return value
-    return Math.max(0, value - cheapest[enemy].get(cell))
+    if(cheapest[enemy][cell] == NONE) return 0
+    if(cheapest[color][cell] == NONE) return value
+    return Math.max(0, value - cheapest[enemy][cell])
 }
 
 const hexDistanceFromCenter = coords => Math.max(Math.abs(coords[0]), Math.abs(coords[1]), Math.abs(coords[2]))
@@ -191,7 +199,6 @@ const evaluateMaster = (board, maximizingColor, enPassant, toMove) => evaluateWe
 // king's cell and move outward as each piece type: if a rook-move from the king lands on an enemy
 // rook or queen, that piece attacks the king, and likewise for bishops, knights, kings and pawns.
 // (Every Gliński piece attacks symmetrically, so this is exact.) About 5 move generations instead of ~16.
-const SUPER_PIECES = [['r', 'rq'], ['b', 'bq'], ['n', 'n'], ['k', 'k'], ['p', 'p']]
 
 const kingAttacked = (board, color) => {
     let kingCell = -1
@@ -201,15 +208,23 @@ const kingAttacked = (board, color) => {
     }
     if(kingCell < 0) return false
 
-    const probe = board.slice()
-    for(const [as, attackers] of SUPER_PIECES){
-        probe[kingCell] = { ...board[kingCell], piece: as }
-        for(const to of generateLegalMoves(probe, kingCell, color, null)){
-            const target = board[to]
-            if(target.piece && target.color != color && attackers.includes(target.piece.toLowerCase())) return true
-        }
+    const enemyIs = (j, letters) => {
+        const t = board[j]
+        return t.piece && t.color != color && letters.includes(t.piece.toLowerCase())
     }
-    return false
+    const slideHits = (rays, letters) => {
+        for(const r of rays) for(const j of r){
+            if(!board[j].piece) continue
+            if(enemyIs(j, letters)) return true
+            break
+        }
+        return false
+    }
+
+    return slideHits(rookRays[kingCell], 'rq') || slideHits(bishopRays[kingCell], 'bq') ||
+        knightJumps[kingCell].some(j => enemyIs(j, 'n')) ||
+        kingSteps[kingCell].some(j => enemyIs(j, 'k')) ||
+        pawnCaptures[color][kingCell].some(j => enemyIs(j, 'p'))
 }
 
 // Plays a move on a copy of the board, sharing every untouched cell with the original (search
@@ -227,7 +242,7 @@ const pseudoMoves = (board, turn, enPassant) => {
     const moves = []
     for(let i = 0; i < board.length; i++){
         if(board[i].color != turn) continue
-        for(const to of generateLegalMoves(board, i, turn, enPassant)) moves.push({ from: i, to })
+        for(const to of fastMoves(board, i, turn, enPassant)) moves.push({ from: i, to })
     }
     return moves
 }
@@ -283,6 +298,18 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
     // remembers which move was best, so later passes try that move first.
     const table = new Map()
     const sameMove = (a, b) => a && b && a.from == b.from && a.to == b.to
+
+    // Move ordering memory: "killer" quiet moves that caused a cutoff at each depth, and a history
+    // score for every from->to pair that has caused cutoffs anywhere. Trying good moves first lets
+    // alpha-beta prune far more of the tree.
+    const killers = []
+    const history = new Int32Array(91 * 91)
+    const quietScore = (m, ply) => {
+        const k = killers[ply]
+        if(k && sameMove(m, k[0])) return 900
+        if(k && sameMove(m, k[1])) return 800
+        return Math.min(700, history[m.from * 91 + m.to])
+    }
 
     const staticScore = (board, turn, maximizingColor, enPassant) => {
         let s = evaluate(board, maximizingColor, enPassant, turn)
@@ -378,7 +405,7 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
         }
 
         const hint = cached?.move || (ply == 0 ? bestMove : null)
-        const ordering = new Map(moves.map(m => [m, sameMove(m, hint) ? 1e9 : orderScore(board, m)]))
+        const ordering = new Map(moves.map(m => [m, sameMove(m, hint) ? 1e9 : (board[m.to].piece ? orderScore(board, m) : quietScore(m, ply))]))
         moves.sort((a, b) => ordering.get(b) - ordering.get(a))
 
         const alphaStart = alpha, betaStart = beta
@@ -411,7 +438,14 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
                 beta = Math.min(beta, value)
             }
 
-            if(beta <= alpha) break
+            if(beta <= alpha){
+                if(!board[move.to].piece){
+                    const k = killers[ply] || (killers[ply] = [null, null])
+                    if(!sameMove(move, k[0])){ k[1] = k[0]; k[0] = move }
+                    history[move.from * 91 + move.to] += depth * depth
+                }
+                break
+            }
         }
 
         if(!legalCount) return { score: inCheck ? mateScore() : 0, move: null }

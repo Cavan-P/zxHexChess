@@ -528,4 +528,4 @@ const getGameStatus = (board, color, enPassant) => {
     return isKingAttacked(board, color, enPassant) ? 'checkmate' : 'stalemate'
 }
 
-module.exports = {promotionCells, cellName, NUM_CELLS: coordinates.length, parseFen, generateLegalMoves, coordToIndex, generateFilteredLegals, isKingAttacked, cloneBoard, applyMove, boardToFen, getGameStatus}
+module.exports = {pawnStartCells: { white: whitePawnStartCells, black: blackPawnStartCells }, promotionCells, cellName, NUM_CELLS: coordinates.length, parseFen, generateLegalMoves, coordToIndex, generateFilteredLegals, isKingAttacked, cloneBoard, applyMove, boardToFen, getGameStatus}
