@@ -135,7 +135,20 @@ export const drawBoard = (colors, stroke, strokeWeight, populateCells) => {
 
             drawHexagon(x, y, hexSize, fill, stroke, Game.palette?.edge || '#3b2718', strokeWeight, Game.ctx)
 
-            // Hairline seams between wooden cells.
+            // Metal and marble: a soft highlight from the top-left, as if lit from above.
+            if(fill instanceof CanvasPattern && Game.palette.sheen){
+                let sheen = Game.palette.sheenCache.get(cellNum)
+                if(!sheen){
+                    sheen = Game.ctx.createLinearGradient(x - hexSize, y - hexSize, x + hexSize, y + hexSize)
+                    sheen.addColorStop(0, `rgba(255, 255, 255, ${Game.palette.sheen})`)
+                    sheen.addColorStop(0.5, 'rgba(255, 255, 255, 0)')
+                    sheen.addColorStop(1, `rgba(0, 0, 0, ${Game.palette.sheen * 0.8})`)
+                    Game.palette.sheenCache.set(cellNum, sheen)
+                }
+                drawHexagon(x, y, hexSize, sheen, false, 'black', 0, Game.ctx)
+            }
+
+            // Hairline seams between textured cells.
             if(fill instanceof CanvasPattern){
                 drawHexagon(x, y, hexSize - 0.5, 'rgba(0, 0, 0, 0)', true, Game.palette.ink(0.35), 1, Game.ctx)
             }

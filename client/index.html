@@ -77,7 +77,7 @@
         </section>
 
         <!-- Primary actions -->
-        <section class="grid gap-4 md:grid-cols-2 md:gap-6">
+        <section class="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
 
           <div id="multiplayer" class="card flex flex-col p-5 sm:p-7">
             <div class="mb-4 flex items-center gap-3">
@@ -89,8 +89,8 @@
             </div>
 
             <div class="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2">
-              <label class="flex items-center gap-2 text-sm font-medium"><i class="fa-regular fa-clock"></i>Clock
-                <select id="tc-friend" class="tc-select input py-1.5 pr-8 text-sm" aria-label="Time control"></select>
+              <label class="flex min-w-0 items-center gap-2 text-sm font-medium"><i class="fa-regular fa-clock"></i>Clock
+                <select id="tc-friend" class="tc-select input min-w-0 max-w-full py-1.5 pr-8 text-sm" aria-label="Time control"></select>
               </label>
               <label class="flex cursor-pointer items-center gap-2 text-sm font-medium">
                 <input id="public-game" type="checkbox" class="h-4 w-4 accent-(--accent-deep)" />
@@ -134,8 +134,8 @@
             </div>
 
             <div class="mt-3 flex flex-wrap items-center gap-3">
-              <label class="flex items-center gap-2 text-sm font-medium"><i class="fa-regular fa-clock"></i>Clock
-                <select id="tc-bot" class="tc-select input py-1.5 pr-8 text-sm" aria-label="Time control against the computer"></select>
+              <label class="flex min-w-0 items-center gap-2 text-sm font-medium"><i class="fa-regular fa-clock"></i>Clock
+                <select id="tc-bot" class="tc-select input min-w-0 max-w-full py-1.5 pr-8 text-sm" aria-label="Time control against the computer"></select>
               </label>
             </div>
 
@@ -169,8 +169,8 @@
               <h2 class="text-xl font-semibold">Pick two bots and watch them play</h2>
             </div>
             <div class="flex flex-wrap items-center gap-3">
-              <label class="flex items-center gap-2 text-sm font-medium"><i class="fa-regular fa-clock"></i>Clock
-                <select id="tc-battle" class="tc-select input py-1.5 pr-8 text-sm" aria-label="Time control for the bot battle"></select>
+              <label class="flex min-w-0 items-center gap-2 text-sm font-medium"><i class="fa-regular fa-clock"></i>Clock
+                <select id="tc-battle" class="tc-select input min-w-0 max-w-full py-1.5 pr-8 text-sm" aria-label="Time control for the bot battle"></select>
               </label>
               <button id="bvb-start-btn" disabled class="btn btn-primary">
                 <i class="fa-solid fa-play"></i> Start battle
@@ -475,12 +475,12 @@
 
     <!-- ========== THEME ========== -->
     <div id="theme-modal" class="modal-backdrop hidden">
-      <div class="modal relative text-left">
+      <div class="modal relative max-h-[92dvh] max-w-md! overflow-y-auto text-left">
         <button id="theme-close" class="btn btn-ghost btn-sm absolute top-3 right-3" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
         <p class="eyebrow mb-1">Settings</p>
         <h2 class="font-display mb-4 text-2xl font-semibold">Look &amp; sound</h2>
 
-        <div id="theme-schemes" class="mb-5 grid grid-cols-2 gap-2"></div>
+        <div id="theme-schemes" class="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-3"></div>
 
         <div class="mb-3 flex items-center justify-between gap-3">
           <span class="text-sm font-medium">Mode</span>
@@ -490,10 +490,13 @@
             <button data-theme-mode="auto">Auto</button>
           </div>
         </div>
-        <div class="flex items-center justify-between gap-3">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
           <span class="text-sm font-medium">Board</span>
-          <div class="segmented" role="group" aria-label="Board finish">
+          <div class="segmented grid grid-cols-5 sm:inline-flex [&>button]:px-2 sm:[&>button]:px-2.5" role="group" aria-label="Board finish">
             <button data-theme-finish="wood">Wood</button>
+            <button data-theme-finish="marble">Marble</button>
+            <button data-theme-finish="stone">Stone</button>
+            <button data-theme-finish="metal">Metal</button>
             <button data-theme-finish="flat">Flat</button>
           </div>
         </div>

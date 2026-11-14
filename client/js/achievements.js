@@ -85,7 +85,7 @@ const showNext = _ => {
     toast.append(badge, text)
     toast.onclick = _ => toast.remove()
     $('achievement-toasts').append(toast)
-    play('promote')
+    play('achievement')
 
     setTimeout(_ => {
         toast.classList.add('is-leaving')
