@@ -100,7 +100,8 @@ const status = _ => {
 
     if(opponent && Game.presence && !Game.presence[opponent]){
         const code = document.getElementById('room-display')?.textContent
-        return [Game.opponentAway ? 'Waiting for your opponent to reconnect…' : `Waiting for an opponent. Share code ${code}.`, '']
+        if(Game.opponentAway) return ['Waiting for your opponent to reconnect…', '']
+        return [Game.isPublic ? `Waiting for an opponent. Your game is listed under Open games (code ${code}).` : `Waiting for an opponent. Share code ${code}.`, '']
     }
 
     if(!seated){

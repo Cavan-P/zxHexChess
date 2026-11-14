@@ -92,6 +92,10 @@
               <label class="flex items-center gap-2 text-sm font-medium"><i class="fa-regular fa-clock"></i>Clock
                 <select id="tc-friend" class="tc-select input py-1.5 pr-8 text-sm" aria-label="Time control"></select>
               </label>
+              <label class="flex cursor-pointer items-center gap-2 text-sm font-medium">
+                <input id="public-game" type="checkbox" class="h-4 w-4 accent-(--accent-deep)" />
+                List in Open games
+              </label>
             </div>
 
             <button id="create-room-btn" class="btn btn-primary w-full py-3 text-base">
@@ -143,6 +147,18 @@
               <i class="fa-solid fa-robot"></i> Or watch two bots play
             </button>
           </div>
+        </section>
+
+        <!-- Open games: public challenges anyone can join -->
+        <section id="open-games" class="card mt-6 p-5 sm:p-7">
+          <div class="mb-3 flex flex-wrap items-end justify-between gap-2">
+            <div>
+              <p class="eyebrow mb-1">Open games</p>
+              <h2 class="text-lg font-semibold">Join someone waiting for an opponent</h2>
+            </div>
+            <span class="text-xs text-(--text-muted)"><i class="fa-solid fa-circle text-(--success) mr-1 text-[0.5rem] align-middle"></i>Live</span>
+          </div>
+          <ul id="open-games-list" class="divide-y divide-(--border-soft)"></ul>
         </section>
 
         <!-- Bot vs Bot picker -->

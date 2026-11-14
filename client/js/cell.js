@@ -68,6 +68,11 @@ export class Cell {
             drawHexagon(this.x, this.y, this.size, Game.palette.highlight(0.75), false, 'black', 0, this.ctx)
         }
 
+        // A queued premove: both cells tinted blue.
+        if(Game.premove && (Game.premove.from == this.num || Game.premove.to == this.num)){
+            drawHexagon(this.x, this.y, this.size, 'rgba(70, 130, 220, 0.42)', false, 'black', 0, this.ctx)
+        }
+
         // The cell a piece is being dragged from.
         if(Game.draggedPiece?.originalCell == this || (Game.selectedPiece?.currentCell == this && !Game.pendingMove)){
             drawHexagon(this.x, this.y, this.size - 3, Game.palette.highlight(0.55), true, Game.palette.ink(0.6), 3, this.ctx)

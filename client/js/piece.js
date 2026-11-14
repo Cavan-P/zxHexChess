@@ -1,5 +1,6 @@
 
 import { Game } from "./game.js"
+import { premoveTargets, setPremove, cancelPremove } from "./premove.js"
 import { pointInHexagon, Smooth } from "./utils.js"
 
 // Where each piece sits in img/pieces.png (200px squares; white on the top row, black below).
@@ -83,6 +84,23 @@ export class Piece {
 
         clearSelection()
 
+        // Picked up during the opponent's turn: queue it as a premove (or, if the turn arrived
+        // while you were still holding the piece, play it now if it's legal).
+        if(this.pickedForPremove){
+            const myTurnNow = Game.turn == Game.playerColor
+            const ok = dropCell && (myTurnNow ? Game.legalMap?.[this.originalCell.num]?.includes(dropCell.num) : Game.legalMoves.includes(dropCell.num))
+            if(!ok){ this.snapBack(); return }
+            if(!myTurnNow){
+                setPremove(this.originalCell.num, dropCell.num)
+                this.snapBack()
+                return
+            }
+            this.sendMove(dropCell, 'q')
+            this.x = dropCell.x
+            this.y = dropCell.y
+            return
+        }
+
         if(!dropCell || !Game.legalMoves.includes(dropCell.num)){
             this.snapBack()
             return
@@ -96,19 +114,20 @@ export class Piece {
     }
 
     // Tap-to-move: glide from the selected piece's cell to the tapped one.
-    tapMoveTo(cell){
+    tapMoveTo(cell, promotion){
         this.originalCell = this.currentCell
         this.startX = this.currentCell.x
         this.startY = this.currentCell.y
         clearSelection()
-        this.sendMove(cell)
+        this.sendMove(cell, promotion)
     }
 
-    sendMove(cell){
+    sendMove(cell, promotion){
         Game.socket.send(JSON.stringify({
             type: 'attemptMove',
             from: this.originalCell.num,
-            to: cell.num
+            to: cell.num,
+            ...(promotion ? { promotion } : {})
         }))
 
         Game.pendingMove = {
@@ -143,7 +162,10 @@ export class Piece {
         if(Math.abs(this.y - this.targetY) < 0.5) this.y = this.targetY
 
 
-        if(Game.state == 'gameOver' || Game.playerColor != Game.turn || Game.viewPly != null) return
+        // On your turn you move; on the opponent's turn you can queue a premove.
+        const myTurn = Game.playerColor == Game.turn
+        if(Game.state != 'playing' || Game.viewPly != null) return
+        if(Game.playerColor != 'white' && Game.playerColor != 'black') return
 
         if(Game.draggedPiece && Game.draggedPiece != this) return
 
@@ -158,11 +180,16 @@ export class Piece {
                 this.startY = this.y
 
                 this.originalCell = this.currentCell
+                this.pickedForPremove = !myTurn
 
                 // Legal moves for this turn arrive with the opponent's move, so highlights can show
                 // instantly. Only ask the server if we somehow don't have them.
                 const cached = Game.legalMap?.[this.originalCell.num]
-                if(cached){
+                if(!myTurn){
+                    Game.legalMoves = premoveTargets(this)
+                    Game.onLegalMoves?.(this.originalCell.num, Game.legalMoves)
+                }
+                else if(cached){
                     Game.legalMoves = cached
                     Game.onLegalMoves?.(this.originalCell.num, cached)
                 }

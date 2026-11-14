@@ -118,9 +118,13 @@ const handlers = {
 
     createRoom(socket, data){
         const timeControl = Object.prototype.hasOwnProperty.call(Room.TIME_CONTROLS, data.timeControl) ? data.timeControl : null
-        const room = matchmaker.createRoom({ timeControl })
+        const room = matchmaker.createRoom({ timeControl, isPublic: data.isPublic === true })
         send(socket, { type: 'roomCreated', code: room.id })
         joinRoom(socket, room)
+    },
+
+    getLobby(socket){
+        send(socket, { type: 'lobby', games: matchmaker.openGames() })
     },
 
     joinRoom(socket, data){
@@ -163,6 +167,12 @@ const handlers = {
 
 module.exports = function attachWebSocket(server){
     const wss = new WebSocketServer({ server, maxPayload: 16 * 1024 })
+
+    // Everyone on the home page sees open games appear and disappear live.
+    matchmaker.onLobbyChange = games => {
+        const msg = JSON.stringify({ type: 'lobby', games })
+        for(const client of wss.clients) if(client.readyState == 1) client.send(msg)
+    }
 
     wss.on('connection', socket => {
         socket.room = null

@@ -19,6 +19,7 @@ const showPosition = ply => {
 
 export const showPly = ply => {
     if(!Game.positions?.length) return
+    Game.premove = null
     ply = Math.max(0, Math.min(lastPly(), ply))
     if(ply == lastPly()) return goLive()
     Game.viewPly = ply

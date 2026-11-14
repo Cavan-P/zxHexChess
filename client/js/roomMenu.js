@@ -158,12 +158,47 @@ export const setupRoomMenu = _ => {
     }
 
     const friendTimeControl = timeControlPicker('tc-friend')
+
+    // "List in Open games" is remembered like the clock choice.
+    const publicBox = document.getElementById('public-game')
+    try { publicBox.checked = localStorage.getItem('qrs.publicGame') == '1' } catch(e){}
+    publicBox.onchange = _ => { try { localStorage.setItem('qrs.publicGame', publicBox.checked ? '1' : '0') } catch(e){} }
+
+    // ------ Open games ------
+
+    Game.onLobby = games => {
+        const list = document.getElementById('open-games-list')
+        const mine = Game.state != 'idle' ? document.getElementById('room-display').textContent : null
+        const visible = games.filter(g => g.code != mine)
+        list.replaceChildren()
+
+        if(!visible.length){
+            list.append(el('li', 'py-4 text-center text-sm text-(--text-muted)', 'No open games right now. Create one with "List in Open games" ticked, and it shows up here for everyone.'))
+            return
+        }
+
+        for(const g of visible){
+            const row = el('li', 'flex items-center gap-3 py-2.5')
+            const avatar = el('span', 'grid h-8 w-8 flex-none place-items-center rounded-full bg-(--bg-sunken) text-sm font-bold text-(--text-strong)', (g.host || '?').charAt(0).toUpperCase())
+            const who = el('span', 'min-w-0 flex-1')
+            const nameLine = el('span', 'flex items-center gap-2')
+            nameLine.append(el('span', 'truncate font-semibold text-(--text-strong)', g.host))
+            if(g.elo != null) nameLine.append(el('span', 'elo-badge', ratingLabel(g.elo, g.provisional)))
+            who.append(nameLine, el('span', 'block text-xs text-(--text-muted)', g.timeControl ? describeTimeControl(g.timeControl) : 'No clock'))
+
+            const join = el('button', 'btn btn-primary btn-sm', 'Join')
+            join.onclick = _ => sendRoomJoin(g.code)
+            row.append(avatar, who, join)
+            list.append(row)
+        }
+    }
+    Game.onLobby([])
     const botTimeControl = timeControlPicker('tc-bot')
     const battleTimeControl = timeControlPicker('tc-battle')
 
     createBtn.onclick = _ => {
         showStatus('')
-        sendRoomCreate(friendTimeControl())
+        sendRoomCreate(friendTimeControl(), publicBox.checked)
     }
 
     joinForm.onsubmit = e => {
@@ -451,6 +486,7 @@ export const setupRoomMenu = _ => {
 
         Game.draggedPiece = null
         Game.selectedPiece = null
+        Game.premove = null
         Game.viewPly = null
         Game.positions = []
         Game.plyMoves = []

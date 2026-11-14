@@ -25,7 +25,8 @@ class Room {
     // profiles: the PlayerStore used to look up and rate signed-in players (optional)
     // timeControl: a key of TIME_CONTROLS, or null for an untimed game
     // spawn: creates a new room with the given options (used for rematches)
-    constructor(id, { bots = {}, botMeta = {}, profiles = null, timeControl = null, onEmpty, spawn = null } = {}){
+    // isPublic: listed under "Open games" for anyone to join; onChange: called when seats change
+    constructor(id, { bots = {}, botMeta = {}, profiles = null, timeControl = null, isPublic = false, onEmpty, onChange = null, spawn = null } = {}){
         this.id = id
         this.players = []
         this.spectators = []
@@ -54,6 +55,9 @@ class Room {
         this.unrated = false
 
         this.spawn = spawn
+        this.isPublic = isPublic
+        this.onChange = onChange
+        this.createdAt = Date.now()
         this.timeControl = timeControl
         this.rematchOffers = new Set()       // colours that have asked for a rematch
         this.rated = false
@@ -135,7 +139,8 @@ class Room {
             lastMove: this.game.history.at(-1) || null,
             result: this.game.result,
             legal: this.game.allLegalMoves(),
-            clock: this.clockState()
+            clock: this.clockState(),
+            isPublic: this.isPublic
         })
         this.broadcastPresence()
 
@@ -173,6 +178,7 @@ class Room {
     // Which seats are filled (bots always are), so clients can show "waiting for opponent",
     // plus fresh names and ratings for everyone.
     broadcastPresence(){
+        this.onChange?.()
         const seated = color => Boolean(this.bots[color]) || this.players.some(p => p.color == color)
         this.broadcast({ type: 'matchInfo', ...this.getMatchInfo() })
         this.broadcast({ type: 'presence', white: seated('white'), black: seated('black') })

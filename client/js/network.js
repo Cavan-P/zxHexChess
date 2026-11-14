@@ -2,6 +2,7 @@ import { Game } from "./game.js"
 import { addChatMessage, addSystemMessage } from "./chat.js"
 import { setSystemMessage } from "./utils.js"
 import { play } from "./sound.js"
+import { executePremove } from "./premove.js"
 
 const host = window.location.hostname
 const isLocal = host == 'localhost' || host == '127.0.0.1'
@@ -18,6 +19,7 @@ export const setupNetwork = onFenInit => {
     Game.socket.onopen = _ => {
         Game.onConnected?.()
         send({ type: 'getBotList' })
+        send({ type: 'getLobby' })
     }
 
     Game.socket.onmessage = msg => {
@@ -38,6 +40,7 @@ export const setupNetwork = onFenInit => {
 
             case 'roomJoined':
                 Game.endSoundPlayed = false
+                Game.premove = null
                 Game.onRoomJoined?.(data)
                 if(data.code) setRoomCodeDisplay(data.code)
                 onFenInit(Game.fen)
@@ -58,6 +61,7 @@ export const setupNetwork = onFenInit => {
                 Game.check = data.lastMove?.check ?? null
                 Game.drawOffer = null
                 Game.opponentAway = false
+                Game.isPublic = Boolean(data.isPublic)
                 Game.positions = data.positions || [data.fen]
                 Game.plyMoves = data.plyMoves || []
                 Game.viewPly = null
@@ -165,6 +169,10 @@ export const setupNetwork = onFenInit => {
                 addSystemMessage('Your opponent is back.')
                 return
 
+            case 'lobby':
+                Game.onLobby?.(data.games)
+                return
+
             case 'botList':
                 Game.labEnabled = Boolean(data.labEnabled)
                 Game.onBotListReceived?.(data.bots)
@@ -252,9 +260,10 @@ const handleMove = data => {
     Game.legalMoves = []
 
     if(data.result) handleGameOver(data.result)
+    else if(Game.turn == Game.playerColor) executePremove()
 }
 
-export const sendRoomCreate = timeControl => send({ type: 'createRoom', timeControl })
+export const sendRoomCreate = (timeControl, isPublic = false) => send({ type: 'createRoom', timeControl, isPublic })
 
 export const sendRoomJoin = code => send({ type: 'joinRoom', code })
 
@@ -344,6 +353,7 @@ const renderRatingChange = ratings => {
 }
 
 const handleGameOver = (result, { quiet = false, ratings } = {}) => {
+    Game.premove = null
     // Ignore the result of a game we've already left (leaving mid-game resigns, and the server's
     // game-over message arrives after we're back on the home screen).
     if(!result || Game.state == 'idle') return

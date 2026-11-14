@@ -1,6 +1,7 @@
 import { Game } from "./game.js";
 import { clearSelection } from "./piece.js";
 import { goLive } from "./review.js";
+import { canPremove, setPremove, cancelPremove } from "./premove.js";
 
 // Converts a pointer position on the page into the board's logical coordinate space,
 // undoing the canvas scale/offset and the 180° flip used when playing Black.
@@ -38,18 +39,26 @@ export const setupInput = _ => {
             return
         }
 
-        // Tap-to-move: with a piece selected, tapping a highlighted cell plays the move.
+        const cell = Game.cells.find(c => c.checkMouseHover())
+        const ownPiece = cell?.occupied && cell.occupiedByMyColor(Game.playerColor)
+        const myTurn = Game.state == 'playing' && Game.turn == Game.playerColor
+        const premoving = canPremove()
+
+        // Tap-to-move: with a piece selected, tapping a highlighted cell plays the move (or, during
+        // the opponent's turn, queues it as a premove).
         const selected = Game.selectedPiece
-        if(selected && Game.state == 'playing' && Game.turn == Game.playerColor){
-            const cell = Game.cells.find(c => c.checkMouseHover())
+        if(selected && (myTurn || premoving)){
             if(cell?.isLegalTarget){
-                selected.tapMoveTo(cell)
+                if(myTurn) selected.tapMoveTo(cell)
+                else { setPremove(selected.currentCell.num, cell.num); clearSelection() }
                 return
             }
             // Tapping anywhere that isn't one of our own pieces cancels the selection.
-            const ownPiece = cell?.occupied && cell.occupiedByMyColor(Game.playerColor)
             if(!ownPiece) clearSelection()
         }
+
+        // Tapping an empty cell (or an enemy piece) clears a queued premove.
+        if(Game.premove && !ownPiece) cancelPremove()
 
         Game.mouse.pressed = true
     })
@@ -61,5 +70,15 @@ export const setupInput = _ => {
 
     document.addEventListener('pointercancel', _ => {
         Game.mouse.pressed = false
+    })
+
+    // Right-click or Esc also cancels a premove (and any selection).
+    Game.canvas.addEventListener('contextmenu', e => {
+        e.preventDefault()
+        cancelPremove()
+        clearSelection()
+    })
+    document.addEventListener('keydown', e => {
+        if(e.key == 'Escape'){ cancelPremove(); clearSelection() }
     })
 }

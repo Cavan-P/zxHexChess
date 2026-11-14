@@ -125,3 +125,28 @@ test('a bot on a clock budgets its thinking time', _ => {
     assert.ok(room.botTimeBudget('black') <= 300, 'nearly flagged -> hurry')
     room.destroy()
 })
+
+test('open games: a public game is listed until someone joins, private games never are', async _ => {
+    const matchmaker = require('../src/rooms/matchmaker')
+    const updates = []
+    matchmaker.onLobbyChange = games => updates.push(games)
+
+    const pub = matchmaker.createRoom({ isPublic: true, timeControl: '5+0' })
+    const priv = matchmaker.createRoom({})
+    const host = fakeSocket(), other = fakeSocket(), joiner = fakeSocket()
+    pub.addClient(host); host.room = pub
+    priv.addClient(other); other.room = priv
+
+    let listed = matchmaker.openGames().map(g => g.code)
+    assert.ok(listed.includes(pub.id))
+    assert.ok(!listed.includes(priv.id))
+    assert.strictEqual(matchmaker.openGames().find(g => g.code == pub.id).timeControl, '5+0')
+
+    pub.addClient(joiner); joiner.room = pub
+    assert.ok(!matchmaker.openGames().some(g => g.code == pub.id), 'full games drop off the list')
+
+    await new Promise(r => setTimeout(r, 150))
+    assert.ok(updates.length >= 1, 'lobby updates are pushed')
+    matchmaker.onLobbyChange = null
+    pub.destroy(); priv.destroy()
+})
