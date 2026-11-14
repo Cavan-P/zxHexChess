@@ -39,6 +39,11 @@ test('no clock runs before White moves; then Black runs, and the mover gets the 
     room.destroy()
 })
 
+test('no-increment time controls exist and add nothing per move', _ => {
+    for(const name of ['1+0', '3+0', '5+0', '10+0', '15+0', '30+0']) assert.strictEqual(Room.TIME_CONTROLS[name].incrementMs, 0, name)
+    assert.strictEqual(Room.TIME_CONTROLS['30+20'].initialMs, 30 * 60000)
+})
+
 test('running out of time loses the game', _ => {
     const { room, white } = timedRoom()
     room.handleMessage(white, { type: 'attemptMove', from: cellOf('f5'), to: cellOf('f6') })
@@ -62,7 +67,7 @@ test('untimed games have no clock; unknown time controls fall back to untimed', 
     const { room, white } = timedRoom(null)
     assert.strictEqual(white.last('init').clock, null)
     room.destroy()
-    const r2 = new Room('X', { timeControl: '1+0' })
+    const r2 = new Room('X', { timeControl: '7+7' })
     assert.strictEqual(r2.clock, null)
 })
 

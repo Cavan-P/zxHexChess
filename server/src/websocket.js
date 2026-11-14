@@ -105,9 +105,11 @@ const handlers = {
     startBotVsBot(socket, data){
         if(!hasBot(data.botA) || !hasBot(data.botB)) return send(socket, { type: 'error', message: 'Bot not found' })
 
+        const timeControl = Object.prototype.hasOwnProperty.call(Room.TIME_CONTROLS, data.timeControl) ? data.timeControl : null
         const room = matchmaker.createRoom({
             bots: { white: data.botA, black: data.botB },
-            botMeta: { white: getBotMeta(data.botA), black: getBotMeta(data.botB) }
+            botMeta: { white: getBotMeta(data.botA), black: getBotMeta(data.botB) },
+            timeControl
         })
 
         send(socket, { type: 'roomCreated', code: room.id })

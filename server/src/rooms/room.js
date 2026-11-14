@@ -8,13 +8,17 @@ const RECONNECT_GRACE_MS = 60000
 const MAX_CHAT_LENGTH = 300
 const MIN_RATED_PLIES = 2      // both sides must move at least once for a game to be rated
 
-// Time controls players can pick when creating a game: minutes per side + seconds added per move.
-const TIME_CONTROLS = {
-    '3+2': { initialMs: 3 * 60000, incrementMs: 2000 },
-    '5+3': { initialMs: 5 * 60000, incrementMs: 3000 },
-    '10+5': { initialMs: 10 * 60000, incrementMs: 5000 },
-    '15+10': { initialMs: 15 * 60000, incrementMs: 10000 }
-}
+// Time controls players can pick: "minutes per side + seconds added per move".
+// Keep in step with the list in client/js/roomMenu.js.
+const TIME_CONTROLS = Object.fromEntries([
+    '1+0', '2+1',                        // bullet
+    '3+0', '3+2', '5+0', '5+3',          // blitz
+    '10+0', '10+5', '15+0', '15+10',     // rapid
+    '30+0', '30+20'                      // classical
+].map(name => {
+    const [minutes, seconds] = name.split('+').map(Number)
+    return [name, { initialMs: minutes * 60000, incrementMs: seconds * 1000 }]
+}))
 
 class Room {
     // bots: { white?: botId, black?: botId }   botMeta: { white?: {id,name,elo}, black?: {id,name,elo} }
@@ -497,7 +501,8 @@ class Room {
         if(this.isBotVsBot){
             const room = this.spawn({
                 bots: { white: this.bots.black, black: this.bots.white },
-                botMeta: { white: this.botMeta.black, black: this.botMeta.white }
+                botMeta: { white: this.botMeta.black, black: this.botMeta.white },
+                timeControl: this.timeControl
             })
             for(const s of [...this.spectators]) this.moveClient(s, room)
             return this.destroy()

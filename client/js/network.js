@@ -244,7 +244,7 @@ export const setRoomCodeDisplay = code => {
 export const sendStartBotGame = (botId, playerColor = 'white', timeControl = null) => send({ type: 'startBotGame', botId, playerColor, timeControl })
 export const sendRematch = _ => send({ type: 'rematch' })
 
-export const sendBotVsBot = (botA, botB) => send({ type: 'startBotVsBot', botA, botB })
+export const sendBotVsBot = (botA, botB, timeControl = null) => send({ type: 'startBotVsBot', botA, botB, timeControl })
 
 export const sendStartTournament = (botIds, gamesPerPairing) => send({ type: 'startTournament', botIds, gamesPerPairing })
 

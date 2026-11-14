@@ -58,6 +58,19 @@ const renderBotCard = (bot, { selected = false, compact = false, beaten = false,
     return card
 }
 
+// Time controls, "minutes + seconds per move". Must match TIME_CONTROLS in server/src/rooms/room.js.
+const TIME_CONTROL_GROUPS = [
+    { label: 'Bullet', items: ['1+0', '2+1'] },
+    { label: 'Blitz', items: ['3+0', '3+2', '5+0', '5+3'] },
+    { label: 'Rapid', items: ['10+0', '10+5', '15+0', '15+10'] },
+    { label: 'Classical', items: ['30+0', '30+20'] }
+]
+
+const describeTimeControl = name => {
+    const [minutes, seconds] = name.split('+').map(Number)
+    return `${name}  ·  ${minutes} min${seconds ? ` + ${seconds}s per move` : ''}`
+}
+
 const SPRITE_COLUMNS = { k: 0, q: 1, b: 2, n: 3, r: 4, p: 5 }
 
 // Gliński starting army, and piece values for the material count.
@@ -124,20 +137,32 @@ export const setupRoomMenu = _ => {
         statusBox.textContent = text
     }
 
-    // ------ Time control choice ------
+    // ------ Time controls ------
 
-    let timeControl = ''
-    const tcButtons = [...document.querySelectorAll('.tc-btn')]
-    const renderTimeControl = _ => tcButtons.forEach(btn => {
-        btn.classList.toggle('is-active', btn.dataset.tc == timeControl)
-        btn.setAttribute('aria-pressed', btn.dataset.tc == timeControl)
-    })
-    tcButtons.forEach(btn => btn.onclick = _ => { timeControl = btn.dataset.tc; renderTimeControl() })
-    renderTimeControl()
+    // Each picker remembers its last choice in this browser.
+    const timeControlPicker = (id, fallback = '') => {
+        const select = document.getElementById(id)
+        select.append(new Option('No clock', ''))
+        for(const group of TIME_CONTROL_GROUPS){
+            const optgroup = document.createElement('optgroup')
+            optgroup.label = group.label
+            for(const name of group.items) optgroup.append(new Option(describeTimeControl(name), name))
+            select.append(optgroup)
+        }
+        const key = `qrs.tc.${id}`
+        try { select.value = localStorage.getItem(key) ?? fallback } catch(e){ select.value = fallback }
+        if(select.selectedIndex < 0) select.value = fallback
+        select.onchange = _ => { try { localStorage.setItem(key, select.value) } catch(e){} }
+        return _ => select.value || null
+    }
+
+    const friendTimeControl = timeControlPicker('tc-friend')
+    const botTimeControl = timeControlPicker('tc-bot')
+    const battleTimeControl = timeControlPicker('tc-battle')
 
     createBtn.onclick = _ => {
         showStatus('')
-        sendRoomCreate(timeControl || null)
+        sendRoomCreate(friendTimeControl())
     }
 
     joinForm.onsubmit = e => {
@@ -447,15 +472,6 @@ export const setupRoomMenu = _ => {
 
     const pickBotColor = _ => botColorChoice == 'random' ? (Math.random() < 0.5 ? 'white' : 'black') : botColorChoice
 
-    // Clock against the computer.
-    let botTimeControl = ''
-    const botTcButtons = [...document.querySelectorAll('.bot-tc-btn')]
-    const renderBotTimeControl = _ => botTcButtons.forEach(btn => {
-        btn.classList.toggle('is-active', btn.dataset.botTc == botTimeControl)
-        btn.setAttribute('aria-pressed', btn.dataset.botTc == botTimeControl)
-    })
-    botTcButtons.forEach(btn => btn.onclick = _ => { botTimeControl = btn.dataset.botTc; renderBotTimeControl() })
-    renderBotTimeControl()
 
     // ------ Bot list ------
 
@@ -497,7 +513,7 @@ export const setupRoomMenu = _ => {
                 if(tierBeaten) heading.append(el('span', `tier-progress${tierBeaten == inTier.length ? ' is-complete' : ''}`, `${tierBeaten}/${inTier.length}`))
                 container.append(heading)
             }
-            container.append(renderBotCard(bot, { beaten: beaten.has(bot.id), onClick: b => sendStartBotGame(b.id, pickBotColor(), botTimeControl || null) }))
+            container.append(renderBotCard(bot, { beaten: beaten.has(bot.id), onClick: b => sendStartBotGame(b.id, pickBotColor(), botTimeControl()) }))
         }
     }
 
@@ -555,7 +571,7 @@ export const setupRoomMenu = _ => {
 
     document.getElementById('bvb-start-btn').onclick = _ => {
         if(!bvbSelection.white || !bvbSelection.black) return
-        sendBotVsBot(bvbSelection.white, bvbSelection.black)
+        sendBotVsBot(bvbSelection.white, bvbSelection.black, battleTimeControl())
     }
 
     // ------ Tournament ------
