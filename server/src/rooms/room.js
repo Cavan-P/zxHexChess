@@ -1,6 +1,8 @@
 const { GameState } = require('../game/rules')
 const { requestBotMove } = require('../ai/botPool')
 const { Chatter } = require('../ai/chat/chatter')
+const { getBotList } = require('../ai/botManager')
+const { checkGame, BY_ID } = require('../players/achievements')
 
 const BOT_MOVE_DELAY_MS = 400
 const BOT_ANNOUNCE_PAUSE_MS = 900
@@ -221,6 +223,8 @@ class Room {
         if(!changes) return null
         this.rated = true
 
+        const newAchievements = this.awardAchievements(result, changes)
+
         // Push updated profiles to whoever is still connected, announcing any newly earned title.
         for(const socket of this.players){
             const profile = socket.profileId && this.profiles.get(socket.profileId)
@@ -228,9 +232,40 @@ class Room {
             this.send(socket, { type: 'profile', player: profile })
             const before = titlesBefore[socket.profileId]
             if(profile.title && profile.title.code != before?.code) this.send(socket, { type: 'titleEarned', title: profile.title })
+            const earned = newAchievements[socket.profileId]
+            if(earned?.length) this.send(socket, { type: 'achievements', earned: earned.map(id => BY_ID[id]) })
         }
 
         return changes
+    }
+
+    // Checks each rated player's achievements after a game. Returns { profileId: [new ids] }.
+    awardAchievements(result, changes){
+        const awarded = {}
+        try {
+            const bots = getBotList()
+            for(const color of ['white', 'black']){
+                const profileId = this.seatProfiles[color]
+                const change = changes[color]
+                if(!profileId || !change || this.bots[color]) continue
+
+                const opp = color == 'white' ? 'black' : 'white'
+                const isBot = Boolean(this.bots[opp])
+                const opponentRating = isBot ? this.botMeta[opp]?.elo : changes[opp]?.before
+
+                const ids = checkGame({
+                    color, game: this.game, result,
+                    player: this.profiles.record(profileId),
+                    opponent: { isBot, rating: opponentRating },
+                    ratingBefore: change.before,
+                    clockMs: this.clock ? this.clockState().remaining[color] : null,
+                    bots
+                })
+                awarded[profileId] = this.profiles.awardAchievements(profileId, ids)
+            }
+        }
+        catch(e){ console.error(`[room ${this.id}] Achievement check failed:`, e) }
+        return awarded
     }
 
     removeClient(socket){

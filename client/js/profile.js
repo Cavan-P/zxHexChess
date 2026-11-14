@@ -1,4 +1,5 @@
 import { Game } from './game.js'
+import { renderAchievements } from './achievements.js'
 
 // The browser keeps { playerId, token } so the server can recognise this player next visit.
 const STORAGE_KEY = 'qrs.profile'
@@ -119,6 +120,7 @@ const openProfile = _ => {
     $('profile-rename-input').value = ''
     $('profile-rename-error').textContent = ''
     renderChart(p.history)
+    renderAchievements(p)
 
     modal.classList.remove('hidden')
 }
@@ -223,6 +225,7 @@ export const setupProfile = _ => {
         else if(!storage.get(SKIP_KEY)) openSignup()
         renderChip()
         requestLeaderboard()
+        send({ type: 'getAchievementDefs' })
     }
 
     Game.onProfile = player => {

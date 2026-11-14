@@ -2,6 +2,7 @@ const { WebSocketServer } = require('ws')
 const matchmaker = require('./rooms/matchmaker')
 const Room = require('./rooms/room')
 const { getBotList, hasBot } = require('./ai/botManager')
+const { DEFINITIONS: ACHIEVEMENTS } = require('./players/achievements')
 const { runTournament } = require('./ai/tournament')
 const { runEvolution, materializeGenome } = require('./ai/evolve')
 const { PlayerStore } = require('./players/playerStore')
@@ -123,6 +124,10 @@ const handlers = {
         if(res.error) return send(socket, { type: 'profileError', message: res.error })
         send(socket, { type: 'profile', player: res.player })
         send(socket, { type: 'leaderboard', players: profiles.leaderboard(25) })
+    },
+
+    getAchievementDefs(socket){
+        send(socket, { type: 'achievementDefs', defs: ACHIEVEMENTS })
     },
 
     getLeaderboard(socket){

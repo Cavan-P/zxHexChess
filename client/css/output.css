@@ -11,6 +11,7 @@
     --color-white: #fff;
     --spacing: 0.25rem;
     --container-sm: 24rem;
+    --container-md: 28rem;
     --container-xl: 36rem;
     --container-2xl: 42rem;
     --container-3xl: 48rem;
@@ -216,6 +217,9 @@
   .sticky {
     position: sticky;
   }
+  .inset-x-0 {
+    inset-inline: calc(var(--spacing) * 0);
+  }
   .top-0 {
     top: calc(var(--spacing) * 0);
   }
@@ -230,6 +234,9 @@
   }
   .z-10 {
     z-index: 10;
+  }
+  .z-50 {
+    z-index: 50;
   }
   .col-span-2 {
     grid-column: span 2 / span 2;
@@ -369,11 +376,17 @@
   .max-h-48 {
     max-height: calc(var(--spacing) * 48);
   }
+  .max-h-\[92dvh\] {
+    max-height: 92dvh;
+  }
   .min-h-0 {
     min-height: calc(var(--spacing) * 0);
   }
   .min-h-5 {
     min-height: calc(var(--spacing) * 5);
+  }
+  .min-h-8 {
+    min-height: calc(var(--spacing) * 8);
   }
   .min-h-12 {
     min-height: calc(var(--spacing) * 12);
@@ -435,6 +448,9 @@
   .max-w-\[min\(20rem\,85\%\)\] {
     max-width: min(20rem, 85%);
   }
+  .max-w-md\! {
+    max-width: var(--container-md) !important;
+  }
   .max-w-sm {
     max-width: var(--container-sm);
   }
@@ -473,6 +489,9 @@
   }
   .grid-cols-\[2\.25rem_1fr_1fr\] {
     grid-template-columns: 2.25rem 1fr 1fr;
+  }
+  .grid-cols-\[repeat\(auto-fill\,minmax\(2\.5rem\,1fr\)\)\] {
+    grid-template-columns: repeat(auto-fill,minmax(2.5rem,1fr));
   }
   .grid-cols-\[repeat\(auto-fill\,minmax\(150px\,1fr\)\)\] {
     grid-template-columns: repeat(auto-fill,minmax(150px,1fr));
@@ -542,6 +561,13 @@
       --tw-space-y-reverse: 0;
       margin-block-start: calc(calc(var(--spacing) * 1) * var(--tw-space-y-reverse));
       margin-block-end: calc(calc(var(--spacing) * 1) * calc(1 - var(--tw-space-y-reverse)));
+    }
+  }
+  .space-y-1\.5 {
+    :where(& > :not(:last-child)) {
+      --tw-space-y-reverse: 0;
+      margin-block-start: calc(calc(var(--spacing) * 1.5) * var(--tw-space-y-reverse));
+      margin-block-end: calc(calc(var(--spacing) * 1.5) * calc(1 - var(--tw-space-y-reverse)));
     }
   }
   .gap-x-1 {
@@ -1902,6 +1928,86 @@
   .status-banner.is-over {
     background: var(--text-strong);
     color: var(--bg-card);
+  }
+  .achievement-group {
+    margin-top: 0.35rem;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .achievement-group:first-child {
+    margin-top: 0;
+  }
+  .achievement-badge {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 10px;
+    background: var(--bg-card);
+    color: var(--text-muted);
+    opacity: 0.45;
+    filter: grayscale(1);
+    transition: transform .12s ease;
+    cursor: pointer;
+  }
+  .achievement-badge:hover {
+    transform: translateY(-1px);
+  }
+  .achievement-badge.is-earned {
+    opacity: 1;
+    filter: none;
+    background: var(--accent-primary);
+    color: var(--text-chat);
+    box-shadow: inset 0 0 0 2px var(--accent-deep);
+  }
+  .rating-pill {
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    background: var(--bg-card);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    opacity: 0.55;
+    cursor: pointer;
+  }
+  .rating-pill.is-earned {
+    opacity: 1;
+    background: var(--accent-primary);
+    color: var(--text-chat);
+  }
+  .achievement-toast {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    max-width: 22rem;
+    padding: 0.65rem 0.9rem;
+    border-radius: 14px;
+    background: var(--bg-card);
+    box-shadow: var(--shadow-pop);
+    text-align: left;
+    cursor: pointer;
+    animation: toastIn .35s cubic-bezier(.2, .9, .3, 1.2);
+  }
+  .achievement-toast.is-leaving {
+    animation: toastOut .3s ease forwards;
+  }
+  @keyframes toastIn {
+    from {
+      opacity: 0;
+      transform: translateY(-1rem) scale(.96);
+    }
+  }
+  @keyframes toastOut {
+    to {
+      opacity: 0;
+      transform: translateY(-0.75rem);
+    }
   }
   .modal-backdrop {
     position: fixed;

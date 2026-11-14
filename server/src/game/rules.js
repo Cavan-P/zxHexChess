@@ -180,7 +180,7 @@ class GameState {
             this.result?.reason == 'checkmate' ? '#' : opponentInCheck ? '+' : ''
         ].join('')
 
-        const move = { from, to, color, captured, capturedCell, promotion: promoting ? newPiece : null, check: kingCell, notation }
+        const move = { from, to, color, piece: movingPiece.piece, captured, capturedCell, promotion: promoting ? newPiece : null, check: kingCell, notation }
         this.history.push(move)
         this.positions.push(this.fen)
 

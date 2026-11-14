@@ -1,3 +1,4 @@
+import { setupAchievements } from './achievements.js'
 // ------ IMPORTS ------
 
 import { Game } from './game.js'
@@ -53,6 +54,7 @@ setupThemePicker()
 setupReview()
 setupLab()
 setupProfile()
+setupAchievements()
 setupRoomMenu()
 setupInput()
 Game.onRatingsChanged = requestLeaderboard

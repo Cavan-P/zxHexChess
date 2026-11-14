@@ -17,6 +17,7 @@ const K_ESTABLISHED = 20
 const HISTORY_LENGTH = 50
 
 const { titleFor } = require('./titles')
+const { BY_ID } = require('./achievements')
 
 const NAME_PATTERN = /^[\p{L}\p{N} _.'-]{2,20}$/u
 
@@ -82,6 +83,7 @@ class PlayerStore {
             gamesPlayed: 0,
             history: [{ t: Date.now(), elo: STARTING_ELO }],
             botsBeaten: {},
+            achievements: {},
             createdAt: Date.now()
         }
         this.save()
@@ -117,7 +119,7 @@ class PlayerStore {
         if(!player) return { error: 'Unknown player' }
         Object.assign(player, {
             elo: STARTING_ELO, peak: STARTING_ELO, wins: 0, losses: 0, draws: 0, gamesPlayed: 0,
-            history: [{ t: Date.now(), elo: STARTING_ELO }], botsBeaten: {}
+            history: [{ t: Date.now(), elo: STARTING_ELO }], botsBeaten: {}, achievements: {}, streak: 0
         })
         delete player.titlePeak
         this.save()
@@ -135,8 +137,27 @@ class PlayerStore {
             title: titleOf(profile),
             provisional: profile.gamesPlayed < PROVISIONAL_GAMES,
             history: [...profile.history],
-            botsBeaten: { ...(profile.botsBeaten || {}) }
+            botsBeaten: { ...(profile.botsBeaten || {}) },
+            achievements: { ...(profile.achievements || {}) }
         }
+    }
+
+    // The raw stored record (for achievement checks). Read-only, please.
+    record(id){
+        return this.players[id] || null
+    }
+
+    // Records achievements and returns the ids that are new for this player.
+    awardAchievements(id, ids){
+        const player = this.players[id]
+        if(!player) return []
+        player.achievements ||= {}
+        const fresh = ids.filter(a => BY_ID[a] && !player.achievements[a])
+        if(!fresh.length) return []
+        const now = Date.now()
+        fresh.forEach(a => player.achievements[a] = now)
+        this.save()
+        return fresh
     }
 
     applyResult(player, opponentRating, score){
@@ -150,6 +171,7 @@ class PlayerStore {
         if(score > 0.5) player.wins++
         else if(score < 0.5) player.losses++
         else player.draws++
+        player.streak = score > 0.5 ? (player.streak || 0) + 1 : 0
 
         player.history.push({ t: Date.now(), elo: player.elo })
         if(player.history.length > HISTORY_LENGTH) player.history.splice(0, player.history.length - HISTORY_LENGTH)

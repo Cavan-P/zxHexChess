@@ -519,7 +519,7 @@
 
     <!-- ========== PROFILE ========== -->
     <div id="profile-modal" class="modal-backdrop hidden">
-      <div class="modal relative text-left">
+      <div class="modal relative max-h-[92dvh] max-w-md! overflow-y-auto text-left">
         <button id="profile-close" class="btn btn-ghost btn-sm absolute top-3 right-3" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
 
         <!-- New player -->
@@ -557,6 +557,10 @@
           </div>
           <svg id="profile-chart" viewBox="0 0 300 80" preserveAspectRatio="none" class="mb-5 h-20 w-full rounded-lg bg-(--bg-sunken)" role="img" aria-label="Rating history"></svg>
 
+          <div class="mb-1 text-xs text-(--text-muted)">Achievements</div>
+          <div id="profile-achievements" class="mb-2 space-y-1.5 rounded-lg bg-(--bg-sunken) p-3"></div>
+          <p id="profile-achievement-caption" class="mb-5 min-h-8 text-xs text-(--text-muted)" aria-live="polite"></p>
+
           <form id="profile-rename-form" class="flex gap-2">
             <input id="profile-rename-input" maxlength="20" class="input flex-1 text-sm" placeholder="Change your name" />
             <button type="submit" class="btn btn-secondary btn-sm">Rename</button>
@@ -569,6 +573,8 @@
         </div>
       </div>
     </div>
+
+    <div id="achievement-toasts" class="pointer-events-none fixed inset-x-0 top-3 z-50 flex flex-col items-center gap-2 px-4"></div>
 
     <script type="module" src="js/main.js"></script>
   </body>

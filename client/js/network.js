@@ -102,6 +102,12 @@ export const setupNetwork = onFenInit => {
                 addSystemMessage(`🎉 New title! You're now a ${data.title.name} (${data.title.code}).`)
                 play('promote')
                 return
+            case 'achievements':
+                Game.onAchievements?.(data.earned)
+                return
+            case 'achievementDefs':
+                Game.achievementDefs = data.defs
+                return
             case 'registered': return Game.onRegistered?.(data.player, data.token)
             case 'profileInvalid': return Game.onProfileInvalid?.()
             case 'profileError': return Game.onProfileError?.(data.message)

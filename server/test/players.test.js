@@ -175,3 +175,22 @@ test('resetting progress keeps the name and token but wipes rating, record and b
     assert.ok(store.authenticate(player.id, token))
     assert.ok(store.resetProgress('missing').error)
 })
+
+test('a finished game awards achievements once and announces them', _ => {
+    const store = tempStore()
+    const a = store.register('Badge One').player
+    const b = store.register('Badge Two').player
+    const room = new Room('R9', { profiles: store })
+    const ws = fakeSocket(a.id), bs = fakeSocket(b.id)
+    room.addClient(ws)
+    room.addClient(bs)
+
+    playOpening(room)
+    room.handleMessage(bs, { type: 'resign' })
+
+    const earned = ws.last('achievements').earned.map(d => d.id)
+    assert.ok(earned.includes('first-game') && earned.includes('live-win'))
+    assert.ok(store.get(a.id).achievements['live-win'])
+    assert.strictEqual(store.awardAchievements(a.id, ['live-win']).length, 0)
+    assert.deepStrictEqual(store.resetProgress(a.id).player.achievements, {})
+})

@@ -10,7 +10,7 @@ Play it at qrschess.itscavanp.dev.
 - Online games with a room code, or post an open game that anyone can join from the home page
 - Clocks (bullet up to classical, with or without increment), rematches, draw offers, resigning
 - 27 bots from "plays randomly" up to a few that'll actually beat you. They also talk a bit of trash in chat
-- Elo ratings and a leaderboard. You just pick a name, no accounts or passwords
+- Elo ratings, titles, achievements and a leaderboard. You just pick a name, no accounts or passwords
 - Drag or tap to move, premoves, step back through the moves, board coordinates
 - A few color themes (light and dark), a wood board, and sound effects
 
