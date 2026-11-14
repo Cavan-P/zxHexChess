@@ -8,10 +8,19 @@ const RECONNECT_GRACE_MS = 60000
 const MAX_CHAT_LENGTH = 300
 const MIN_RATED_PLIES = 2      // both sides must move at least once for a game to be rated
 
+// Time controls players can pick when creating a game: minutes per side + seconds added per move.
+const TIME_CONTROLS = {
+    '3+2': { initialMs: 3 * 60000, incrementMs: 2000 },
+    '5+3': { initialMs: 5 * 60000, incrementMs: 3000 },
+    '10+5': { initialMs: 10 * 60000, incrementMs: 5000 },
+    '15+10': { initialMs: 15 * 60000, incrementMs: 10000 }
+}
+
 class Room {
     // bots: { white?: botId, black?: botId }   botMeta: { white?: {id,name,elo}, black?: {id,name,elo} }
     // profiles: the PlayerStore used to look up and rate signed-in players (optional)
-    constructor(id, { bots = {}, botMeta = {}, profiles = null, onEmpty } = {}){
+    // timeControl: a key of TIME_CONTROLS, or null for an untimed game
+    constructor(id, { bots = {}, botMeta = {}, profiles = null, timeControl = null, onEmpty } = {}){
         this.id = id
         this.players = []
         this.spectators = []
@@ -21,6 +30,18 @@ class Room {
         this.botMeta = botMeta
         this.onEmpty = onEmpty
         this.profiles = profiles
+
+        // Clocks live on the server. The side to move's clock runs from `runningSince`; nobody's
+        // clock runs before White's first move.
+        const tc = TIME_CONTROLS[timeControl]
+        this.clock = tc ? {
+            name: timeControl,
+            ...tc,
+            remaining: { white: tc.initialMs, black: tc.initialMs },
+            running: null,
+            runningSince: 0,
+            timer: null
+        } : null
 
         // Which profile sits in each human seat. If a different profile takes over a seat mid-game
         // (e.g. a stranger fills a disconnected player's spot), the game becomes unrated.
@@ -101,7 +122,8 @@ class Room {
             history: this.game.history.map(m => m.notation),
             lastMove: this.game.history.at(-1) || null,
             result: this.game.result,
-            legal: this.game.allLegalMoves()
+            legal: this.game.allLegalMoves(),
+            clock: this.clockState()
         })
         this.broadcastPresence()
 
@@ -218,16 +240,56 @@ class Room {
         }
     }
 
+    // ------ Clock ------
+
+    // Remaining time for both sides as of now, plus who is running.
+    clockState(){
+        const c = this.clock
+        if(!c) return null
+        const remaining = { ...c.remaining }
+        if(c.running) remaining[c.running] = Math.max(0, remaining[c.running] - (Date.now() - c.runningSince))
+        return { name: c.name, initialMs: c.initialMs, incrementMs: c.incrementMs, remaining, running: c.running }
+    }
+
+    startClock(color){
+        const c = this.clock
+        if(!c || this.game.result) return
+        c.running = color
+        c.runningSince = Date.now()
+        clearTimeout(c.timer)
+        c.timer = setTimeout(_ => this.flag(color), c.remaining[color] + 50)
+    }
+
+    // Stops the running clock, charging the elapsed time. Returns false if that side had run out.
+    stopClock(){
+        const c = this.clock
+        if(!c?.running) return true
+        clearTimeout(c.timer)
+        const color = c.running
+        c.remaining[color] = Math.max(0, c.remaining[color] - (Date.now() - c.runningSince))
+        c.running = null
+        return c.remaining[color] > 0
+    }
+
+    flag(color){
+        if(this.game.result || this.destroyed) return
+        this.stopClock()
+        this.clock.remaining[color] = 0
+        this.endGame(this.game.timeout(color))
+    }
+
     destroy(){
         if(this.destroyed) return
         this.destroyed = true
         clearTimeout(this.disconnectTimer)
+        if(this.clock) clearTimeout(this.clock.timer)
         for(const chatter of Object.values(this.chatters)) chatter.stop()
         this.onEmpty?.(this)
     }
 
     endGame(result){
         if(!result) return
+        this.stopClock()
         this.drawOffer = null
         clearTimeout(this.disconnectTimer)
         this.disconnectTimer = null
@@ -236,7 +298,7 @@ class Room {
         try { ratings = this.rateGame(result) }
         catch(e){ console.error(`[room ${this.id}] Rating update failed:`, e) }
 
-        this.broadcast({ type: 'gameOver', result, ratings })
+        this.broadcast({ type: 'gameOver', result, ratings, clock: this.clockState() })
 
         for(const chatter of Object.values(this.chatters)) chatter.onGameOver(result)
     }
@@ -300,6 +362,14 @@ class Room {
     afterMove(move, fenBefore, mover){
         this.drawOffer = null
 
+        // Charge the mover's thinking time, add the increment, and start the opponent's clock.
+        if(this.clock){
+            const wasRunning = this.clock.running == mover
+            if(!this.stopClock()) return this.flag(mover)
+            if(wasRunning) this.clock.remaining[mover] += this.clock.incrementMs
+            this.startClock(this.game.turn)
+        }
+
         this.broadcast({
             type: 'move',
             ...move,
@@ -307,7 +377,8 @@ class Room {
             turn: this.game.turn,
             result: this.game.result,
             // Sent with every move so the next player's highlights appear instantly on pickup.
-            legal: this.game.allLegalMoves()
+            legal: this.game.allLegalMoves(),
+            clock: this.clockState()
         })
 
         if(this.game.result) return this.endGame(this.game.result)
@@ -405,3 +476,4 @@ class Room {
 }
 
 module.exports = Room
+module.exports.TIME_CONTROLS = TIME_CONTROLS

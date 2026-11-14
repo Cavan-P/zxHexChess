@@ -6,7 +6,8 @@ It's a web-based implementation of Gliński's variant of hexagonal chess, allowi
 ## Rules implemented
 - Full Gliński movement, including pawn double-steps, en passant, and promotion anywhere on the far edge
 - Checkmate, and Gliński's stalemate rule (the stalemating side wins ¾ of a point)
-- Draws by agreement, threefold repetition, the 50-move rule, and insufficient material (king vs king, or king and a single bishop/knight vs king)
+- Draws by agreement, threefold repetition, the 50-move rule, and dead positions where checkmate is impossible
+- Insufficient material is worked out for Gliński's geometry rather than borrowed from square-board chess. Exhaustive searches over every piece placement show a lone king *can* be checkmated by king + knight, or king + a light- or dark-shade bishop (a corner king has only five moves), so those games play on, although the mate can never be forced. A middle-shade bishop (the shade of the centre cell f6) can never give mate, even two of them or against a defending middle-shade bishop. So a position is dead exactly when every piece besides the kings is a middle-shade bishop.
 - Resignation, and a win by abandonment if your opponent disconnects for more than 60 seconds
 
 All moves are validated on the server; the browser only ever sends "move from A to B".

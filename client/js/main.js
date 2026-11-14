@@ -7,6 +7,7 @@ import { setupNetwork, sendChatMessage, describeResult } from './network.js'
 import { drawBoard, populateBoardFromFen, BOARD_WIDTH, BOARD_HEIGHT } from './board.js'
 import { setSystemMessage } from './utils.js'
 import { setupProfile, requestLeaderboard } from './profile.js'
+import { setupThemePicker } from './theme.js'
 
 // ------ GLOBALS ------
 
@@ -45,6 +46,7 @@ Game.onLegalMoves = (from, moves) => {
 
 Game.resyncBoard = fen => populateBoardFromFen(fen)
 
+setupThemePicker()
 setupProfile()
 setupRoomMenu()
 setupInput()
@@ -148,11 +150,8 @@ const render = _ => {
         ctx.translate(-Game.boardCenter.x, -Game.boardCenter.y)
     }
 
-    drawBoard([
-        '#D18B47FF',     /*  Dark cell    */
-        '#E8AB6FFF',     /*  Middle cell  */
-        '#FFCE9EFF'],    /*  Light cell   */
-        0, 0)
+    // Dark, middle and light cells: flat colours or wood textures from the active theme.
+    drawBoard(Game.palette.cells, 0, 0)
 
     // Draw the dragged piece last so it stays on top.
     Game.pieces.sort((a, b) => a.isDragging - b.isDragging)
@@ -171,8 +170,30 @@ const render = _ => {
     if(Game.playerColor) updateStatus()
 }
 
+// "4:59", or "9.4" in the last ten seconds.
+const formatClock = ms => {
+    if(ms < 10000) return (Math.max(0, ms) / 1000).toFixed(1)
+    const total = Math.ceil(ms / 1000)
+    return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`
+}
+
+const updateClocks = _ => {
+    const c = Game.clock
+    if(!c) return
+    for(const node of document.querySelectorAll('.clock[data-color]')){
+        const color = node.dataset.color
+        const running = c.running == color && Game.state == 'playing'
+        const ms = c.remaining[color] - (running ? performance.now() - Game.clockReceivedAt : 0)
+        const text = formatClock(ms)
+        if(node.textContent != text) node.textContent = text
+        node.classList.toggle('is-running', running)
+        node.classList.toggle('is-low', ms < 20000)
+    }
+}
+
 const loop = _ => {
     render()
+    updateClocks()
     requestAnimationFrame(loop)
 }
 

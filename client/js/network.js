@@ -22,6 +22,13 @@ export const setupNetwork = onFenInit => {
     Game.socket.onmessage = msg => {
         const data = JSON.parse(msg.data)
 
+        // Clock snapshots ride along on init/move/gameOver; remember when we got each one so the
+        // display can count down smoothly between server updates.
+        if('clock' in data){
+            Game.clock = data.clock
+            Game.clockReceivedAt = performance.now()
+        }
+
         switch(data.type){
             case 'roomCreated':
                 Game.onRoomCreated?.(data.code)
@@ -162,6 +169,7 @@ export const setupNetwork = onFenInit => {
 }
 
 const handleMove = data => {
+    if(Game.state == 'idle') return
     Game.turn = data.turn
     Game.legalMap = data.legal || null
     Game.pendingMove = null
@@ -202,7 +210,7 @@ const handleMove = data => {
     if(data.result) handleGameOver(data.result)
 }
 
-export const sendRoomCreate = _ => send({ type: 'createRoom' })
+export const sendRoomCreate = timeControl => send({ type: 'createRoom', timeControl })
 
 export const sendRoomJoin = code => send({ type: 'joinRoom', code })
 
@@ -259,7 +267,8 @@ export const describeResult = result => {
         checkmate: 'by checkmate',
         stalemate: 'by stalemate',
         resignation: 'by resignation',
-        abandonment: 'by abandonment'
+        abandonment: 'by abandonment',
+        timeout: 'on time'
     }[reason] || `(${reason})`
 
     return { title, detail: `${colorName(winner)} wins ${how} (${score})` }
@@ -290,7 +299,9 @@ const renderRatingChange = ratings => {
 }
 
 const handleGameOver = (result, { quiet = false, ratings } = {}) => {
-    if(!result) return
+    // Ignore the result of a game we've already left (leaving mid-game resigns, and the server's
+    // game-over message arrives after we're back on the home screen).
+    if(!result || Game.state == 'idle') return
 
     Game.state = 'gameOver'
     Game.result = result

@@ -54,10 +54,32 @@ test('threefold repetition draws', _ => {
     assert.strictEqual(game.result?.reason, 'threefold repetition')
 })
 
-test('king and minor piece against a lone king is a draw', _ => {
-    const game = new GameState({ fen: position({ g1: 'K', g10: 'k', c3: 'N' }) })
-    game.play('white', cellOf('g1'), cellOf('g2'))
-    assert.strictEqual(game.result?.reason, 'insufficient material')
+test('insufficient material follows Gliński geometry, not square-board rules', _ => {
+    const afterQuietMove = pieces => {
+        const game = new GameState({ fen: position({ g1: 'K', g10: 'k', ...pieces }) })
+        game.play('white', cellOf('g1'), cellOf('g2'))
+        return game.result?.reason || null
+    }
+
+    // Dead draws: only middle-shade bishops (f3/f9 shade, same as the centre f6) besides the kings.
+    assert.strictEqual(afterQuietMove({}), 'insufficient material')
+    assert.strictEqual(afterQuietMove({ f3: 'B' }), 'insufficient material')
+    assert.strictEqual(afterQuietMove({ f3: 'B', f9: 'b' }), 'insufficient material')
+    assert.strictEqual(afterQuietMove({ f3: 'B', f6: 'B' }), 'insufficient material')
+
+    // Mate is still possible (a corner king has only five moves), so play goes on.
+    assert.strictEqual(afterQuietMove({ c3: 'N' }), null)
+    assert.strictEqual(afterQuietMove({ f2: 'B' }), null)      // dark-shade bishop
+    assert.strictEqual(afterQuietMove({ f1: 'B' }), null)      // light-shade bishop
+    assert.strictEqual(afterQuietMove({ f3: 'B', a4: 'p' }), null)
+})
+
+test('a lone king really can be mated by king + knight and king + light/dark bishop', _ => {
+    const { getGameStatus, parseFen } = require('../src/game/moves')
+    for(const extra of [{ d8: 'N' }, { e9: 'B' }]){
+        const board = parseFen(position({ f11: 'k', f9: 'K', ...extra }))
+        assert.strictEqual(getGameStatus(board, 'black', null), 'checkmate')
+    }
 })
 
 test('50-move rule draws after 100 quiet plies', _ => {

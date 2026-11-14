@@ -61,16 +61,16 @@ export class Cell {
 
         // Last move: warm gold wash on both cells (drawn first so other markers sit on top).
         if(Game.lastMove?.from == this.num){
-            drawHexagon(this.x, this.y, this.size, 'rgba(233, 196, 106, 0.45)', false, 'black', 0, this.ctx)
+            drawHexagon(this.x, this.y, this.size, Game.palette.highlight(0.45), false, 'black', 0, this.ctx)
         }
 
         if(Game.lastMove?.to == this.num){
-            drawHexagon(this.x, this.y, this.size, 'rgba(233, 196, 106, 0.75)', false, 'black', 0, this.ctx)
+            drawHexagon(this.x, this.y, this.size, Game.palette.highlight(0.75), false, 'black', 0, this.ctx)
         }
 
         // The cell a piece is being dragged from.
         if(Game.draggedPiece?.originalCell == this){
-            drawHexagon(this.x, this.y, this.size - 3, 'rgba(233, 196, 106, 0.55)', true, 'rgba(185, 120, 47, 0.85)', 3, this.ctx)
+            drawHexagon(this.x, this.y, this.size - 3, Game.palette.highlight(0.55), true, Game.palette.ink(0.6), 3, this.ctx)
         }
 
         if(this.num == Game.check){
@@ -81,22 +81,22 @@ export class Cell {
         }
 
         if(this.hovering && this.occupied && this.occupiedByMyColor(colorPerspective) && !Game.draggedPiece && Game.turn == colorPerspective){
-            drawHexagon(this.x, this.y, this.size - 3, 'rgba(255, 255, 255, 0.18)', true, 'rgba(59, 39, 24, 0.65)', 3, this.ctx)
+            drawHexagon(this.x, this.y, this.size - 3, 'rgba(255, 255, 255, 0.18)', true, Game.palette.ink(0.65), 3, this.ctx)
         }
 
         if(this.isLegalTarget){
             if(this.hovering && Game.draggedPiece){
-                drawHexagon(this.x, this.y, this.size - 3, 'rgba(255, 255, 255, 0.25)', true, 'rgba(59, 39, 24, 0.55)', 3, this.ctx)
+                drawHexagon(this.x, this.y, this.size - 3, 'rgba(255, 255, 255, 0.25)', true, Game.palette.ink(0.55), 3, this.ctx)
             }
 
             if(!this.occupied){
                 this.ctx.beginPath()
                 this.ctx.arc(this.x, this.y, this.size * 0.22, 0, Math.PI * 2)
-                this.ctx.fillStyle = 'rgba(59, 39, 24, 0.32)'
+                this.ctx.fillStyle = Game.palette.hint
                 this.ctx.fill()
             }
             else if(this.occupiedBy.toLowerCase() != 'k'){
-                drawHexagon(this.x, this.y, this.size - 4, 'rgba(0, 0, 0, 0)', true, 'rgba(59, 39, 24, 0.4)', 6, this.ctx)
+                drawHexagon(this.x, this.y, this.size - 4, 'rgba(0, 0, 0, 0)', true, Game.palette.hint, 6, this.ctx)
             }
         }
 

@@ -1,5 +1,6 @@
 const { WebSocketServer } = require('ws')
 const matchmaker = require('./rooms/matchmaker')
+const Room = require('./rooms/room')
 const { getBotList, hasBot } = require('./ai/botManager')
 const { runTournament } = require('./ai/tournament')
 const { runEvolution, materializeGenome } = require('./ai/evolve')
@@ -111,8 +112,9 @@ const handlers = {
         joinRoom(socket, room)
     },
 
-    createRoom(socket){
-        const room = matchmaker.createRoom()
+    createRoom(socket, data){
+        const timeControl = Object.prototype.hasOwnProperty.call(Room.TIME_CONTROLS, data.timeControl) ? data.timeControl : null
+        const room = matchmaker.createRoom({ timeControl })
         send(socket, { type: 'roomCreated', code: room.id })
         joinRoom(socket, room)
     },

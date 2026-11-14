@@ -17,13 +17,24 @@ const isValidCell = n => Number.isInteger(n) && n >= 0 && n < NUM_CELLS
 const isPromotionMove = (piece, to) =>
     piece.piece.toLowerCase() == 'p' && promotionCells[piece.color].includes(to)
 
-// Kings only, or a king plus a single bishop or knight against a bare king: no mate is possible.
-const hasInsufficientMaterial = board => {
-    const nonKings = board.filter(c => c.piece && c.piece.toLowerCase() != 'k')
-    if(nonKings.length == 0) return true
-    if(nonKings.length == 1) return ['b', 'n'].includes(nonKings[0].piece.toLowerCase())
-    return false
-}
+// Each cell has one of three shades; a bishop never leaves its shade. The "middle" shade is the
+// one the centre cell f6 has (white's f3 bishop, black's f9 bishop).
+const isMiddleShade = ([q, r]) => ((q - r) % 3 + 3) % 3 == 0
+
+// A dead position: no sequence of legal moves can ever reach checkmate, so the game is drawn.
+//
+// Gliński's board differs from the square board here. Exhaustive searches over every placement
+// show that a lone king CAN be checkmated by king + knight, and by king + a light- or dark-shade
+// bishop (a corner king has only five moves), so those are NOT draws - play continues, though the
+// mate can't be forced. But a middle-shade bishop can never deliver mate: not alone, not two of
+// them, and not against a defending middle-shade bishop. So the position is dead exactly when every
+// piece except the kings is a bishop on a middle-shade cell (including bare kings).
+const hasInsufficientMaterial = board =>
+    board.every(c => !c.piece || c.piece.toLowerCase() == 'k' || (c.piece.toLowerCase() == 'b' && isMiddleShade(c.coords)))
+
+// Could `color` ever checkmate, by any sequence of moves? Not with only middle-shade bishops.
+const canEverMate = (board, color) =>
+    board.some(c => c.color == color && c.piece.toLowerCase() != 'k' && !(c.piece.toLowerCase() == 'b' && isMiddleShade(c.coords)))
 
 class GameState {
     constructor({ fen = START_FEN, turn = 'white', enPassant = null } = {}){
@@ -191,6 +202,17 @@ class GameState {
         if(this.halfmoveClock >= FIFTY_MOVE_PLIES) return { winner: null, reason: '50-move rule', score: '½-½' }
 
         return null
+    }
+
+    // `color` ran out of time. The opponent wins - unless they could never checkmate anyway, in
+    // which case it's a draw (the standard rule, using Gliński's insufficient-material analysis).
+    timeout(color){
+        if(this.result) return null
+        const opponent = other(color)
+        this.result = canEverMate(this.board(), opponent)
+            ? { winner: opponent, reason: 'timeout', score: opponent == 'white' ? '1-0' : '0-1' }
+            : { winner: null, reason: 'timeout vs insufficient material', score: '½-½' }
+        return this.result
     }
 
     resign(color){

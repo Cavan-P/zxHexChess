@@ -124,7 +124,20 @@ export const drawBoard = (colors, stroke, strokeWeight, populateCells) => {
         let x = centerX - ((numCols - 1) * columnOffset) / 2
 
         for(let col = 0; col < numCols; col++){
-            drawHexagon(x, y, hexSize, colors[colorIndex], stroke, '#3b2718', strokeWeight, Game.ctx)
+            const fill = colors ? colors[colorIndex] : undefined
+
+            // Wood: give every cell its own grain direction and offset, like an inlaid board.
+            if(fill instanceof CanvasPattern){
+                const angle = [0, 60, 120][(cellNum * 7) % 3] + ((cellNum * 37) % 11) - 5
+                fill.setTransform(new DOMMatrix().translateSelf(x + (cellNum * 53) % 97, y + (cellNum * 29) % 89).rotateSelf(angle))
+            }
+
+            drawHexagon(x, y, hexSize, fill, stroke, Game.palette?.edge || '#3b2718', strokeWeight, Game.ctx)
+
+            // Hairline seams between wooden cells.
+            if(fill instanceof CanvasPattern){
+                drawHexagon(x, y, hexSize - 0.5, 'rgba(0, 0, 0, 0)', true, Game.palette.ink(0.35), 1, Game.ctx)
+            }
 
             if(populateCells){
 

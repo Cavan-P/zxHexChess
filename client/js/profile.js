@@ -47,7 +47,7 @@ const renderChart = history => {
         text.setAttribute('y', '44')
         text.setAttribute('text-anchor', 'middle')
         text.setAttribute('font-size', '11')
-        text.setAttribute('fill', '#9a7a5e')
+        text.style.fill = 'var(--text-muted)'
         text.textContent = 'Play a game to start your graph'
         svg.append(text)
         return
@@ -63,12 +63,12 @@ const renderChart = history => {
 
     const area = document.createElementNS(ns, 'path')
     area.setAttribute('d', `M${points[0]} L${points.join(' L')} L${x(values.length - 1)},80 L${x(0)},80 Z`)
-    area.setAttribute('fill', 'rgba(233, 196, 106, 0.35)')
+    area.style.fill = 'color-mix(in srgb, var(--accent-primary) 35%, transparent)'
 
     const line = document.createElementNS(ns, 'polyline')
     line.setAttribute('points', points.join(' '))
     line.setAttribute('fill', 'none')
-    line.setAttribute('stroke', '#b9782f')
+    line.style.stroke = 'var(--accent-deep)'
     line.setAttribute('stroke-width', '2')
     line.setAttribute('vector-effect', 'non-scaling-stroke')
     line.setAttribute('stroke-linejoin', 'round')

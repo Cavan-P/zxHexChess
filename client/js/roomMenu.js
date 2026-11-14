@@ -123,9 +123,20 @@ export const setupRoomMenu = _ => {
         statusBox.textContent = text
     }
 
+    // ------ Time control choice ------
+
+    let timeControl = ''
+    const tcButtons = [...document.querySelectorAll('.tc-btn')]
+    const renderTimeControl = _ => tcButtons.forEach(btn => {
+        btn.classList.toggle('is-active', btn.dataset.tc == timeControl)
+        btn.setAttribute('aria-pressed', btn.dataset.tc == timeControl)
+    })
+    tcButtons.forEach(btn => btn.onclick = _ => { timeControl = btn.dataset.tc; renderTimeControl() })
+    renderTimeControl()
+
     createBtn.onclick = _ => {
         showStatus('')
-        sendRoomCreate()
+        sendRoomCreate(timeControl || null)
     }
 
     joinForm.onsubmit = e => {
@@ -262,7 +273,12 @@ export const setupRoomMenu = _ => {
 
             row.replaceChildren(swatch, text)
             if(side.elo != null && present) row.append(el('span', 'elo-badge', ratingLabel(side.elo, side.provisional)))
-            row.append(el('span', 'turn-dot'))
+            if(Game.clock){
+                const clock = el('span', 'clock')
+                clock.dataset.color = color
+                row.append(clock)
+            }
+            else row.append(el('span', 'turn-dot'))
 
             row.classList.toggle('is-turn', Game.state == 'playing' && Game.turn == color)
         }
@@ -357,6 +373,7 @@ export const setupRoomMenu = _ => {
         document.getElementById('chat-box').replaceChildren()
         showStatus('')
         Game.turn = null
+        Game.clock = null
         Game.fen = null
         Game.check = null
         Game.matchInfo = null
