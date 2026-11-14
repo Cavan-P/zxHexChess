@@ -13,8 +13,8 @@ module.exports = {
     id: 'derekSanders',
     name: 'Derek Sanders',
     description: "Finally stopped guessing! Actually looks at the board now. Just... not very far into it.",
-    category: 'Apprentice',
+    category: 'Intermediate',
     icon: 'fa-chess-bishop',
-    elo: 460,
+    elo: 564,
     play: strategy
 }

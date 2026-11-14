@@ -84,6 +84,6 @@ module.exports = {
     description: 'Is just glad to be here.  But he beat Timothy!',
     category: 'Beginner',
     icon: 'fa-chess-knight',
-    elo: 102,
+    elo: 70,
     play: strategy
 }

@@ -4,9 +4,9 @@ module.exports = makeEngineBot({
     id: "priyaNandakumar",
     name: "Priya Nandakumar",
     description: "Can spot a free piece from across the room! Her own pieces, though? Different story.",
-    category: "Novice",
+    category: 'Novice',
     icon: "fa-chess-pawn",
-    elo: 360
+    elo: 261
 }, {
     maxDepth: 1, timeLimitMs: 600, eval: 'material', blunderChance: 0.35
 })

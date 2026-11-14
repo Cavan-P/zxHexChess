@@ -13,9 +13,9 @@ function strategy(state) {
 module.exports = {
     id: 'victorKane',
     name: 'Victor Kane',
-    description: "Sees further than everyone else and keeps his king locked down tight. Bring your best game. Seriously.",
+    description: "Keeps his king locked down tight and waits for you to slip. Bring your best game. Seriously.",
     category: 'Master',
     icon: 'fa-chess-king',
-    elo: 1900,
+    elo: 1766,
     play: strategy
 }

@@ -74,6 +74,6 @@ module.exports = {
     description: 'She loves moving her queen!  It usually gets stuck very quickly.',
     category: 'Beginner',
     icon: 'fa-chess-pawn',
-    elo: 170,
+    elo: 162,
     play: strategy
 }

@@ -71,8 +71,8 @@ module.exports = {
     id: 'kyleMorton',
     name: 'Kyle Morton',
     description: 'Loves to capture pieces!  Problem is, he misses a lot of the board...',
-    category: 'Beginner',
+    category: 'Novice',
     icon: 'fa-chess-pawn',
-    elo: 130,
+    elo: 329,
     play: strategy
 }

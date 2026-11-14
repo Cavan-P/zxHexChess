@@ -170,7 +170,7 @@ const evaluateWeighted = (board, maximizingColor, enPassant, weights, toMove = o
     return score
 }
 
-const MATERIAL_WEIGHTS = { ...DEFAULT_WEIGHTS, centralityWeight: 0, mobilityWeight: 0, kingSafetyWeight: 0 }
+const MATERIAL_WEIGHTS = { ...DEFAULT_WEIGHTS, centralityWeight: 0.02, mobilityWeight: 0, kingSafetyWeight: 0 }
 const CENTRAL_WEIGHTS = { ...DEFAULT_WEIGHTS, mobilityWeight: 0, kingSafetyWeight: 0 }
 const POSITIONAL_WEIGHTS = { ...DEFAULT_WEIGHTS, kingSafetyWeight: 0 }
 const MASTER_WEIGHTS = { ...DEFAULT_WEIGHTS }
@@ -366,6 +366,17 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
         }
 
         const moves = pseudoMoves(board, turn, ply == 0 ? enPassant : null)
+
+        // At the root, shuffle before sorting so equally-good moves are chosen at random.
+        // Otherwise ties go to whichever piece comes first on the board, and a bot with nothing
+        // better to do keeps moving that same piece (often a back-rank rook) around.
+        if(ply == 0){
+            for(let i = moves.length - 1; i > 0; i--){
+                const j = Math.floor(Math.random() * (i + 1))
+                ;[moves[i], moves[j]] = [moves[j], moves[i]]
+            }
+        }
+
         const hint = cached?.move || (ply == 0 ? bestMove : null)
         const ordering = new Map(moves.map(m => [m, sameMove(m, hint) ? 1e9 : orderScore(board, m)]))
         moves.sort((a, b) => ordering.get(b) - ordering.get(a))

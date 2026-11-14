@@ -4,9 +4,9 @@ module.exports = makeEngineBot({
     id: "ingridHalvorsen",
     name: "Ingrid Halvorsen",
     description: "Counts every pawn. Twice. Leave anything loose and it's going straight into the collection.",
-    category: "Advanced",
+    category: 'Advanced',
     icon: "fa-chess-queen",
-    elo: 760
+    elo: 912
 }, {
     maxDepth: 3, timeLimitMs: 1500, eval: 'material'
 })

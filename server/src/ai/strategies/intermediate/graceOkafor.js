@@ -4,9 +4,9 @@ module.exports = makeEngineBot({
     id: "graceOkafor",
     name: "Grace Okafor",
     description: "Three bishops each?? Best variant ever. Gets a little lost when the position goes quiet, though.",
-    category: "Intermediate",
+    category: 'Intermediate',
     icon: "fa-chess-bishop",
-    elo: 650
+    elo: 629
 }, {
     maxDepth: 2, timeLimitMs: 900, eval: 'central', noise: 0.4
 })
