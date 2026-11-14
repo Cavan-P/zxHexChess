@@ -35,7 +35,7 @@ const genomeToTrainingPlay = genome => ({ fen, turn, enPassant }) => searchBot({
     fen, turn, enPassant,
     maxDepth: TRAIN_DEPTH,
     timeLimitMs: TRAIN_TIME_MS,
-    evaluate: (board, color, ep) => evaluateWeighted(board, color, ep, genome)
+    evaluate: (board, color, ep, toMove) => evaluateWeighted(board, color, ep, genome, toMove)
 })
 
 const yieldToEventLoop = _ => new Promise(resolve => setImmediate(resolve))
@@ -140,12 +140,12 @@ const materializeGenome = (genome, meta = {}) => {
 // Weights discovered via self-play evolutionary training (generations=${meta.generations ?? '?'}, population=${meta.populationSize ?? '?'}).
 const weights = ${weightsLiteral}
 
-function strategy({ fen, turn, enPassant }) {
+function strategy({ fen, turn, enPassant, seen }) {
     return searchBot({
-        fen, turn, enPassant,
+        fen, turn, enPassant, seen,
         maxDepth: ${PLAY_DEPTH},
         timeLimitMs: ${PLAY_TIME_MS},
-        evaluate: (board, color, ep) => evaluateWeighted(board, color, ep, weights)
+        evaluate: (board, color, ep, toMove) => evaluateWeighted(board, color, ep, weights, toMove)
     })
 }
 

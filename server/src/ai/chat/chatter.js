@@ -13,6 +13,24 @@ const SAC_WINDOW_PLIES = 6         // how long a sacrifice has to pay off
 const BIG_SWING = 5                // material lead (in pawns) that counts as "winning"
 
 const other = c => c == 'white' ? 'black' : 'white'
+
+// Conditions a line can require (see personalities.js), checked against the live board so a bot
+// never brags about a queen it no longer has.
+const CONDITIONS = {
+    hasQueen: c => c.queens > 0,
+    noQueen: c => c.queens == 0,
+    oneQueen: c => c.queens == 1,
+    twoQueens: c => c.queens >= 2,
+    hasKnight: c => c.knights > 0,
+    noKnight: c => c.knights == 0,
+    hasBishop: c => c.bishops > 0,
+    movedQueen: c => c.moved == 'q',
+    notMovedQueen: c => c.moved != 'q',
+    movedDiagonal: c => c.moved == 'b' || c.moved == 'q',
+    lostQueen: c => c.captured == 'q',
+    notLostQueen: c => c.captured != 'q',
+    oppHasRook: c => c.oppRooks > 0
+}
 const value = cell => VALUES[cell.piece.toLowerCase()] || 0
 const rand = (min, max) => min + Math.random() * (max - min)
 
@@ -54,8 +72,9 @@ const hangingPieces = (board, color, enPassant, minValue = 3) => {
 
 class Chatter {
     // say(text) delivers a message. getOpponentName() returns who the bot is talking to.
-    constructor({ botId, color, say, getOpponentName, opponentIsBot = false }){
+    constructor({ botId, color, say, getOpponentName, getGame = null, opponentIsBot = false }){
         this.botId = botId
+        this.getGame = getGame
         this.color = color
         this.deliver = say
         this.getOpponentName = getOpponentName
@@ -74,6 +93,7 @@ class Chatter {
         this.advantage = 'even'      // 'even' | 'winning' | 'losing'
         this.saidDrawish = false
         this.sac = null              // { cell, before, ply, taken }
+        this.spotted = null          // a loose enemy piece: { cell, piece, cellName, ply }
     }
 
     // ------ delivery ------
@@ -84,9 +104,30 @@ class Chatter {
         return t
     }
 
-    pick(event){
-        const pool = this.personality.lines[event]
-        if(!pool?.length) return null
+    // What's true on the board right now, for line conditions.
+    context(board, extra = {}){
+        board ||= this.getGame?.()?.board()
+        const count = (color, letter) => board ? board.filter(c => c.color == color && c.piece.toLowerCase() == letter).length : 1
+        return {
+            queens: count(this.color, 'q'),
+            knights: count(this.color, 'n'),
+            bishops: count(this.color, 'b'),
+            oppRooks: count(other(this.color), 'r'),
+            moved: null,
+            captured: null,
+            ...extra
+        }
+    }
+
+    pick(event, ctx){
+        const all = this.personality.lines[event]
+        if(!all?.length) return null
+
+        // Lines are plain strings, or { when, text } to require a board condition.
+        const pool = all
+            .filter(line => typeof line == 'string' || CONDITIONS[line.when]?.(ctx))
+            .map(line => typeof line == 'string' ? line : line.text)
+        if(!pool.length) return null
 
         const fresh = pool.filter(line => !this.used.has(line))
         const choices = fresh.length ? fresh : pool
@@ -100,7 +141,7 @@ class Chatter {
         if(this.stopped && !force) return false
         if(!force && (this.pending || Date.now() - this.lastSentAt < MIN_GAP_MS)) return false
 
-        const line = this.pick(event)
+        const line = this.pick(event, vars.ctx || this.context())
         if(!line) return false
 
         const name = this.getOpponentName() || 'friend'
@@ -155,9 +196,10 @@ class Chatter {
         if(mine){
             if(this.sac && move.captured && move.to == this.sac.cell) this.sac.taken = true
 
-            if(move.promotion) candidates.push(['botPromotes', 0.8])
-            if(move.check != null) candidates.push(['botChecks', 0.35 * chattiness + 0.1])
-            if(move.captured) candidates.push(['botCaptures', 0.25 * chattiness, { piece: PIECE_NAMES[move.captured.toLowerCase()] }])
+            const ctx = this.context(after, { moved: after[move.to]?.piece.toLowerCase() })
+            if(move.promotion) candidates.push(['botPromotes', 0.8, { ctx }])
+            if(move.check != null) candidates.push(['botChecks', 0.35 * chattiness + 0.1, { ctx }])
+            if(move.captured) candidates.push(['botCaptures', 0.25 * chattiness, { piece: PIECE_NAMES[move.captured.toLowerCase()], ctx }])
         }
         else {
             // A piece the opponent gave up earlier has paid for itself (material back, or more).
@@ -170,7 +212,8 @@ class Chatter {
             if(move.captured && VALUES[move.captured.toLowerCase()] >= 3){
                 const wasHanging = hangingPieces(before, this.color, null, 3).some(c => c.cell == move.capturedCell)
                 if(wasHanging){
-                    candidates.push(['botBlunder', 0.35 + 0.5 * chattiness, { piece: PIECE_NAMES[move.captured.toLowerCase()] }])
+                    const ctx = this.context(after, { captured: move.captured.toLowerCase() })
+                    candidates.push(['botBlunder', 0.35 + 0.5 * chattiness, { piece: PIECE_NAMES[move.captured.toLowerCase()], ctx }])
                 }
             }
 
@@ -181,9 +224,12 @@ class Chatter {
             // (A piece that just captured something at least as valuable is only an even trade.)
             const isTrade = c => c.cell == move.to && move.captured && VALUES[move.captured.toLowerCase()] >= value(c)
             const loose = hangingPieces(after, opp, game.enPassant, 3).find(c => !isTrade(c))
+            // Remember it, but only say something if we actually take it (see beforeOwnMove), so a
+            // bot never shouts "free bishop!" and then ignores the bishop.
+            this.spotted = null
             if(loose){
                 if(!this.sac) this.sac = { cell: loose.cell, before: materialBalance(before, opp), ply, taken: false }
-                candidates.push(['playerHangs', 0.85 * awareness, { piece: PIECE_NAMES[loose.piece.toLowerCase()], cell: cellName(loose.cell) }])
+                this.spotted = { cell: loose.cell, piece: PIECE_NAMES[loose.piece.toLowerCase()], cellName: cellName(loose.cell), ply }
             }
         }
 
@@ -210,6 +256,20 @@ class Chatter {
         }
 
         this.scheduleIdle(game, ply)
+    }
+
+    // Called with the bot's chosen move just before it's played. If it grabs the loose piece we
+    // spotted, announce it first. Returns true if the room should pause a beat before moving.
+    beforeOwnMove(move){
+        const spotted = this.spotted
+        this.spotted = null
+        if(this.stopped || !spotted || +move.to != spotted.cell) return false
+        if(!this.roll(0.85 * this.personality.awareness + 0.1)) return false
+
+        const board = this.getGame?.()?.board()
+        const ctx = this.context(board, { moved: board?.[+move.from]?.piece.toLowerCase() })
+        this.lastSentAt = 0
+        return this.say('playerHangs', { piece: spotted.piece, cell: spotted.cellName, ctx }, { delay: 0 })
     }
 
     // Small talk while waiting on a human opponent to move.

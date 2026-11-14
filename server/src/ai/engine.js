@@ -1,4 +1,4 @@
-const { parseFen, generateFilteredLegals, cloneBoard, applyMove, isKingAttacked, promotionCells } = require('../game/moves')
+const { parseFen, boardToFen, generateFilteredLegals, generateLegalMoves, cloneBoard, applyMove, isKingAttacked, promotionCells } = require('../game/moves')
 
 const pieceValues = {
     p: 1,
@@ -16,20 +16,39 @@ const CENTER = 5 // hex board radius, cell [0,0,0] is the center
 
 const other = c => c == 'white' ? 'black' : 'white'
 
-const isPieceHanging = (board, color, cellIndex, enPassant) => {
-    const enemyColor = other(color)
+// One pass over the board: for each side, which cells it covers (attacks or defends) and the
+// value of its cheapest piece covering each cell, plus how many moves it has. Moves are generated
+// on a copy where every piece is "neutral", so a piece guarding a friend counts as covering it.
+// Pseudo-legal moves ignore pins, which is fine for evaluation and far cheaper than the fully
+// legal generator (that one replays every move to test for check).
+const coverageMap = (board, enPassant, values) => {
+    const neutral = board.map(c => c.piece ? { ...c, color: 'neutral' } : c)
+    const cheapest = { white: new Map(), black: new Map() }
+    const mobility = { white: 0, black: 0 }
 
     for(let i = 0; i < board.length; i++){
-        const piece = board[i]
-        if(!piece || piece.color != enemyColor) continue
+        const cell = board[i]
+        if(!cell?.piece) continue
 
-        const legals = generateFilteredLegals(board, i, enemyColor, enPassant)
-        if(legals.includes(cellIndex)){
-            return true
+        const value = cell.piece.toLowerCase() == 'k' ? 100 : (values[cell.piece.toLowerCase()] || 0)
+        const covers = cheapest[cell.color]
+
+        for(const to of generateLegalMoves(neutral, i, cell.color, enPassant)){
+            if(board[to].color != cell.color) mobility[cell.color]++
+            if(!covers.has(to) || value < covers.get(to)) covers.set(to, value)
         }
     }
 
-    return false
+    return { cheapest, mobility }
+}
+
+// What `color` stands to lose on `cell` if the opponent captures there: the whole piece if it's
+// undefended, the difference if the attacker is cheaper, nothing otherwise.
+const exposure = (cell, color, value, cheapest) => {
+    const enemy = other(color)
+    if(!cheapest[enemy].has(cell)) return 0
+    if(!cheapest[color].has(cell)) return value
+    return Math.max(0, value - cheapest[enemy].get(cell))
 }
 
 const hexDistanceFromCenter = coords => Math.max(Math.abs(coords[0]), Math.abs(coords[1]), Math.abs(coords[2]))
@@ -60,8 +79,19 @@ const DEFAULT_WEIGHTS = {
     kingSafetyWeight: 0.1
 }
 
-const evaluateWeighted = (board, maximizingColor, enPassant, weights) => {
+// `toMove` (optional) is whose turn it is in this position. The side to move can grab the
+// opponent's most exposed piece, while its own exposed pieces aren't lost yet - it can still move
+// them. Without it, the evaluator assumes the opponent moves next (the old behaviour).
+const evaluateWeighted = (board, maximizingColor, enPassant, weights, toMove = other(maximizingColor)) => {
     let score = 0
+
+    const { cheapest, mobility } = coverageMap(board, enPassant, weights.pieceValues)
+    const enemyColor = other(maximizingColor)
+    const worstExposure = { white: 0, black: 0 }
+
+    if(weights.mobilityWeight){
+        score += (mobility[maximizingColor] - mobility[enemyColor]) * weights.mobilityWeight
+    }
 
     for(let i = 0; i < board.length; i++){
         const cell = board[i]
@@ -74,18 +104,21 @@ const evaluateWeighted = (board, maximizingColor, enPassant, weights) => {
         const v = lower == 'k' ? 0 : (weights.pieceValues[lower] || 0)
         score += sign * v
 
-        if(friendly && v && isPieceHanging(board, maximizingColor, i, enPassant)){
-            score -= v * weights.hangingPenaltyMult
+        if(v){
+            const lost = exposure(i, cell.color, v, cheapest)
+            if(lost > worstExposure[cell.color]) worstExposure[cell.color] = lost
         }
 
         if(weights.centralityWeight && lower != 'k' && lower != 'p'){
             score += sign * (CENTER - hexDistanceFromCenter(cell.coords)) * weights.centralityWeight
         }
 
-        if(weights.mobilityWeight){
-            score += sign * generateFilteredLegals(board, i, cell.color, enPassant).length * weights.mobilityWeight
-        }
     }
+
+    // Only the side NOT to move is at risk of losing a piece right now, and only its worst one.
+    const victim = toMove == maximizingColor ? enemyColor : maximizingColor
+    const threatened = worstExposure[victim] * (weights.hangingPenaltyMult / HANG_PENALTY_MULT) * 0.8
+    score += victim == maximizingColor ? -threatened : threatened
 
     if(weights.kingSafetyWeight){
         const king = board.find(p => p.piece?.toLowerCase() == 'k' && p.color == maximizingColor)
@@ -108,31 +141,16 @@ const POSITIONAL_WEIGHTS = { ...DEFAULT_WEIGHTS, kingSafetyWeight: 0 }
 const MASTER_WEIGHTS = { ...DEFAULT_WEIGHTS }
 
 // Material count, penalizing pieces the opponent could capture for free
-const evaluateMaterial = (board, maximizingColor, enPassant) => evaluateWeighted(board, maximizingColor, enPassant, MATERIAL_WEIGHTS)
+const evaluateMaterial = (board, maximizingColor, enPassant, toMove) => evaluateWeighted(board, maximizingColor, enPassant, MATERIAL_WEIGHTS, toMove)
 
 // Material + a bonus for keeping minor/major pieces away from the board edge
-const evaluateCentral = (board, maximizingColor, enPassant) => evaluateWeighted(board, maximizingColor, enPassant, CENTRAL_WEIGHTS)
+const evaluateCentral = (board, maximizingColor, enPassant, toMove) => evaluateWeighted(board, maximizingColor, enPassant, CENTRAL_WEIGHTS, toMove)
 
 // Central eval + mobility (how many squares each side can actually move to)
-const evaluatePositional = (board, maximizingColor, enPassant) => evaluateWeighted(board, maximizingColor, enPassant, POSITIONAL_WEIGHTS)
+const evaluatePositional = (board, maximizingColor, enPassant, toMove) => evaluateWeighted(board, maximizingColor, enPassant, POSITIONAL_WEIGHTS, toMove)
 
 // Positional eval + keeping friendly pieces near your own king
-const evaluateMaster = (board, maximizingColor, enPassant) => evaluateWeighted(board, maximizingColor, enPassant, MASTER_WEIGHTS)
-
-const terminalScore = (board, turn, maximizingColor, enPassant, ply) => {
-    const moves = generateAllMoves(board, turn, enPassant)
-    if(moves.length) return null
-
-    if(isKingAttacked(board, turn, enPassant)){
-        const losingSide = turn
-        const winForMax = losingSide != maximizingColor
-
-        return winForMax ? (MATE - ply) : (-MATE + ply)
-    }
-
-    //Stalemate
-    return 0
-}
+const evaluateMaster = (board, maximizingColor, enPassant, toMove) => evaluateWeighted(board, maximizingColor, enPassant, MASTER_WEIGHTS, toMove)
 
 const moveHeuristic = (board, move, turn, enPassant) => {
     let h = 0
@@ -151,18 +169,33 @@ const moveHeuristic = (board, move, turn, enPassant) => {
     return h
 }
 
-const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLimitMs, evaluate) => {
+// Repeating an earlier position counts as a draw, scored just below level so a bot that's ahead
+// avoids it (no more shuffling the same piece back and forth) and a bot that's behind welcomes it.
+const REPETITION_SCORE = -0.1
+
+// `seen` (optional) is a Set of "fen|turn" keys for positions that already happened in the game.
+const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLimitMs, evaluate, seen = null) => {
     let bestMove = null
     const startTime = Date.now()
 
-    const search = (board, turn, enPassant, depth, alpha, beta, maximizingColor, ply) => {
-        if(Date.now() - startTime > timeLimitMs) return { timeout: true }
+    // The time limit only applies once depth 1 is done: a bot must always finish at least a
+    // one-move search, or it would fall back to an arbitrary move (and shuffle the same piece).
+    let enforceTime = false
 
-        const tScore = terminalScore(board, turn, maximizingColor, enPassant, ply)
-        if(tScore != null) return { score: tScore, move: null }
+    const search = (board, turn, enPassant, depth, alpha, beta, maximizingColor, ply) => {
+        if(enforceTime && Date.now() - startTime > timeLimitMs) return { timeout: true }
+
+        if(ply == 1 && seen?.size && seen.has(`${boardToFen(board)}|${turn}`)) return { score: REPETITION_SCORE, move: null }
+
+        const inCheck = isKingAttacked(board, turn, enPassant)
+        const mateScore = _ => turn != maximizingColor ? (MATE - ply) : (-MATE + ply)
 
         if(!depth){
-            let s = evaluate(board, maximizingColor, enPassant)
+            // Full mate detection needs every legal move, so at leaves only do it when in check
+            // (a stalemate at a leaf is rare enough to ignore).
+            if(inCheck && !generateAllMoves(board, turn, enPassant).length) return { score: mateScore(), move: null }
+
+            let s = evaluate(board, maximizingColor, enPassant, turn)
 
             const enemy = other(turn)
             if(isKingAttacked(board, enemy, enPassant)) s += CHECK_BONUS
@@ -171,9 +204,11 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
         }
 
         const moves = generateAllMoves(board, turn, enPassant)
-        if(!moves.length) return { score: evaluate(board, maximizingColor, enPassant), move: null }
+        if(!moves.length) return { score: inCheck ? mateScore() : 0, move: null }
 
-        moves.sort((a, b) => moveHeuristic(board, b, turn, enPassant) - moveHeuristic(board, a, turn, enPassant))
+        // Score each move once for ordering (captures and checks first), then sort.
+        const ordering = new Map(moves.map(m => [m, moveHeuristic(board, m, turn, enPassant)]))
+        moves.sort((a, b) => ordering.get(b) - ordering.get(a))
 
         let bestLocal = null
         const maximizing = turn == maximizingColor
@@ -205,6 +240,7 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
     }
 
     for(let depth = 1; depth <= maxDepth; depth++){
+        enforceTime = depth > 1
         const r = search(rootBoard, rootTurn, rootEnPassant, depth, -Infinity, Infinity, rootTurn, 0)
         if(r.timeout) break
 
@@ -222,7 +258,7 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
 //   noise          - random error (in pawns) added to every position the bot evaluates, so it
 //                    misjudges close positions the way a human does
 //   blunderChance  - probability of skipping the search and playing a random legal move
-const searchBot = ({ fen, turn, enPassant, maxDepth, timeLimitMs, evaluate, noise = 0, blunderChance = 0 }) => {
+const searchBot = ({ fen, turn, enPassant, seen = null, maxDepth, timeLimitMs, evaluate, noise = 0, blunderChance = 0 }) => {
     const board = parseFen(fen)
     const legal = generateAllMoves(board, turn, enPassant)
     if(!legal.length) return null
@@ -234,9 +270,10 @@ const searchBot = ({ fen, turn, enPassant, maxDepth, timeLimitMs, evaluate, nois
     }
     else {
         const noisyEvaluate = noise
-            ? (b, color, ep) => evaluate(b, color, ep) + (Math.random() * 2 - 1) * noise
+            ? (b, color, ep, toMove) => evaluate(b, color, ep, toMove) + (Math.random() * 2 - 1) * noise
             : evaluate
-        move = iterativeDeepening(board, turn, enPassant, maxDepth, timeLimitMs, noisyEvaluate) || legal[0]
+        const seenSet = Array.isArray(seen) ? new Set(seen) : null
+        move = iterativeDeepening(board, turn, enPassant, maxDepth, timeLimitMs, noisyEvaluate, seenSet) || legal[0]
     }
 
     const piece = board[move.from]
@@ -262,7 +299,7 @@ const makeEngineBot = (profile, { eval: evalName = 'material', ...search }) => {
 
     return {
         ...profile,
-        play: ({ fen, turn, enPassant }) => searchBot({ fen, turn, enPassant, evaluate, ...search })
+        play: ({ fen, turn, enPassant, seen }) => searchBot({ fen, turn, enPassant, seen, evaluate, ...search })
     }
 }
 

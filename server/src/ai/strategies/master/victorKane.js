@@ -1,8 +1,8 @@
 const { searchBot, evaluateMaster } = require('../../engine')
 
-function strategy({ fen, turn, enPassant }) {
+function strategy({ fen, turn, enPassant, seen }) {
     return searchBot({
-        fen, turn, enPassant,
+        fen, turn, enPassant, seen,
         maxDepth: 6,
         timeLimitMs: 5000,
         evaluate: evaluateMaster

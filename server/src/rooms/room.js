@@ -3,6 +3,7 @@ const { requestBotMove } = require('../ai/botPool')
 const { Chatter } = require('../ai/chat/chatter')
 
 const BOT_MOVE_DELAY_MS = 400
+const BOT_ANNOUNCE_PAUSE_MS = 900
 const RECONNECT_GRACE_MS = 60000
 const MAX_CHAT_LENGTH = 300
 const MIN_RATED_PLIES = 2      // both sides must move at least once for a game to be rated
@@ -36,6 +37,7 @@ class Room {
                 botId: bots[color],
                 color,
                 opponentIsBot: Boolean(bots[opponent]),
+                getGame: _ => this.game,
                 getOpponentName: _ => this.botMeta[opponent]?.name?.split(' ')[0]
                     || (this.seatProfiles[opponent] && this.profiles?.get(this.seatProfiles[opponent])?.name),
                 say: text => this.broadcast({ type: 'chat', username: this.botMeta[color]?.name || 'Bot', payload: text, bot: true, color })
@@ -327,7 +329,7 @@ class Room {
         setTimeout(async _ => {
             let move = null
             try {
-                move = await requestBotMove(botId, { fen: this.game.fen, turn: color, enPassant: this.game.enPassant })
+                move = await requestBotMove(botId, { fen: this.game.fen, turn: color, enPassant: this.game.enPassant, seen: this.game.seenPositions() })
             }
             catch(e){
                 console.error(`[room ${this.id}] Bot ${botId} failed:`, e.message)
@@ -338,16 +340,25 @@ class Room {
             // The room may have closed or the game ended while the bot was thinking.
             if(this.destroyed || this.game.result || this.game.history.length != ply) return
 
-            // Bots that always promote to a queen can omit the piece.
-            const fenBefore = this.game.fen
-            const res = move ? this.game.play(color, move.from, move.to, move.promotion || 'q') : { ok: false }
+            const play = _ => {
+                if(this.destroyed || this.game.result || this.game.history.length != ply) return
 
-            if(!res.ok){
-                console.error(`[room ${this.id}] Bot ${botId} produced no legal move; it resigns.`)
-                return this.endGame(this.game.resign(color))
+                // Bots that always promote to a queen can omit the piece.
+                const fenBefore = this.game.fen
+                const res = move ? this.game.play(color, move.from, move.to, move.promotion || 'q') : { ok: false }
+
+                if(!res.ok){
+                    console.error(`[room ${this.id}] Bot ${botId} produced no legal move; it resigns.`)
+                    return this.endGame(this.game.resign(color))
+                }
+
+                this.afterMove(res.move, fenBefore, color)
             }
 
-            this.afterMove(res.move, fenBefore, color)
+            // "Free bishop!" ...then take it, a beat later.
+            const announced = move && this.chatters[color]?.beforeOwnMove(move)
+            if(announced) setTimeout(play, BOT_ANNOUNCE_PAUSE_MS)
+            else play()
         }, BOT_MOVE_DELAY_MS)
     }
 

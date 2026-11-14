@@ -3,10 +3,17 @@
 //   chattiness  0-1  how often optional comments fire
 //   awareness   0-1  how likely the bot is to notice tactics (hung pieces, sacrifices)
 //
+// A line can be a plain string, or when('condition', 'text') to require something on the board,
+// e.g. when('hasQueen', ...) so a bot never brags about a queen it has lost. If every line for an
+// event is ruled out, the bot simply stays quiet.
+//
 // Events (any a bot leaves out fall back to DEFAULT):
 //   greeting, idle, playerHangs, botBlunder, brilliantSac, playerChecks, botChecks, botCaptures,
 //   botPromotes, playerPromotes, winning, losing, drawish, win, winOther (won by resignation or
 //   abandonment), loss, draw, stalemateWin, stalemateLoss, replyHello, replyGG, reply
+
+// A line that only makes sense when something is true on the board (conditions live in chatter.js).
+const when = (condition, text) => ({ when: condition, text })
 
 const DEFAULT = {
     chattiness: 0.5,
@@ -14,7 +21,7 @@ const DEFAULT = {
     lines: {
         greeting: ['Good luck, {name}!', 'Let\'s have a good game.'],
         idle: ['Take your time.', 'Hmm, what are you planning?', 'No rush.'],
-        playerHangs: ['Is your {piece} on {cell} safe?', 'That {piece} looks a little lonely.'],
+        playerHangs: ['Free {piece}! Thank you.', 'That {piece} on {cell} looks a little lonely. I\'ll keep it company.'],
         botBlunder: ['Oops. I needed that {piece}.', 'Ah, I missed that.'],
         brilliantSac: ['Wow, that sacrifice was real. Nicely done.', 'You gave up that piece on purpose? Impressive.'],
         playerChecks: ['Check, huh.', 'Okay, okay, my king is moving.'],
@@ -114,23 +121,61 @@ const BOTS = {
         awareness: 0.3,
         lines: {
             greeting: ['Hi! Just so you know, my queen is going to do everything this game.', 'Hello! Ready to meet my queen?'],
-            idle: ['My queen is getting restless.', 'Have you noticed how pretty the queen piece is?', 'I could move my queen... again...'],
-            playerHangs: ['Ooh, my queen might be able to reach that {piece}!'],
-            botBlunder: ['Wait, not my {piece}! Well, at least it wasn\'t the queen.', 'Hmm, I was looking at my queen and missed that.'],
-            playerChecks: ['Can my queen fix this? My queen can fix this.'],
-            botChecks: ['Check! Courtesy of the queen, obviously.'],
-            botCaptures: ['Another one for the queen\'s collection!'],
-            botPromotes: ['A SECOND QUEEN?! Best day ever!'],
+            idle: [
+                when('hasQueen', 'My queen is getting restless.'),
+                when('hasQueen', 'I could move my queen... again...'),
+                'Have you noticed how pretty the queen piece is?',
+                when('noQueen', 'I keep reaching for my queen. She\'s not there anymore.'),
+                when('noQueen', 'This board feels so empty without her.')
+            ],
+            playerHangs: [
+                when('movedQueen', 'Ooh, my queen can reach that {piece}!'),
+                when('notMovedQueen', 'Ooh, a free {piece}! Don\'t mind if I do.')
+            ],
+            botBlunder: [
+                when('notLostQueen', 'Wait, not my {piece}! Well, at least it wasn\'t the queen.'),
+                when('notLostQueen', 'Hmm, I was looking at my queen and missed that.'),
+                when('lostQueen', 'NOT THE QUEEN! Anything but the queen!'),
+                when('lostQueen', 'My queen... she was so young.')
+            ],
+            playerChecks: [
+                when('hasQueen', 'Can my queen fix this? My queen can fix this.'),
+                when('noQueen', 'If only I still had my queen...')
+            ],
+            botChecks: [
+                when('movedQueen', 'Check! Courtesy of the queen, obviously.'),
+                when('notMovedQueen', 'Check! See, the other pieces can do stuff too.')
+            ],
+            botCaptures: [
+                when('movedQueen', 'Another one for the queen\'s collection!'),
+                when('notMovedQueen', 'Got one!')
+            ],
+            botPromotes: [
+                when('twoQueens', 'A SECOND QUEEN?! Best day ever!'),
+                when('oneQueen', 'MY QUEEN IS BACK!')
+            ],
             playerPromotes: ['You got a new queen? We should start a club.'],
-            winning: ['See? I told you the queen does everything.'],
-            losing: ['My queen is stuck in the corner again, isn\'t she.'],
-            drawish: ['Even my queen can\'t find anything to do now.'],
-            win: ['The queen wins it! Good game!'],
+            winning: [
+                when('hasQueen', 'See? I told you the queen does everything.'),
+                when('noQueen', 'Winning without my queen? Who knew!')
+            ],
+            losing: [
+                when('hasQueen', 'My queen is stuck in the corner again, isn\'t she.'),
+                when('noQueen', 'This is what happens when you lose your queen.')
+            ],
+            drawish: [
+                when('hasQueen', 'Even my queen can\'t find anything to do now.'),
+                when('noQueen', 'Without a queen there\'s not much left to do. Draw?')
+            ],
+            win: [
+                when('hasQueen', 'The queen wins it! Good game!'),
+                when('noQueen', 'I won without my queen?! Good game!')
+            ],
             loss: ['Good game! My queen will get you next time.'],
-            draw: ['A draw. My queen is... fine with it. Probably.'],
-            replyHello: ['Hi! The queen says hello too.'],
+            draw: [when('hasQueen', 'A draw. My queen is... fine with it. Probably.'), 'A draw! Good game.'],
+            replyHello: [when('hasQueen', 'Hi! The queen says hello too.'), 'Hi! Good luck!'],
             replyGG: ['GG! You played well.'],
-            reply: ['Sorry, I was admiring my queen.', 'Haha, yeah!']
+            reply: [when('hasQueen', 'Sorry, I was admiring my queen.'), 'Haha, yeah!']
         }
     },
 
@@ -164,7 +209,7 @@ const BOTS = {
         awareness: 0.35,
         lines: {
             greeting: ['Hi {name}! Want to trade some pieces? I love a good trade.', 'Hello! Let\'s swap pieces until there\'s nothing left.'],
-            idle: ['I\'d trade my bishop for your pawn right now, honestly.', 'Everything\'s more fun after a few trades.', 'Got any pieces you\'d like to swap?'],
+            idle: [when('hasBishop', 'I\'d trade my bishop for your pawn right now, honestly.'), 'Everything\'s more fun after a few trades.', 'Got any pieces you\'d like to swap?'],
             playerHangs: ['Is that {piece} a trade offer? I accept!'],
             botBlunder: ['That was... not a great trade for me, was it.', 'Hmm, I don\'t think I got anything back for that {piece}.'],
             playerChecks: ['Check? Can I trade my way out of this?'],
@@ -261,16 +306,16 @@ const BOTS = {
             greeting: ['Hi {name}! Quick tip: knights belong in the middle. You\'re welcome.', 'Hello! Watch my knights. They\'ll be central, as they should be.'],
             idle: ['A knight on the rim is grim. Even on hexagons.', 'Have you centralised your knights yet? Just asking.', 'The middle of the board is where the magic happens.'],
             playerHangs: ['Your {piece} on {cell} is out of position. And undefended, actually.'],
-            botBlunder: ['I was so busy centralising I forgot to defend my {piece}.', 'Ugh, my {piece}. At least my knights are central.'],
+            botBlunder: ['I was so busy centralising I forgot to defend my {piece}.', when('hasKnight', 'Ugh, my {piece}. At least my knights are central.')],
             brilliantSac: ['Okay, that sacrifice was beautiful. Very central energy.'],
             playerChecks: ['Check! Was that a knight? Tell me it was a knight.'],
             botChecks: ['Check, from the centre. As it should be.'],
-            winning: ['Central knights, winning position. Coincidence? No.'],
-            losing: ['My knights are in the middle and I\'m still losing. Rude.'],
-            drawish: ['Even with perfect knights, this looks like a draw.'],
+            winning: [when('hasKnight', 'Central knights, winning position. Coincidence? No.'), when('noKnight', 'Winning without knights. Still, they belong in the middle.')],
+            losing: [when('hasKnight', 'My knights are in the middle and I\'m still losing. Rude.'), when('noKnight', 'This is what happens without knights in the middle.')],
+            drawish: [when('hasKnight', 'Even with perfect knights, this looks like a draw.'), 'This looks like a draw to me.'],
             win: ['Checkmate! Knights in the middle, always. Good game!'],
             loss: ['Good game! But seriously, move your knights to the middle.'],
-            draw: ['A draw. At least my knights looked great.'],
+            draw: [when('hasKnight', 'A draw. At least my knights looked great.'), 'A draw. Fair enough.'],
             replyHello: ['Hi! Remember: knights to the centre.'],
             replyGG: ['GG! Good knight work.'],
             reply: ['Agreed. Also, knights go in the middle.', 'Ha!']
@@ -331,15 +376,15 @@ const BOTS = {
         lines: {
             greeting: ['Hello {name}! Three bishops each. Isn\'t this variant lovely?', 'Hi! I hope you like bishops. I really like bishops.'],
             idle: ['A bishop on a long diagonal is a thing of beauty.', 'Quiet positions are the hardest. Take your time.', 'Did you know each bishop stays on one colour forever? Loyal.'],
-            playerHangs: ['Your {piece} on {cell} looks undefended. One of my bishops noticed.'],
-            botBlunder: ['Oh, I misjudged that. Quiet positions get me every time.', 'My {piece}! I was admiring my bishops and forgot about it.'],
+            playerHangs: [when('movedDiagonal', 'Your {piece} on {cell} was undefended. One of my bishops noticed.'), 'Your {piece} on {cell} was undefended. I\'ll take that.'],
+            botBlunder: ['Oh, I misjudged that. Quiet positions get me every time.', when('hasBishop', 'My {piece}! I was admiring my bishops and forgot about it.')],
             brilliantSac: ['That sacrifice was gorgeous. I\'m genuinely impressed.'],
             playerChecks: ['Check. Nicely done.'],
-            botChecks: ['Check, along the diagonal.'],
-            winning: ['My bishops are really singing now.'],
+            botChecks: [when('movedDiagonal', 'Check, along the diagonal.'), 'Check.'],
+            winning: [when('hasBishop', 'My bishops are really singing now.'), 'Things are going rather well.'],
             losing: ['I may have misread this position. Again.'],
             drawish: ['Hmm, I always misjudge these quiet positions. Might be a draw.'],
-            win: ['Checkmate! The bishops send their regards. Good game.'],
+            win: [when('hasBishop', 'Checkmate! The bishops send their regards. Good game.'), 'Checkmate! Good game.'],
             loss: ['Good game, {name}. That was well played.'],
             draw: ['A draw. A peaceful ending.'],
             replyHello: ['Hello! Lovely to meet you.'],
@@ -379,7 +424,7 @@ const BOTS = {
         lines: {
             greeting: ['Hello {name}. The centre is mine this game.', 'Good luck. Whoever controls the middle controls the game.'],
             idle: ['The centre is still up for grabs, you know.', 'Plan carefully. I am.'],
-            playerHangs: ['Your {piece} on {cell} is unprotected. I\'d fix that.'],
+            playerHangs: ['Your {piece} on {cell} was unprotected. I\'ll take it.'],
             botBlunder: ['I didn\'t calculate that line deep enough.', 'Hm. Missed that.'],
             brilliantSac: ['A real sacrifice. I didn\'t see the follow-up. Well played.'],
             playerChecks: ['Check. Noted.'],
@@ -474,7 +519,7 @@ const BOTS = {
         lines: {
             greeting: ['Hello, {name}. Let\'s play carefully.', 'Good luck. Take all the time you need.'],
             idle: ['Patience is a move too.', 'There is no hurry.'],
-            playerHangs: ['Your {piece} on {cell} is unprotected. I would be careful.'],
+            playerHangs: ['Your {piece} on {cell} was unprotected. I\'m sorry.'],
             botBlunder: ['A small oversight. It happens.', 'I see. Well spotted.'],
             brilliantSac: ['A brave sacrifice, and a correct one. Well played.'],
             playerChecks: ['Check. My king is safe enough.'],
@@ -544,7 +589,7 @@ const BOTS = {
         awareness: 1,
         lines: {
             greeting: ['Hello, {name}. Every piece has a job. Let\'s see yours.', 'Good luck. I\'ll be watching the whole board.'],
-            idle: ['Every piece on the board is telling a story right now.', 'Your rooks seem unemployed.'],
+            idle: ['Every piece on the board is telling a story right now.', when('oppHasRook', 'Your rooks seem unemployed.')],
             playerHangs: ['Your {piece} on {cell} has lost its job. And its protection.'],
             botBlunder: ['A rare oversight. Well taken.', 'You saw something I didn\'t. Noted.'],
             brilliantSac: ['A beautiful sacrifice. Every piece did its job there.'],

@@ -52,6 +52,11 @@ class GameState {
         return parseFen(this.fen)
     }
 
+    // Every position that has occurred so far, as "fen|turn" keys (bots use this to avoid repeating).
+    seenPositions(){
+        return [...new Set([...this.positionCounts.keys()].map(k => k.split('|').slice(0, 2).join('|')))]
+    }
+
     legalMovesFrom(color, from){
         from = +from
         if(this.result || color != this.turn || !isValidCell(from)) return []

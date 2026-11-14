@@ -53,21 +53,50 @@ test('finds undefended pieces and pieces attacked by something cheaper', _ => {
     assert.ok(hangingPieces(board, 'white', null).some(c => cellName(c.cell) == 'f4'))
 })
 
-test('comments when the opponent leaves a piece hanging, naming it', _ => {
+test('calls out a hung piece only when actually capturing it', _ => {
     const game = new GameState({ fen: position({ g1: 'K', g10: 'k', f9: 'r', c3: 'N' }) })
     const fenBefore = game.fen
-    const { chatter, said } = eagerChatter('corneliusAshby')
 
-    // White knight walks onto the rook's file, undefended.
-    const to = game.legalMovesFrom('white', cellOf('c3')).find(t => hangingPieces(
-        (_ => { const g = new GameState({ fen: fenBefore }); g.play('white', cellOf('c3'), t); return g.board() })(), 'white', null).length)
+    // A knight move that leaves it en prise to the rook.
+    const to = game.legalMovesFrom('white', cellOf('c3')).find(t => {
+        const g = new GameState({ fen: fenBefore })
+        g.play('white', cellOf('c3'), t)
+        return hangingPieces(g.board(), 'white', null).length
+    })
     assert.ok(to != null, 'test position should allow a hanging knight move')
 
     const res = game.play('white', cellOf('c3'), to)
-    chatter.onMove({ move: res.move, mover: 'white', fenBefore, game })
 
-    assert.strictEqual(said.length, 1)
+    // Ignoring the knight: no callout.
+    let { chatter, said } = eagerChatter('corneliusAshby')
+    chatter.getGame = _ => game
+    chatter.onMove({ move: res.move, mover: 'white', fenBefore, game })
+    assert.strictEqual(said.length, 0, 'nothing is said right after the piece is hung')
+    assert.strictEqual(chatter.beforeOwnMove({ from: cellOf('g10'), to: cellOf('g9') }), false)
+    assert.strictEqual(said.length, 0)
+
+    // Taking the knight: callout first, naming it.
+    ;({ chatter, said } = eagerChatter('corneliusAshby'))
+    chatter.getGame = _ => game
+    chatter.onMove({ move: res.move, mover: 'white', fenBefore, game })
+    assert.strictEqual(chatter.beforeOwnMove({ from: cellOf('f9'), to }), true)
     assert.match(said[0], /knight/)
+})
+
+test('lines that depend on the board respect it (no queen talk without a queen)', _ => {
+    const queenless = new GameState({ fen: position({ g1: 'K', g10: 'k', a1: 'R', f9: 'r' }) })
+    const { chatter, said } = eagerChatter('hannahLewis')
+    chatter.getGame = _ => queenless
+
+    for(let i = 0; i < 40; i++){
+        chatter.used.clear()
+        chatter.lastSentAt = 0
+        chatter.say('idle')
+        chatter.say('losing')
+        chatter.say('reply')
+    }
+    const queenLines = said.filter(t => /\bqueen\b/i.test(t) && !/without|lose|not there|still had|if only/i.test(t))
+    assert.deepStrictEqual(queenLines.filter(t => /my queen (is|can|will|does)|queen says|admiring my queen|move my queen/i.test(t)), [])
 })
 
 test('an even trade is not called a hung piece', _ => {
