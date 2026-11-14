@@ -52,6 +52,27 @@ class GameState {
         return parseFen(this.fen)
     }
 
+    // The given side's most recent move ({ from, to }), or null.
+    lastMoveBy(color){
+        for(let i = this.history.length - 1; i >= 0; i--){
+            if(this.history[i].color == color) return { from: this.history[i].from, to: this.history[i].to }
+        }
+        return null
+    }
+
+    // Every legal move for the side to move, as { fromCell: [toCell, ...] }.
+    allLegalMoves(){
+        if(this.result) return {}
+        const board = this.board()
+        const map = {}
+        for(const c of board){
+            if(c.color != this.turn) continue
+            const moves = generateFilteredLegals(board, c.cell, this.turn, this.enPassant)
+            if(moves.length) map[c.cell] = moves
+        }
+        return map
+    }
+
     // Every position that has occurred so far, as "fen|turn" keys (bots use this to avoid repeating).
     seenPositions(){
         return [...new Set([...this.positionCounts.keys()].map(k => k.split('|').slice(0, 2).join('|')))]
@@ -142,7 +163,7 @@ class GameState {
             this.result?.reason == 'checkmate' ? '#' : opponentInCheck ? '+' : ''
         ].join('')
 
-        const move = { from, to, captured, capturedCell, promotion: promoting ? newPiece : null, check: kingCell, notation }
+        const move = { from, to, color, captured, capturedCell, promotion: promoting ? newPiece : null, check: kingCell, notation }
         this.history.push(move)
 
         return { ok: true, move }

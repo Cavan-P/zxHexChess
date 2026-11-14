@@ -173,8 +173,13 @@ const moveHeuristic = (board, move, turn, enPassant) => {
 // avoids it (no more shuffling the same piece back and forth) and a bot that's behind welcomes it.
 const REPETITION_SCORE = -0.1
 
+// Moving a piece straight back to where it just came from is rarely the best idea; this nudge
+// stops bots from shuffling one piece back and forth when nothing else stands out.
+const UNDO_PENALTY = 0.5
+
 // `seen` (optional) is a Set of "fen|turn" keys for positions that already happened in the game.
-const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLimitMs, evaluate, seen = null) => {
+// `lastOwnMove` (optional) is the side to move's previous move, { from, to }.
+const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLimitMs, evaluate, seen = null, lastOwnMove = null) => {
     let bestMove = null
     const startTime = Date.now()
 
@@ -221,8 +226,12 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
             const r = search(nextBoard, other(turn), enPassant, depth - 1, alpha, beta, maximizingColor, ply + 1)
             if(r.timeout) return r
 
-            if(maximizing ? r.score > value : r.score < value){
-                value = r.score
+            let score = r.score
+            const undoesLastMove = ply == 0 && lastOwnMove && move.from == lastOwnMove.to && move.to == lastOwnMove.from && !board[move.to].piece
+            if(undoesLastMove) score -= UNDO_PENALTY
+
+            if(maximizing ? score > value : score < value){
+                value = score
                 bestLocal = move
             }
 
@@ -258,7 +267,7 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
 //   noise          - random error (in pawns) added to every position the bot evaluates, so it
 //                    misjudges close positions the way a human does
 //   blunderChance  - probability of skipping the search and playing a random legal move
-const searchBot = ({ fen, turn, enPassant, seen = null, maxDepth, timeLimitMs, evaluate, noise = 0, blunderChance = 0 }) => {
+const searchBot = ({ fen, turn, enPassant, seen = null, lastOwnMove = null, maxDepth, timeLimitMs, evaluate, noise = 0, blunderChance = 0 }) => {
     const board = parseFen(fen)
     const legal = generateAllMoves(board, turn, enPassant)
     if(!legal.length) return null
@@ -273,7 +282,7 @@ const searchBot = ({ fen, turn, enPassant, seen = null, maxDepth, timeLimitMs, e
             ? (b, color, ep, toMove) => evaluate(b, color, ep, toMove) + (Math.random() * 2 - 1) * noise
             : evaluate
         const seenSet = Array.isArray(seen) ? new Set(seen) : null
-        move = iterativeDeepening(board, turn, enPassant, maxDepth, timeLimitMs, noisyEvaluate, seenSet) || legal[0]
+        move = iterativeDeepening(board, turn, enPassant, maxDepth, timeLimitMs, noisyEvaluate, seenSet, lastOwnMove) || legal[0]
     }
 
     const piece = board[move.from]
@@ -299,7 +308,7 @@ const makeEngineBot = (profile, { eval: evalName = 'material', ...search }) => {
 
     return {
         ...profile,
-        play: ({ fen, turn, enPassant, seen }) => searchBot({ fen, turn, enPassant, seen, evaluate, ...search })
+        play: ({ fen, turn, enPassant, seen, lastOwnMove }) => searchBot({ fen, turn, enPassant, seen, lastOwnMove, evaluate, ...search })
     }
 }
 

@@ -100,7 +100,8 @@ class Room {
             turn: this.game.turn,
             history: this.game.history.map(m => m.notation),
             lastMove: this.game.history.at(-1) || null,
-            result: this.game.result
+            result: this.game.result,
+            legal: this.game.allLegalMoves()
         })
         this.broadcastPresence()
 
@@ -304,7 +305,9 @@ class Room {
             ...move,
             fen: this.game.fen,
             turn: this.game.turn,
-            result: this.game.result
+            result: this.game.result,
+            // Sent with every move so the next player's highlights appear instantly on pickup.
+            legal: this.game.allLegalMoves()
         })
 
         if(this.game.result) return this.endGame(this.game.result)
@@ -329,7 +332,7 @@ class Room {
         setTimeout(async _ => {
             let move = null
             try {
-                move = await requestBotMove(botId, { fen: this.game.fen, turn: color, enPassant: this.game.enPassant, seen: this.game.seenPositions() })
+                move = await requestBotMove(botId, { fen: this.game.fen, turn: color, enPassant: this.game.enPassant, seen: this.game.seenPositions(), lastOwnMove: this.game.lastMoveBy(color) })
             }
             catch(e){
                 console.error(`[room ${this.id}] Bot ${botId} failed:`, e.message)

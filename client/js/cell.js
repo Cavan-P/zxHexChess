@@ -68,6 +68,11 @@ export class Cell {
             drawHexagon(this.x, this.y, this.size, 'rgba(233, 196, 106, 0.75)', false, 'black', 0, this.ctx)
         }
 
+        // The cell a piece is being dragged from.
+        if(Game.draggedPiece?.originalCell == this){
+            drawHexagon(this.x, this.y, this.size - 3, 'rgba(233, 196, 106, 0.55)', true, 'rgba(185, 120, 47, 0.85)', 3, this.ctx)
+        }
+
         if(this.num == Game.check){
             const glow = this.ctx.createRadialGradient(this.x, this.y, this.size * 0.15, this.x, this.y, this.size)
             glow.addColorStop(0, 'rgba(214, 48, 30, 0.85)')

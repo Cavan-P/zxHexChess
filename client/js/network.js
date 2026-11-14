@@ -43,6 +43,7 @@ export const setupNetwork = onFenInit => {
                 Game.turn = data.turn
                 Game.fen = data.fen
                 Game.result = data.result || null
+                Game.legalMap = data.legal || null
                 Game.lastMove = data.lastMove ? { from: data.lastMove.from, to: data.lastMove.to } : null
                 Game.check = data.lastMove?.check ?? null
                 Game.drawOffer = null
@@ -90,8 +91,8 @@ export const setupNetwork = onFenInit => {
             case 'illegalMove':
                 if(Game.pendingMove){
                     const { piece, originalX, originalY } = Game.pendingMove
-                    piece.x = originalX
-                    piece.y = originalY
+                    piece.targetX = originalX
+                    piece.targetY = originalY
                     piece.currentCell = piece.originalCell
                 }
 
@@ -162,6 +163,7 @@ export const setupNetwork = onFenInit => {
 
 const handleMove = data => {
     Game.turn = data.turn
+    Game.legalMap = data.legal || null
     Game.pendingMove = null
     Game.check = data.check
     Game.drawOffer = null
