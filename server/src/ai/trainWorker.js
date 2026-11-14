@@ -21,7 +21,7 @@ parentPort.on('message', ({ jobId, white, black, depth, timeMs, maxPlies, noProg
 
         while(game.history.length < maxPlies){
             const turn = game.turn
-            const move = players[turn]({ fen: game.fen, turn, enPassant: game.enPassant, seen: game.seenPositions(), recentOwnMoves: game.recentMovesBy(turn) })
+            const move = players[turn]({ fen: game.fen, turn, enPassant: game.enPassant, seen: game.seenPositions(), recentOwnMoves: game.recentMovesBy(turn), ply: game.history.length })
             const res = move ? game.play(turn, move.from, move.to, move.promotion || 'q') : { ok: false }
             if(!res.ok){ result = { winner: other(turn), reason: 'forfeit' }; break }
 

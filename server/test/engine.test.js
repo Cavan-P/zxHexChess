@@ -154,3 +154,42 @@ test('the fast table-driven move generator matches the rules engine exactly', _ 
     }
     assert.ok(compared > 10000)
 })
+
+test('opening variety: strong bots vary their first move but never pass up a mate', _ => {
+    const { searchBot, evaluateMaster } = require('../src/ai/engine')
+    const start = new GameState()
+    const firsts = new Set()
+    for(let i = 0; i < 8; i++){
+        const mv = searchBot({ fen: start.fen, turn: 'white', enPassant: null, ply: 0, maxDepth: 4, timeLimitMs: 300, evaluate: evaluateMaster })
+        assert.ok(start.legalMovesFrom('white', mv.from).includes(mv.to))
+        firsts.add(`${mv.from}-${mv.to}`)
+    }
+    assert.ok(firsts.size > 1, 'expected more than one opening move')
+
+    // Mate-in-one positions from quick games between weak bots: variety must never skip the mate.
+    const kyle = require('../src/ai/botManager').getBotByName('kyleMorton')
+    const original = Math.random
+    Math.random = rng(21)
+    let checked = 0
+    try {
+        for(let n = 0; n < 60 && checked < 3; n++){
+            const game = new GameState()
+            for(let ply = 0; ply < 120 && !game.result; ply++){
+                const hasMate = game.board().filter(c => c.color == game.turn).some(c => game.legalMovesFrom(game.turn, c.cell).some(to => {
+                    const g = new GameState({ fen: game.fen, turn: game.turn }); g.play(game.turn, c.cell, to, 'q'); return g.result?.reason == 'checkmate'
+                }))
+                if(hasMate){
+                    const mv = searchBot({ fen: game.fen, turn: game.turn, enPassant: game.enPassant, ply: 0, maxDepth: 4, timeLimitMs: 2000, evaluate: evaluateMaster })
+                    const g = new GameState({ fen: game.fen, turn: game.turn }); g.play(game.turn, mv.from, mv.to, 'q')
+                    assert.strictEqual(g.result?.reason, 'checkmate', `variety skipped a mate in ${game.fen}`)
+                    checked++
+                    break
+                }
+                const mv = kyle({ fen: game.fen, turn: game.turn, enPassant: game.enPassant })
+                game.play(game.turn, mv.from, mv.to, 'q')
+            }
+        }
+    }
+    finally { Math.random = original }
+    assert.ok(checked >= 2, `expected some mate-in-one positions, found ${checked}`)
+})

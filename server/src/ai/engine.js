@@ -59,6 +59,9 @@ const exposure = (cell, color, value, cheapest) => {
     return Math.max(0, value - cheapest[enemy][cell])
 }
 
+// The six corner cells, where a lone king is easiest to mate.
+const CORNERS = [[5, -5, 0], [5, 0, -5], [0, 5, -5], [-5, 5, 0], [-5, 0, 5], [0, -5, 5]]
+
 const hexDistanceFromCenter = coords => Math.max(Math.abs(coords[0]), Math.abs(coords[1]), Math.abs(coords[2]))
 const hexDistance = (a, b) => hexDistanceFromCenter([a[0] - b[0], a[1] - b[1], a[2] - b[2]])
 
@@ -104,6 +107,7 @@ const evaluateWeighted = (board, maximizingColor, enPassant, weights, toMove = o
     const material = { white: 0, black: 0 }        // everything but kings
     const officers = { white: 0, black: 0 }        // everything but kings and pawns
     const kings = {}
+    const kingCells = {}
     const pawnAdvance = weights.pawnAdvanceWeight ?? 0.03
 
     if(weights.mobilityWeight){
@@ -121,7 +125,7 @@ const evaluateWeighted = (board, maximizingColor, enPassant, weights, toMove = o
         const v = lower == 'k' ? 0 : (weights.pieceValues[lower] || 0)
         score += sign * v
         material[cell.color] += v
-        if(lower == 'k') kings[cell.color] = cell.coords
+        if(lower == 'k'){ kings[cell.color] = cell.coords; kingCells[cell.color] = i }
         else if(lower != 'p') officers[cell.color] += v
 
         // Pawns are worth a little more the closer they get to promoting, so bots have a reason
@@ -155,9 +159,17 @@ const evaluateWeighted = (board, maximizingColor, enPassant, weights, toMove = o
         const winner = lead > 0 ? maximizingColor : enemyColor
         const loser = other(winner)
         if(officers[loser] <= 10){
+            // ...and boxed in: every cell the losing king could step to safely is one more escape.
+            let escapes = 0
+            for(const j of kingSteps[kingCells[loser]]){
+                if(board[j].color != loser && cheapest[winner][j] == NONE) escapes++
+            }
+            const cornerDistance = Math.min(...CORNERS.map(c => hexDistance(c, kings[loser])))
             const mopUp = (weights.mopUpWeight ?? 1) * (
                 0.15 * hexDistanceFromCenter(kings[loser]) +
-                0.1 * (2 * CENTER - hexDistance(kings[winner], kings[loser]))
+                0.1 * (2 * CENTER - hexDistance(kings[winner], kings[loser])) +
+                0.12 * (12 - escapes) +
+                0.04 * (CENTER - cornerDistance)
             )
             score += winner == maximizingColor ? mopUp : -mopUp
         }
@@ -291,7 +303,31 @@ const blindSpotCheck = (oversight, seed) => (board, move, inCheck) => {
     return h / 4294967296 < Math.min(p, 0.9)
 }
 
-const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLimitMs, evaluate, seen = null, recentOwnMoves = [], quiescence = false, oversight = 0) => {
+// Opening variety: early in the game, any move within this many pawns of the best one can be
+// played (closer ones more often), so engine-vs-engine games don't follow the same 20 moves every
+// time. It fades out over the first OPENING_PLIES half-moves and never gives up a forced mate.
+const VARIETY_MARGIN = 0.15
+
+// Pruning helpers (see null-move pruning and late move reductions in the search).
+const NULL_WINDOW = 0.001
+const hasOfficers = (board, color) => {
+    for(let i = 0; i < board.length; i++){
+        const c = board[i]
+        if(c.color == color && c.piece && 'nbrqNBRQ'.includes(c.piece)) return true
+    }
+    return false
+}
+const OPENING_PLIES = 16
+
+const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLimitMs, evaluate, seen = null, recentOwnMoves = [], quiescence = false, oversight = 0, { variety = 0, extendChecks = false, prune = false } = {}) => {
+    const nullMoves = prune === true || prune == 'null'
+    // Reductions would cut short exactly the near-best alternatives opening variety picks from,
+    // so they only start once the opening is over.
+    const reductions = (prune === true || prune == 'lmr') && !variety
+    // Root moves scored within `variety` of the best, from the last finished iteration.
+    let rootScores = null
+    let iterationScores = null
+    let rootDepth = 0
     const isBlind = oversight ? blindSpotCheck(oversight, (Math.random() * 4294967296) >>> 0) : null
     // Splits moves into the ones this bot notices and the ones it doesn't. The unnoticed ones are
     // only looked at if none of the noticed ones turn out to be legal.
@@ -384,7 +420,7 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
         return { score: value }
     }
 
-    const search = (board, turn, enPassant, depth, alpha, beta, maximizingColor, ply) => {
+    const search = (board, turn, enPassant, depth, alpha, beta, maximizingColor, ply, allowNull = true) => {
         if(enforceTime && Date.now() - startTime > timeLimitMs) return { timeout: true }
 
         // The previous move left its own king in check: not a legal position.
@@ -397,6 +433,10 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
 
         const inCheck = kingAttacked(board, turn)
         const mateScore = _ => turn != maximizingColor ? (MATE - ply) : (-MATE + ply)
+
+        // Check extension: when a side is in check, look one move further. Checks are forcing, so
+        // this costs little and lets the search see long mating attacks through to the end.
+        if(extendChecks && inCheck && ply > 0 && ply < rootDepth * 2 + 2) depth++
 
         if(!depth && quiescence && ply > 0) return quiesce(board, turn, alpha, beta, maximizingColor, ply, QUIESCENCE_DEPTH)
 
@@ -421,6 +461,25 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
             if(cached.flag == TT_UPPER && cached.score <= alpha) return { score: cached.score, move: cached.move }
         }
 
+        // Null-move pruning: let the side to move "pass". If the position is still so good that
+        // the opponent can't bring it back within the window even with a free move, searching it
+        // properly is a waste of time. Skipped in check, right after another pass, and when only
+        // pawns are left (where passing can genuinely be better than any move: zugzwang).
+        const maximizing = turn == maximizingColor
+        if(nullMoves && allowNull && ply > 0 && depth >= 3 && !inCheck && Number.isFinite(maximizing ? beta : alpha) && hasOfficers(board, turn)
+            // Only worth trying when the position already looks good for the side to move.
+            && (maximizing ? staticScore(board, turn, maximizingColor, null) >= beta : staticScore(board, turn, maximizingColor, null) <= alpha)){
+            const R = depth >= 6 ? 3 : 2
+            const r = maximizing
+                ? search(board, other(turn), null, depth - 1 - R, beta - NULL_WINDOW, beta, maximizingColor, ply + 1, false)
+                : search(board, other(turn), null, depth - 1 - R, alpha, alpha + NULL_WINDOW, maximizingColor, ply + 1, false)
+            if(r.timeout) return r
+            if(!r.illegal && Math.abs(r.score) < MATE - 1000){
+                if(maximizing && r.score >= beta) return { score: beta, move: null }
+                if(!maximizing && r.score <= alpha) return { score: alpha, move: null }
+            }
+        }
+
         const { moves, missed } = noticed(board, pseudoMoves(board, turn, ply == 0 ? enPassant : null), inCheck)
 
         // At the root, shuffle before sorting so equally-good moves are chosen at random.
@@ -440,7 +499,6 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
         const alphaStart = alpha, betaStart = beta
         let bestLocal = null
         let legalCount = 0
-        const maximizing = turn == maximizingColor
         let value = maximizing ? -Infinity : Infinity
 
         // Moves the bot didn't notice go last, and only count if nothing it did notice was legal.
@@ -452,8 +510,25 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
             if(i >= visibleCount && legalCount) break
             const nextBoard = playOnCopy(board, move.from, move.to)
 
+            // Late move reductions: moves are ordered best-first, so a quiet move far down the
+            // list is rarely the best. Look at it one move shallower with a narrow window first,
+            // and only search it properly if it turns out better than expected.
+            let r = null
+            const quiet = !board[move.to].piece && !(board[move.from].piece.toLowerCase() == 'p' && promotionCells[turn].includes(move.to))
+            // Checks are never reduced: they're the forcing moves tactics are made of.
+            if(reductions && ply > 0 && depth >= 3 && i >= 3 && i < visibleCount && quiet && !inCheck && Number.isFinite(maximizing ? alpha : beta)
+                && !kingAttacked(nextBoard, other(turn))){
+                const reduction = i >= 8 && depth >= 5 ? 2 : 1
+                r = maximizing
+                    ? search(nextBoard, other(turn), null, depth - 1 - reduction, alpha, alpha + NULL_WINDOW, maximizingColor, ply + 1)
+                    : search(nextBoard, other(turn), null, depth - 1 - reduction, beta - NULL_WINDOW, beta, maximizingColor, ply + 1)
+                if(r.timeout) return r
+                // Promising after all (or illegal): fall through to the full search.
+                if(r.illegal || (maximizing ? r.score > alpha : r.score < beta)) r = null
+            }
+
             // En passant only lasts one move, so children search without it.
-            const r = search(nextBoard, other(turn), null, depth - 1, alpha, beta, maximizingColor, ply + 1)
+            if(!r) r = search(nextBoard, other(turn), null, depth - 1, alpha, beta, maximizingColor, ply + 1)
             if(r.timeout) return r
             if(r.illegal) continue
             legalCount++
@@ -465,9 +540,12 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
                 value = score
                 bestLocal = move
             }
+            if(ply == 0 && variety && score > alpha) iterationScores.push({ move, score })
 
+            // With opening variety on, the root keeps its window open a little below the best
+            // score, so moves that are nearly as good get exact scores too.
             if(maximizing){
-                alpha = Math.max(alpha, value)
+                alpha = Math.max(alpha, ply == 0 && variety ? value - variety : value)
             }
             else {
                 beta = Math.min(beta, value)
@@ -493,12 +571,33 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
         return { score: value, move: bestLocal }
     }
 
+    let bestScore = null
     for(let depth = 1; depth <= maxDepth; depth++){
         enforceTime = depth > 1
+        rootDepth = depth
+        iterationScores = []
         const r = search(rootBoard, rootTurn, rootEnPassant, depth, -Infinity, Infinity, rootTurn, 0)
         if(r.timeout) break
 
         bestMove = r.move || bestMove
+        bestScore = r.score
+        rootScores = iterationScores
+
+        // Found a forced mate: looking deeper can't find a faster one.
+        if(r.score > MATE - 1000) break
+    }
+
+    // Pick among the near-best moves, weighting each by how close it is to the best.
+    if(variety && rootScores?.length && bestScore != null && Math.abs(bestScore) < MATE - 1000){
+        // King walks don't count as variety (unless the king move really is the best one).
+        const close = rootScores.filter(c => c.score > bestScore - variety &&
+            (c.move == bestMove || rootBoard[c.move.from].piece.toLowerCase() != 'k'))
+        const weights = close.map(c => 1 - (bestScore - c.score) / variety * 0.8)
+        let pick = Math.random() * weights.reduce((a, b) => a + b, 0)
+        for(let i = 0; i < close.length; i++){
+            pick -= weights[i]
+            if(pick <= 0) return close[i].move
+        }
     }
 
     return bestMove
@@ -515,9 +614,23 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
 //   oversight      - 0-1, how often a move goes unnoticed (see blindSpotCheck): the human way to
 //                    miss a mate in 1 or hang a piece
 // `timeBudgetMs` (optional) caps thinking time when the bot is on a clock.
-const searchBot = ({ fen, turn, enPassant, seen = null, recentOwnMoves = null, lastOwnMove = null, maxDepth, timeLimitMs, timeBudgetMs = null, evaluate, noise = 0, blunderChance = 0, quiescence = false, oversight = 0 }) => {
+const searchBot = ({ fen, turn, enPassant, seen = null, recentOwnMoves = null, lastOwnMove = null, ply = null, maxDepth, timeLimitMs, timeBudgetMs = null, evaluate, noise = 0, blunderChance = 0, quiescence = false, oversight = 0, prune = null }) => {
     if(timeBudgetMs != null) timeLimitMs = Math.min(timeLimitMs, timeBudgetMs)
     const board = parseFen(fen)
+
+    // The stronger bots (4+ moves deep) get the full treatment: a deeper search as pieces come off
+    // (with fewer pieces each move is far cheaper, so the time limit becomes the real cap), check
+    // extensions, late move reductions, and some variety in the opening.
+    //
+    // Null-move pruning is available too (prune: 'null' or true) but is off: in test matches at 1s
+    // a move, reductions alone scored 8.5/12 against the old search, null-move 8/12, both 7/12.
+    const strong = maxDepth >= 4
+    let depthLimit = maxDepth
+    if(strong){
+        const pieces = board.filter(c => c.piece && c.piece.toLowerCase() != 'k').length
+        depthLimit += pieces <= 6 ? 8 : pieces <= 10 ? 5 : pieces <= 16 ? 2 : 0
+    }
+    const variety = strong && ply != null && ply < OPENING_PLIES ? VARIETY_MARGIN * (1 - ply / OPENING_PLIES) : 0
     const legal = generateAllMoves(board, turn, enPassant)
     if(!legal.length) return null
 
@@ -532,7 +645,7 @@ const searchBot = ({ fen, turn, enPassant, seen = null, recentOwnMoves = null, l
             : evaluate
         const seenSet = Array.isArray(seen) ? new Set(seen) : null
         const recent = recentOwnMoves || (lastOwnMove ? [lastOwnMove] : [])
-        move = iterativeDeepening(board, turn, enPassant, maxDepth, timeLimitMs, noisyEvaluate, seenSet, recent, quiescence, oversight) || legal[0]
+        move = iterativeDeepening(board, turn, enPassant, depthLimit, timeLimitMs, noisyEvaluate, seenSet, recent, quiescence, oversight, { variety, extendChecks: strong, prune: prune ?? (strong ? 'lmr' : false) }) || legal[0]
     }
 
     const piece = board[move.from]
