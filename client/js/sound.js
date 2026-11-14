@@ -21,9 +21,17 @@ const ensureContext = _ => {
     const AudioCtx = window.AudioContext || window.webkitAudioContext
     if(!AudioCtx) return null
     ctx = new AudioCtx()
+    // A limiter at the end, so stacked sounds at full volume never clip.
+    const limiter = ctx.createDynamicsCompressor()
+    limiter.threshold.value = -4
+    limiter.knee.value = 2
+    limiter.ratio.value = 16
+    limiter.attack.value = 0.001
+    limiter.release.value = 0.08
+    limiter.connect(ctx.destination)
     master = ctx.createGain()
     master.gain.value = prefs.volume
-    master.connect(ctx.destination)
+    master.connect(limiter)
 
     // One second of white noise, reused for every knock and click.
     noiseBuffer = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate)
@@ -94,12 +102,15 @@ const thump = (at, { from = 140, to = 70, duration = 0.09, gain = 0.5 } = {}) =>
     osc.stop(at + duration + 0.02)
 }
 
-// A weighted piece set down on a wooden board: a dull clack with some body under it.
-const clack = (at, weight = 1) => {
-    burst(at, { type: 'lowpass', freq: vary(1700), q: 0.7, duration: 0.035, gain: 0.55 * weight })
-    burst(at, { freq: vary(650), q: 1.4, duration: 0.06, gain: 0.45 * weight })
-    burst(at, { freq: vary(190), q: 1.2, duration: 0.11, gain: 0.6 * weight })
-    thump(at, { from: vary(150), to: 65, gain: 0.35 * weight })
+// A wooden piece set down on a wooden board: a sharp contact click and the short ringing "tock"
+// of the wood itself (a few narrow resonances), with only a touch of low body under it.
+// `pitch` raises or lowers the wood, `force` is how hard it lands, `bright` adds snap.
+const clack = (at, { pitch = 1, force = 1, bright = 1 } = {}) => {
+    burst(at, { type: 'highpass', freq: 3500, q: 0.7, duration: 0.007, gain: 0.3 * force * bright })
+    burst(at, { freq: vary(1150 * pitch, 0.05), q: 9, duration: 0.07, gain: 1.6 * force })
+    burst(at, { freq: vary(2400 * pitch, 0.05), q: 12, duration: 0.04, gain: 1.1 * force * bright })
+    burst(at, { freq: vary(640 * pitch, 0.05), q: 6, duration: 0.055, gain: 0.8 * force })
+    burst(at, { freq: 260, q: 1.5, duration: 0.04, gain: 0.25 * force })
 }
 
 // A struck wooden bar (marimba-ish): a warm fundamental, its 4th-ish overtone, and a mallet tap.
@@ -131,8 +142,9 @@ const NOTE = { C4: 261.6, D4: 293.7, E4: 329.6, G4: 392, A4: 440, C5: 523.3, E5:
 
 const SOUNDS = {
     move: t => clack(t),
-    capture: t => { clack(t, 0.7); clack(t + 0.045, 1.25) },
-    check: t => { clack(t, 1.1); woodBlock(t + 0.07, 520); woodBlock(t + 0.07, 780, 0.25) },
+    // One harder, brighter knock: the piece cracks into its victim.
+    capture: t => clack(t, { pitch: 1.12, force: 1.2, bright: 1.7 }),
+    check: t => { clack(t, { force: 1.1 }); woodBlock(t + 0.07, 520); woodBlock(t + 0.07, 780, 0.25) },
     promote: t => { clack(t); mallet(t + 0.06, NOTE.G4); mallet(t + 0.16, NOTE.C5); mallet(t + 0.16, NOTE.E5, { gain: 0.12 }) },
     start: t => { mallet(t, NOTE.C4, { gain: 0.18 }); mallet(t + 0.14, NOTE.G4, { gain: 0.18 }) },
     win: t => [NOTE.C4, NOTE.E4, NOTE.G4, NOTE.C5].forEach((f, i) => mallet(t + i * 0.11, f, { gain: 0.2, decay: 0.9 })),

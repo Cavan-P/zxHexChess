@@ -45,26 +45,40 @@
     <!-- ========== HOME ========== -->
     <div id="room-menu" class="flex min-h-dvh flex-col">
 
-      <header class="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
-        <a href="./" class="flex items-center gap-2.5">
+      <header class="site-header">
+        <div class="relative mx-auto flex w-full max-w-6xl items-center gap-3 px-4 py-3 sm:px-6">
+          <a href="#/" class="flex flex-none items-center gap-2.5">
           <svg viewBox="0 0 100 100" class="h-8 w-8" aria-hidden="true"><path d="M50 4l40 23v46L50 96 10 73V27z" style="fill: var(--accent-primary); stroke: var(--text-strong)" stroke-width="6"/><path d="M50 30l17 10v20L50 70 33 60V40z" style="fill: var(--text-strong)"/></svg>
           <span class="font-display text-xl font-semibold text-(--text-strong)">QRS Chess</span>
         </a>
-        <nav class="flex items-center gap-1 sm:gap-2">
-          <a href="#ladder" class="btn btn-ghost btn-sm"><i class="fa-solid fa-ranking-star"></i><span class="hidden sm:inline">Leaderboard</span></a>
-          <a href="#rules" class="btn btn-ghost btn-sm"><i class="fa-regular fa-circle-question"></i><span class="hidden sm:inline">How to play</span></a>
-          <button class="theme-open btn btn-ghost btn-sm" aria-label="Look and sound settings" title="Look & sound"><i class="fa-solid fa-sliders"></i></button>
-          <button id="profile-chip" class="btn btn-secondary btn-sm hidden max-w-[15rem] gap-2 pl-1.5" aria-label="Your profile">
-            <span id="profile-chip-avatar" class="grid h-6 w-6 flex-none place-items-center rounded-full bg-(--accent-primary) text-xs font-bold text-(--text-chat)"></span>
-            <span id="profile-chip-name" class="truncate"></span>
-            <span id="profile-chip-elo" class="elo-badge flex-none"></span>
-          </button>
-          <button id="profile-signup" class="btn btn-primary btn-sm hidden"><i class="fa-solid fa-user-plus"></i><span>Get rated</span></button>
+          <nav class="ml-4 hidden items-center gap-1 md:flex" aria-label="Main">
+            <a href="#/play" data-nav="play" class="nav-link">Play</a>
+            <a href="#/bots" data-nav="bots" class="nav-link">Bots</a>
+            <a href="#/leaderboard" data-nav="leaderboard" class="nav-link">Leaderboard</a>
+            <a href="#/rules" data-nav="rules" class="nav-link">How to play</a>
+          </nav>
+          <div class="ml-auto flex items-center gap-1 sm:gap-2">
+            <button class="theme-open btn btn-ghost btn-sm" aria-label="Look and sound settings" title="Look & sound"><i class="fa-solid fa-sliders"></i></button>
+            <button id="profile-chip" class="btn btn-secondary btn-sm hidden max-w-[15rem] gap-2 pl-1.5" aria-label="Your profile">
+              <span id="profile-chip-avatar" class="grid h-6 w-6 flex-none place-items-center rounded-full bg-(--accent-primary) text-xs font-bold text-(--text-chat)"></span>
+              <span id="profile-chip-name" class="truncate"></span>
+              <span id="profile-chip-elo" class="elo-badge flex-none"></span>
+            </button>
+            <button id="profile-signup" class="btn btn-primary btn-sm hidden"><i class="fa-solid fa-user-plus"></i><span>Get rated</span></button>
+            <button id="nav-menu-btn" class="btn btn-ghost btn-sm md:hidden" aria-label="Menu" aria-expanded="false" aria-controls="nav-menu"><i class="fa-solid fa-bars"></i></button>
+          </div>
+        </div>
+        <nav id="nav-menu" class="nav-menu hidden md:hidden" aria-label="Main">
+          <a href="#/play" data-nav="play" class="nav-menu-link"><i class="fa-solid fa-user-group w-5 text-center"></i>Play</a>
+          <a href="#/bots" data-nav="bots" class="nav-menu-link"><i class="fa-solid fa-microchip w-5 text-center"></i>Bots</a>
+          <a href="#/leaderboard" data-nav="leaderboard" class="nav-menu-link"><i class="fa-solid fa-ranking-star w-5 text-center"></i>Leaderboard</a>
+          <a href="#/rules" data-nav="rules" class="nav-menu-link"><i class="fa-solid fa-circle-question w-5 text-center"></i>How to play</a>
         </nav>
       </header>
 
-      <main class="mx-auto w-full max-w-6xl flex-1 px-4 pb-16 sm:px-6">
+      <main class="mx-auto w-full max-w-6xl flex-1 px-4 pt-4 pb-16 sm:px-6 sm:pt-8">
 
+        <div data-page="home">
         <!-- Hero -->
         <section class="pt-6 pb-10 text-center sm:pt-12 sm:pb-14">
           <p class="eyebrow mb-3">Gliński's hexagonal chess</p>
@@ -76,15 +90,54 @@
           </p>
         </section>
 
-        <!-- Primary actions -->
-        <section class="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
+        <section class="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+            <a href="#/play" class="home-tile card">
+              <span class="bot-avatar"><i class="fa-solid fa-user-group"></i></span>
+              <span class="min-w-0 flex-1">
+                <span class="flex items-center gap-2 text-lg font-semibold text-(--text-strong)">Play a friend<span id="home-open-count" class="elo-badge hidden"></span></span>
+                <span class="block text-sm text-(--text-muted)">Create a game and share the code, or join an open one.</span>
+              </span>
+              <i class="fa-solid fa-arrow-right text-(--text-muted)"></i>
+            </a>
+            <a href="#/bots" class="home-tile card">
+              <span class="bot-avatar"><i class="fa-solid fa-microchip"></i></span>
+              <span class="min-w-0 flex-1">
+                <span class="flex items-center gap-2 text-lg font-semibold text-(--text-strong)">Play the computer</span>
+                <span class="block text-sm text-(--text-muted)">27 opponents, from first steps to grandmaster.</span>
+              </span>
+              <i class="fa-solid fa-arrow-right text-(--text-muted)"></i>
+            </a>
+            <a href="#/leaderboard" class="home-tile card">
+              <span class="bot-avatar"><i class="fa-solid fa-ranking-star"></i></span>
+              <span class="min-w-0 flex-1">
+                <span class="flex items-center gap-2 text-lg font-semibold text-(--text-strong)">Leaderboard</span>
+                <span class="block text-sm text-(--text-muted)">Ratings, titles and who's on top.</span>
+              </span>
+              <i class="fa-solid fa-arrow-right text-(--text-muted)"></i>
+            </a>
+            <a href="#/rules" class="home-tile card">
+              <span class="bot-avatar"><i class="fa-solid fa-circle-question"></i></span>
+              <span class="min-w-0 flex-1">
+                <span class="flex items-center gap-2 text-lg font-semibold text-(--text-strong)">How to play</span>
+                <span class="block text-sm text-(--text-muted)">The pieces, the board and the Gliński twists.</span>
+              </span>
+              <i class="fa-solid fa-arrow-right text-(--text-muted)"></i>
+            </a>
+        </section>
+        </div>
 
+        <div data-page="play" hidden>
+          <div class="mb-5">
+            <p class="eyebrow mb-1">Play online</p>
+            <h1 class="font-display text-3xl font-semibold sm:text-4xl">Play a friend</h1>
+          </div>
+          <section class="grid grid-cols-1 items-start gap-4 md:grid-cols-2 md:gap-6">
           <div id="multiplayer" class="card flex flex-col p-5 sm:p-7">
             <div class="mb-4 flex items-center gap-3">
               <span class="bot-avatar"><i class="fa-solid fa-user-group"></i></span>
               <div>
-                <h2 class="text-lg font-semibold">Play a friend</h2>
-                <p class="text-sm text-(--text-muted)">Create a game and share the code.</p>
+                <h2 class="text-lg font-semibold">Start a game</h2>
+                <p class="text-sm text-(--text-muted)">Create a game and share the code with a friend.</p>
               </div>
             </div>
 
@@ -115,202 +168,198 @@
             <p id="room-status" class="mt-3 min-h-5 text-sm text-(--danger)" role="status"></p>
           </div>
 
-          <div class="card flex flex-col p-5 sm:p-7">
-            <div class="mb-4 flex items-center gap-3">
-              <span class="bot-avatar"><i class="fa-solid fa-microchip"></i></span>
+            <!-- Open games: public challenges anyone can join -->
+            <section id="open-games" class="card p-5 sm:p-7">
+              <div class="mb-3 flex flex-wrap items-end justify-between gap-2">
+                <div>
+                  <p class="eyebrow mb-1">Open games</p>
+                  <h2 class="text-lg font-semibold">Join someone waiting for an opponent</h2>
+                </div>
+                <span class="text-xs text-(--text-muted)"><i class="fa-solid fa-circle text-(--success) mr-1 text-[0.5rem] align-middle"></i>Live</span>
+              </div>
+              <ul id="open-games-list" class="divide-y divide-(--border-soft)"></ul>
+            </section>
+          </section>
+        </div>
+
+        <div data-page="bots" hidden>
+          <section>
+            <div class="mb-5 flex flex-wrap items-end justify-between gap-3">
               <div>
-                <h2 class="text-lg font-semibold">Play the computer</h2>
-                <p id="bot-count" class="text-sm text-(--text-muted)">Opponents from first steps to master.</p>
+                <p class="eyebrow mb-1">Computer opponents</p>
+                <h1 class="font-display text-3xl font-semibold sm:text-4xl">Choose your challenger</h1>
+                <p id="bot-count" class="mt-1 text-sm text-(--text-muted)">Opponents from first steps to master.</p>
+              </div>
+              <div class="flex gap-2">
+                <button id="tournament-btn" class="btn btn-secondary btn-sm hidden"><i class="fa-solid fa-trophy"></i> Tournament</button>
+                <button id="train-bot-btn" class="btn btn-secondary btn-sm hidden"><i class="fa-solid fa-dna"></i> Train a bot</button>
               </div>
             </div>
 
-            <div class="flex flex-wrap items-center gap-3">
-              <span class="text-sm font-medium">Play as</span>
-              <div id="bot-color-picker" class="segmented" role="group" aria-label="Your color">
-                <button data-color="white" class="bot-color-btn">White</button>
-                <button data-color="black" class="bot-color-btn">Black</button>
-                <button data-color="random" class="bot-color-btn">Random</button>
+            <div class="card mb-6 flex flex-wrap items-center gap-x-6 gap-y-3 p-4 sm:px-5">
+              <div class="flex flex-wrap items-center gap-3">
+                <span class="text-sm font-medium">Play as</span>
+                <div id="bot-color-picker" class="segmented" role="group" aria-label="Your color">
+                  <button data-color="white" class="bot-color-btn">White</button>
+                  <button data-color="black" class="bot-color-btn">Black</button>
+                  <button data-color="random" class="bot-color-btn">Random</button>
+                </div>
               </div>
-            </div>
-
-            <div class="mt-3 flex flex-wrap items-center gap-3">
               <label class="flex min-w-0 items-center gap-2 text-sm font-medium"><i class="fa-regular fa-clock"></i>Clock
                 <select id="tc-bot" class="tc-select input min-w-0 max-w-full py-1.5 pr-8 text-sm" aria-label="Time control against the computer"></select>
               </label>
-            </div>
-
-            <a href="#local" class="btn btn-primary mt-5 w-full py-3 text-base">
-              Choose an opponent <i class="fa-solid fa-arrow-down"></i>
-            </a>
-
-            <button id="bot-vs-bot-btn" class="btn btn-ghost btn-sm mt-3 self-center">
-              <i class="fa-solid fa-robot"></i> Or watch two bots play
-            </button>
-          </div>
-        </section>
-
-        <!-- Open games: public challenges anyone can join -->
-        <section id="open-games" class="card mt-6 p-5 sm:p-7">
-          <div class="mb-3 flex flex-wrap items-end justify-between gap-2">
-            <div>
-              <p class="eyebrow mb-1">Open games</p>
-              <h2 class="text-lg font-semibold">Join someone waiting for an opponent</h2>
-            </div>
-            <span class="text-xs text-(--text-muted)"><i class="fa-solid fa-circle text-(--success) mr-1 text-[0.5rem] align-middle"></i>Live</span>
-          </div>
-          <ul id="open-games-list" class="divide-y divide-(--border-soft)"></ul>
-        </section>
-
-        <!-- Bot vs Bot picker -->
-        <section id="bot-vs-bot-panel" class="card mt-6 hidden p-5 sm:p-7">
-          <div class="mb-5 flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <p class="eyebrow mb-1">Bot battle</p>
-              <h2 class="text-xl font-semibold">Pick two bots and watch them play</h2>
-            </div>
-            <div class="flex flex-wrap items-center gap-3">
-              <label class="flex min-w-0 items-center gap-2 text-sm font-medium"><i class="fa-regular fa-clock"></i>Clock
-                <select id="tc-battle" class="tc-select input min-w-0 max-w-full py-1.5 pr-8 text-sm" aria-label="Time control for the bot battle"></select>
-              </label>
-              <button id="bvb-start-btn" disabled class="btn btn-primary">
-                <i class="fa-solid fa-play"></i> Start battle
+              <button id="bot-vs-bot-btn" class="btn btn-ghost btn-sm sm:ml-auto">
+                <i class="fa-solid fa-robot"></i> Watch two bots play
               </button>
             </div>
-          </div>
-          <div class="grid gap-6 lg:grid-cols-2">
-            <div>
-              <h3 class="mb-2 flex items-center gap-2 text-sm font-semibold"><span class="h-3 w-3 rounded-sm border border-(--border-strong) bg-white"></span>White</h3>
-              <div id="bvb-white-grid" class="grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-2"></div>
-            </div>
-            <div>
-              <h3 class="mb-2 flex items-center gap-2 text-sm font-semibold"><span class="h-3 w-3 rounded-sm bg-(--text-strong)"></span>Black</h3>
-              <div id="bvb-black-grid" class="grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-2"></div>
-            </div>
-          </div>
-        </section>
 
-        <!-- Bots -->
-        <section id="local" class="scroll-mt-6 pt-14">
-          <div class="mb-2 flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <p class="eyebrow mb-1">Computer opponents</p>
-              <h2 class="font-display text-3xl font-semibold">Choose your challenger</h2>
+          <!-- Bot vs Bot picker -->
+          <section id="bot-vs-bot-panel" class="card mb-6 hidden scroll-mt-24 p-5 sm:p-7">
+            <div class="mb-5 flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <p class="eyebrow mb-1">Bot battle</p>
+                <h2 class="text-xl font-semibold">Pick two bots and watch them play</h2>
+              </div>
+              <div class="flex flex-wrap items-center gap-3">
+                <label class="flex min-w-0 items-center gap-2 text-sm font-medium"><i class="fa-regular fa-clock"></i>Clock
+                  <select id="tc-battle" class="tc-select input min-w-0 max-w-full py-1.5 pr-8 text-sm" aria-label="Time control for the bot battle"></select>
+                </label>
+                <button id="bvb-start-btn" disabled class="btn btn-primary">
+                  <i class="fa-solid fa-play"></i> Start battle
+                </button>
+              </div>
             </div>
-            <div class="flex gap-2">
-              <button id="tournament-btn" class="btn btn-secondary btn-sm hidden"><i class="fa-solid fa-trophy"></i> Tournament</button>
-              <button id="train-bot-btn" class="btn btn-secondary btn-sm hidden"><i class="fa-solid fa-dna"></i> Train a bot</button>
+            <div class="grid gap-6 lg:grid-cols-2">
+              <div>
+                <h3 class="mb-2 flex items-center gap-2 text-sm font-semibold"><span class="h-3 w-3 rounded-sm border border-(--border-strong) bg-white"></span>White</h3>
+                <div id="bvb-white-grid" class="grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-2"></div>
+              </div>
+              <div>
+                <h3 class="mb-2 flex items-center gap-2 text-sm font-semibold"><span class="h-3 w-3 rounded-sm bg-(--text-strong)"></span>Black</h3>
+                <div id="bvb-black-grid" class="grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-2"></div>
+              </div>
             </div>
-          </div>
+          </section>
 
-          <div id="bot-grid" class="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-3"></div>
-        </section>
+            <div id="bot-grid" class="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-3"></div>
+          </section>
 
-        <!-- Leaderboard -->
-        <section id="ladder" class="scroll-mt-6 pt-16">
-          <div class="mb-6 flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <p class="eyebrow mb-1">Leaderboard</p>
-              <h2 class="font-display text-3xl font-semibold">Top players</h2>
+          <!-- Tournament (bot lab only) -->
+          <section id="tournament-panel" class="card mt-6 hidden scroll-mt-24 p-5 sm:p-7">
+            <p class="eyebrow mb-1">Bot lab</p>
+            <h2 class="text-xl font-semibold">Run a tournament</h2>
+            <p class="mt-1 mb-4 text-sm text-(--text-muted)">Every pair plays a round-robin, and Elo updates after each game.</p>
+            <div id="tournament-grid" class="grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-2"></div>
+            <div class="mt-4 flex flex-wrap items-center gap-3">
+              <label for="tournament-games" class="text-sm font-medium">Games per pairing</label>
+              <input id="tournament-games" type="number" min="1" max="10" value="2" class="input w-20 text-center" />
+              <button id="tournament-start-btn" class="btn btn-primary">Start tournament</button>
             </div>
-            <p class="max-w-sm text-sm text-(--text-muted)">Every finished game against a person or a bot moves your Elo rating. New players start at 800. Reach 1200, 1400, 1600, 1800 or 2200 with an established rating (20+ games) to earn a title: HCM, HM, HIM, HGM, and Hex Legend.</p>
-          </div>
-          <div class="card overflow-hidden">
-            <ol id="leaderboard" class="divide-y divide-(--border-soft)"></ol>
-          </div>
-        </section>
+            <div id="tournament-log" class="mt-4 max-h-48 space-y-1 overflow-y-auto rounded-lg bg-(--bg-sunken) p-3 font-mono text-xs"></div>
+            <div id="tournament-standings" class="mt-3 text-sm"></div>
+          </section>
 
-        <!-- Tournament (bot lab only) -->
-        <section id="tournament-panel" class="card mt-6 hidden p-5 sm:p-7">
-          <p class="eyebrow mb-1">Bot lab</p>
-          <h2 class="text-xl font-semibold">Run a tournament</h2>
-          <p class="mt-1 mb-4 text-sm text-(--text-muted)">Every pair plays a round-robin, and Elo updates after each game.</p>
-          <div id="tournament-grid" class="grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-2"></div>
-          <div class="mt-4 flex flex-wrap items-center gap-3">
-            <label for="tournament-games" class="text-sm font-medium">Games per pairing</label>
-            <input id="tournament-games" type="number" min="1" max="10" value="2" class="input w-20 text-center" />
-            <button id="tournament-start-btn" class="btn btn-primary">Start tournament</button>
-          </div>
-          <div id="tournament-log" class="mt-4 max-h-48 space-y-1 overflow-y-auto rounded-lg bg-(--bg-sunken) p-3 font-mono text-xs"></div>
-          <div id="tournament-standings" class="mt-3 text-sm"></div>
-        </section>
-
-        <!-- Training (bot lab only) -->
-        <section id="training-panel" class="card mt-6 hidden p-5 sm:p-7">
-          <p class="eyebrow mb-1">Bot lab</p>
-          <h2 class="text-xl font-semibold">Train a bot</h2>
-          <p class="mt-1 mb-4 text-sm text-(--text-muted)">
-            Evolves a new bot's evaluation weights through self-play: mutated variants play each other and the winners survive into the next generation.
-          </p>
-          <div class="grid grid-cols-3 gap-3">
-            <label class="flex flex-col gap-1 text-xs font-medium">Generations
-              <input id="train-generations" type="number" min="1" max="30" value="6" class="input text-center" />
+          <!-- Training (bot lab only) -->
+          <section id="training-panel" class="card mt-6 hidden scroll-mt-24 p-5 sm:p-7">
+            <p class="eyebrow mb-1">Bot lab</p>
+            <h2 class="text-xl font-semibold">Train a bot</h2>
+            <p class="mt-1 mb-4 text-sm text-(--text-muted)">
+              Evolves a new bot's evaluation weights through self-play: mutated variants play each other and the winners survive into the next generation.
+            </p>
+            <div class="grid grid-cols-3 gap-3">
+              <label class="flex flex-col gap-1 text-xs font-medium">Generations
+                <input id="train-generations" type="number" min="1" max="30" value="6" class="input text-center" />
+              </label>
+              <label class="flex flex-col gap-1 text-xs font-medium">Population
+                <input id="train-population" type="number" min="4" max="20" value="8" class="input text-center" />
+              </label>
+              <label class="flex flex-col gap-1 text-xs font-medium">Games/match
+                <input id="train-games" type="number" min="1" max="4" value="1" class="input text-center" />
+              </label>
+            </div>
+            <p class="mt-4 mb-1 text-xs font-semibold tracking-wide text-(--text-muted) uppercase">How the finished bot plays</p>
+            <div class="grid grid-cols-2 gap-3">
+              <label class="flex flex-col gap-1 text-xs font-medium">Search depth (moves ahead)
+                <input id="train-play-depth" type="number" min="1" max="12" value="6" class="input text-center" />
+              </label>
+              <label class="flex flex-col gap-1 text-xs font-medium">Seconds per move
+                <input id="train-play-seconds" type="number" min="0.5" max="60" step="0.5" value="5" class="input text-center" />
+              </label>
+            </div>
+            <p class="mt-1 text-xs text-(--text-muted)">It stops at whichever comes first. Each extra move of depth takes roughly 5× longer, so time is usually the real limit.</p>
+            <label class="mt-3 flex cursor-pointer items-center gap-2 text-sm font-medium">
+              <input id="train-watchable" type="checkbox" class="h-4 w-4 accent-(--accent-deep)" />
+              Watchable pace <span class="font-normal text-(--text-muted)">(slows training so you can follow the games)</span>
             </label>
-            <label class="flex flex-col gap-1 text-xs font-medium">Population
-              <input id="train-population" type="number" min="4" max="20" value="8" class="input text-center" />
-            </label>
-            <label class="flex flex-col gap-1 text-xs font-medium">Games/match
-              <input id="train-games" type="number" min="1" max="4" value="1" class="input text-center" />
-            </label>
-          </div>
-          <p class="mt-4 mb-1 text-xs font-semibold tracking-wide text-(--text-muted) uppercase">How the finished bot plays</p>
-          <div class="grid grid-cols-2 gap-3">
-            <label class="flex flex-col gap-1 text-xs font-medium">Search depth (moves ahead)
-              <input id="train-play-depth" type="number" min="1" max="12" value="6" class="input text-center" />
-            </label>
-            <label class="flex flex-col gap-1 text-xs font-medium">Seconds per move
-              <input id="train-play-seconds" type="number" min="0.5" max="60" step="0.5" value="5" class="input text-center" />
-            </label>
-          </div>
-          <p class="mt-1 text-xs text-(--text-muted)">It stops at whichever comes first. Each extra move of depth takes roughly 5× longer, so time is usually the real limit.</p>
-          <label class="mt-3 flex cursor-pointer items-center gap-2 text-sm font-medium">
-            <input id="train-watchable" type="checkbox" class="h-4 w-4 accent-(--accent-deep)" />
-            Watchable pace <span class="font-normal text-(--text-muted)">(slows training so you can follow the games)</span>
-          </label>
-          <div class="mt-4 flex flex-wrap gap-2">
-            <button id="train-start-btn" class="btn btn-primary">Start training</button>
-            <button id="lab-open-btn" class="btn btn-secondary"><i class="fa-solid fa-table-cells"></i> Open live view</button>
-          </div>
-          <div id="train-log" class="mt-4 max-h-48 space-y-1 overflow-y-auto rounded-lg bg-(--bg-sunken) p-3 font-mono text-xs"></div>
-        </section>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <button id="train-start-btn" class="btn btn-primary">Start training</button>
+              <button id="lab-open-btn" class="btn btn-secondary"><i class="fa-solid fa-table-cells"></i> Open live view</button>
+            </div>
+            <div id="train-log" class="mt-4 max-h-48 space-y-1 overflow-y-auto rounded-lg bg-(--bg-sunken) p-3 font-mono text-xs"></div>
+          </section>
 
-        <!-- Rules -->
-        <section id="rules" class="scroll-mt-6 pt-16">
-          <p class="eyebrow mb-1">How to play</p>
-          <h2 class="font-display mb-6 text-3xl font-semibold">Chess, on a honeycomb</h2>
-          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <div class="card p-5">
-              <h3 class="mb-1 font-semibold"><i class="fa-solid fa-chess-rook mr-2 text-(--accent-deep)"></i>Rooks &amp; queens</h3>
-              <p class="text-sm leading-relaxed">Rooks slide in six directions, through the sides of each hexagon. Queens combine rook and bishop moves.</p>
+
+        </div>
+
+        <div data-page="leaderboard" hidden>
+          <!-- Leaderboard -->
+          <section id="ladder">
+            <div class="mb-6 flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <p class="eyebrow mb-1">Leaderboard</p>
+                <h1 class="font-display text-3xl font-semibold sm:text-4xl">Top players</h1>
+              </div>
+              <p class="max-w-sm text-sm text-(--text-muted)">Every finished game against a person or a bot moves your Elo rating. New players start at 800. Reach 1200, 1400, 1600, 1800 or 2200 with an established rating (20+ games) to earn a title: HCM, HM, HIM, HGM and Hex Legend. Some of the bots hold women's titles too (HWCM, HWM, HWIM, HWGM).</p>
             </div>
-            <div class="card p-5">
-              <h3 class="mb-1 font-semibold"><i class="fa-solid fa-chess-bishop mr-2 text-(--accent-deep)"></i>Three bishops</h3>
-              <p class="text-sm leading-relaxed">Bishops move through the corners of each hexagon and never change color, so each side gets one bishop per color.</p>
+            <div class="card overflow-hidden">
+              <ol id="leaderboard" class="divide-y divide-(--border-soft)"></ol>
             </div>
-            <div class="card p-5">
-              <h3 class="mb-1 font-semibold"><i class="fa-solid fa-chess-pawn mr-2 text-(--accent-deep)"></i>Pawns</h3>
-              <p class="text-sm leading-relaxed">Pawns move straight ahead and capture to the two cells forward at an angle. They can advance two from their starting cell and promote on the far edge.</p>
+          </section>
+
+
+        </div>
+
+        <div data-page="rules" hidden>
+          <!-- Rules -->
+          <section id="rules">
+            <p class="eyebrow mb-1">How to play</p>
+            <h1 class="font-display mb-6 text-3xl font-semibold sm:text-4xl">Chess, on a honeycomb</h1>
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div class="card p-5">
+                <h3 class="mb-1 font-semibold"><i class="fa-solid fa-chess-rook mr-2 text-(--accent-deep)"></i>Rooks &amp; queens</h3>
+                <p class="text-sm leading-relaxed">Rooks slide in six directions, through the sides of each hexagon. Queens combine rook and bishop moves.</p>
+              </div>
+              <div class="card p-5">
+                <h3 class="mb-1 font-semibold"><i class="fa-solid fa-chess-bishop mr-2 text-(--accent-deep)"></i>Three bishops</h3>
+                <p class="text-sm leading-relaxed">Bishops move through the corners of each hexagon and never change color, so each side gets one bishop per color.</p>
+              </div>
+              <div class="card p-5">
+                <h3 class="mb-1 font-semibold"><i class="fa-solid fa-chess-pawn mr-2 text-(--accent-deep)"></i>Pawns</h3>
+                <p class="text-sm leading-relaxed">Pawns move straight ahead and capture to the two cells forward at an angle. They can advance two from their starting cell and promote on the far edge.</p>
+              </div>
+              <div class="card p-5">
+                <h3 class="mb-1 font-semibold"><i class="fa-solid fa-chess-knight mr-2 text-(--accent-deep)"></i>Knights &amp; kings</h3>
+                <p class="text-sm leading-relaxed">Knights jump: two cells in a straight line, then one cell turning off it, with twelve possible landing cells. Kings step one cell in any of twelve directions. There's no castling.</p>
+              </div>
+              <div class="card p-5">
+                <h3 class="mb-1 font-semibold"><i class="fa-solid fa-scale-balanced mr-2 text-(--accent-deep)"></i>Stalemate counts</h3>
+                <p class="text-sm leading-relaxed">Stalemating your opponent wins ¾ of a point. Repetition, the 50-move rule and bare kings are draws.</p>
+              </div>
+              <div class="card p-5">
+                <h3 class="mb-1 font-semibold"><i class="fa-solid fa-hand-pointer mr-2 text-(--accent-deep)"></i>Making moves</h3>
+                <p class="text-sm leading-relaxed">Drag a piece, or tap it and then tap where it should go. Legal cells are highlighted. During your opponent's turn you can queue up premoves; right-click or Esc clears them.</p>
+              </div>
             </div>
-            <div class="card p-5">
-              <h3 class="mb-1 font-semibold"><i class="fa-solid fa-chess-knight mr-2 text-(--accent-deep)"></i>Knights &amp; kings</h3>
-              <p class="text-sm leading-relaxed">Knights jump: two cells in a straight line, then one cell turning off it, with twelve possible landing cells. Kings step one cell in any of twelve directions. There's no castling.</p>
-            </div>
-            <div class="card p-5">
-              <h3 class="mb-1 font-semibold"><i class="fa-solid fa-scale-balanced mr-2 text-(--accent-deep)"></i>Stalemate counts</h3>
-              <p class="text-sm leading-relaxed">Stalemating your opponent wins ¾ of a point. Repetition, the 50-move rule and bare kings are draws.</p>
-            </div>
-            <div class="card p-5">
-              <h3 class="mb-1 font-semibold"><i class="fa-solid fa-hand-pointer mr-2 text-(--accent-deep)"></i>Making moves</h3>
-              <p class="text-sm leading-relaxed">Drag a piece to move it. Legal destinations are highlighted while you drag. Works with a mouse or touch.</p>
-            </div>
-          </div>
-        </section>
+          </section>
+
+        </div>
       </main>
 
       <footer class="border-t border-(--border-soft)">
         <div class="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-6 text-xs text-(--text-muted) sm:px-6 md:flex-row md:items-start md:justify-between md:gap-8">
           <p class="font-semibold text-(--text-main)">QRS Chess</p>
           <p class="max-w-2xl leading-relaxed">
-            <span class="font-semibold">Privacy:</span> QRS Chess uses your IP address only to run multiplayer connections and doesn’t log it. If you make a profile, your display name, rating, game record and beaten bots are stored on the server, and your name and rating appear on the leaderboard. Your browser keeps your sign-in token and settings. You can reset your progress from your profile, or email to have it deleted. Games and chat aren’t saved. Fonts and icons load from Google Fonts and cdnjs. Nothing is sold, shared or tracked.Contact: <a class="underline decoration-dotted hover:text-(--text-strong)" href="mailto:itscavanp.dev@gmail.com">itscavanp.dev@gmail.com</a>
+            <span class="font-semibold">Privacy:</span> QRS Chess uses your IP address only to run multiplayer connections and doesn’t log it. If you make a profile, your display name, rating, game record and beaten bots are stored on the server, and your name and rating appear on the leaderboard. Your browser keeps your sign-in token and settings. You can reset your progress from your profile, or email to have it deleted. Games and chat aren’t saved. Fonts and icons load from Google Fonts and cdnjs. Nothing is sold, shared or tracked. Contact: <a class="underline decoration-dotted hover:text-(--text-strong)" href="mailto:itscavanp.dev@gmail.com">itscavanp.dev@gmail.com</a>
           </p>
         </div>
       </footer>

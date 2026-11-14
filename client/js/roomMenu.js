@@ -174,6 +174,11 @@ export const setupRoomMenu = _ => {
         const visible = games.filter(g => g.code != mine)
         list.replaceChildren()
 
+        // The home page's "Play a friend" tile shows how many games are waiting.
+        const count = document.getElementById('home-open-count')
+        count.textContent = `${visible.length} open`
+        count.classList.toggle('hidden', !visible.length)
+
         if(!visible.length){
             list.append(el('li', 'py-4 text-center text-sm text-(--text-muted)', 'No open games right now. Create one with "List in Open games" ticked, and it shows up here for everyone.'))
             return

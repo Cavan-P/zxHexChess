@@ -1,3 +1,4 @@
+import { setupRouter } from './router.js'
 import { setupAchievements } from './achievements.js'
 // ------ IMPORTS ------
 
@@ -55,6 +56,7 @@ setupReview()
 setupLab()
 setupProfile()
 setupAchievements()
+setupRouter()
 setupRoomMenu()
 setupInput()
 Game.onRatingsChanged = requestLeaderboard

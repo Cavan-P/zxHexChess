@@ -853,6 +853,54 @@
     .status-banner.is-check { background: var(--check-bg); border-color: color-mix(in srgb, var(--danger) 50%, transparent); color: var(--check-text); }
     .status-banner.is-over { background: var(--text-strong); color: var(--bg-card); }
 
+    /* Site header and page navigation */
+    .site-header {
+        position: sticky; top: 0; z-index: 20;
+        background: color-mix(in srgb, var(--bg-main) 88%, transparent);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border-soft);
+    }
+    .nav-link {
+        padding: 0.4rem 0.75rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text-main);
+        transition: background-color .15s, color .15s;
+    }
+    .nav-link:hover { background: var(--bg-sunken); color: var(--text-strong); }
+    .nav-link.is-active { background: var(--bg-panel); color: var(--text-strong); box-shadow: inset 0 -2px 0 var(--accent-deep); }
+    .nav-menu {
+        position: absolute; left: 0.75rem; right: 0.75rem; top: calc(100% + 0.25rem);
+        display: flex; flex-direction: column;
+        padding: 0.4rem;
+        border-radius: 14px;
+        background: var(--bg-card);
+        border: 1px solid var(--border-soft);
+        box-shadow: var(--shadow-pop);
+        animation: popIn .15s ease;
+    }
+    .nav-menu.hidden { display: none; }
+    .nav-menu-link {
+        display: flex; align-items: center; gap: 0.75rem;
+        padding: 0.7rem 0.85rem;
+        border-radius: 10px;
+        font-weight: 600;
+        color: var(--text-main);
+    }
+    .nav-menu-link:hover { background: var(--bg-sunken); }
+    .nav-menu-link.is-active { background: var(--bg-panel); color: var(--text-strong); }
+    .nav-menu-link.is-active i { color: var(--accent-deep); }
+
+    .home-tile {
+        display: flex; align-items: center; gap: 1rem;
+        padding: 1.1rem 1.25rem;
+        text-align: left;
+        transition: transform .15s, border-color .15s, box-shadow .15s;
+    }
+    .home-tile:hover { transform: translateY(-2px); border-color: var(--accent-deep); }
+    .home-tile:hover .fa-arrow-right { color: var(--accent-deep); }
+
     /* Achievements */
     .achievement-group {
         margin-top: 0.35rem;
