@@ -133,3 +133,29 @@ test('losing to a bot lowers only the player, and closing the tab mid-game still
     assert.strictEqual(after.losses, 1)
     assert.ok(after.elo < STARTING_ELO)
 })
+
+test('titles: earned from an established peak, kept after a drop, and given to bots by rating', _ => {
+    const { titleFor } = require('../src/players/titles')
+    assert.strictEqual(titleFor(1199), null)
+    assert.strictEqual(titleFor(1200).code, 'HCM')
+    assert.strictEqual(titleFor(1850).code, 'HGM')
+    assert.strictEqual(titleFor(2500).code, 'HL')
+
+    const store = tempStore()
+    const p = store.register('Climber Two').player
+    const raw = store.players[p.id]
+
+    // Provisional players have no title, however high they get.
+    raw.elo = 1500; raw.gamesPlayed = 5
+    assert.strictEqual(store.get(p.id).title, null)
+
+    // Established and over 1400 -> Hex Master, kept after dropping back.
+    raw.gamesPlayed = 19
+    store.recordBotGame(p.id, 2000, 1)           // 20th game, rating goes up
+    assert.strictEqual(store.get(p.id).title.code, 'HM')
+    raw.elo = 900
+    assert.strictEqual(store.get(p.id).title.code, 'HM')
+
+    const cornelius = require('../src/ai/botManager').getBotList().find(b => b.id == 'corneliusAshby')
+    assert.ok(cornelius.title, 'top bots carry titles')
+})

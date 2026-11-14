@@ -504,6 +504,29 @@
     .clock.is-low { color: var(--danger); }
     .clock.is-running.is-low { background: var(--danger); color: #fff; }
 
+    /* Earned titles, e.g. "HGM" before a name */
+    .title-badge {
+        display: inline-block;
+        margin-right: 0.3rem;
+        padding: 0.02rem 0.3rem;
+        border-radius: 4px;
+        background: var(--danger);
+        color: #fff;
+        font-size: 0.65rem;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        line-height: 1.35;
+        vertical-align: 0.1em;
+        cursor: help;
+    }
+
+    /* Training lab tiles */
+    .lab-tile { transition: border-color .15s, box-shadow .15s, opacity .2s; }
+    .lab-tile:hover { border-color: var(--border-strong); }
+    .lab-tile.is-selected { border-color: var(--accent-deep); box-shadow: 0 0 0 2px var(--accent-primary); }
+    .lab-tile.is-done { opacity: .6; }
+    .lab-tile.is-done.is-selected { opacity: 1; }
+
     /* Theme picker */
     .theme-card {
         display: flex;

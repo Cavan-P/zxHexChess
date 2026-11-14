@@ -1,7 +1,7 @@
 import { Game } from './game.js'
 import { addSystemMessage } from './chat.js'
 import { showPly } from './review.js'
-import { ratingLabel, requestLeaderboard, getBeatenBots, markBotBeaten } from './profile.js'
+import { ratingLabel, titleBadge, requestLeaderboard, getBeatenBots, markBotBeaten } from './profile.js'
 import { sendRematch, sendRoomCreate, sendRoomJoin, sendStartBotGame, sendBotVsBot, sendStartTournament, sendStartTraining, sendResign, sendOfferDraw, sendAcceptDraw, sendDeclineDraw, sendLeaveRoom } from './network.js'
 
 const categoryOrder = [
@@ -47,7 +47,9 @@ const renderBotCard = (bot, { selected = false, compact = false, beaten = false,
 
     const body = el('span', 'min-w-0 flex-1')
     const top = el('span', 'flex items-center justify-between gap-2')
-    top.append(el('span', 'truncate font-semibold text-(--text-strong)', bot.name), el('span', 'elo-badge', String(bot.elo)))
+    const botName = el('span', 'truncate font-semibold text-(--text-strong)')
+    botName.append(...[titleBadge(bot.title), document.createTextNode(bot.name)].filter(Boolean))
+    top.append(botName, el('span', 'elo-badge', String(bot.elo)))
     body.append(top)
 
     if(!compact && bot.description){
@@ -182,7 +184,9 @@ export const setupRoomMenu = _ => {
             const avatar = el('span', 'grid h-8 w-8 flex-none place-items-center rounded-full bg-(--bg-sunken) text-sm font-bold text-(--text-strong)', (g.host || '?').charAt(0).toUpperCase())
             const who = el('span', 'min-w-0 flex-1')
             const nameLine = el('span', 'flex items-center gap-2')
-            nameLine.append(el('span', 'truncate font-semibold text-(--text-strong)', g.host))
+            const host = el('span', 'truncate font-semibold text-(--text-strong)')
+            host.append(...[titleBadge(g.title), document.createTextNode(g.host)].filter(Boolean))
+            nameLine.append(host)
             if(g.elo != null) nameLine.append(el('span', 'elo-badge', ratingLabel(g.elo, g.provisional)))
             who.append(nameLine, el('span', 'block text-xs text-(--text-muted)', g.timeControl ? describeTimeControl(g.timeControl) : 'No clock'))
 
@@ -356,6 +360,8 @@ export const setupRoomMenu = _ => {
 
             const label = el('span', `min-w-0 truncate text-sm font-semibold ${side.type != 'bot' && !present ? 'text-(--text-muted) italic font-medium' : 'text-(--text-strong)'}`, name)
 
+            const badge = present ? titleBadge(side.title) : null
+            if(badge) label.prepend(badge)
             const text = el('span', 'flex min-w-0 flex-col')
             text.append(label, capturedStrip(color))
 
@@ -705,8 +711,12 @@ export const setupRoomMenu = _ => {
 
         document.getElementById('train-log').replaceChildren()
 
-        sendStartTraining(generations, population, games)
+        sendStartTraining(generations, population, games, document.getElementById('train-watchable').checked,
+            +document.getElementById('train-play-depth').value || 6, +document.getElementById('train-play-seconds').value || 5)
+        Game.openLab?.()
     }
+
+    document.getElementById('lab-open-btn').onclick = _ => Game.openLab?.()
 
     Game.onTrainingProgress = data => {
         const log = document.getElementById('train-log')

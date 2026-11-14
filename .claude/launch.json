@@ -4,7 +4,19 @@
     {
       "name": "server",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["src/index.js"],
+      "runtimeArgs": [
+        "src/index.js"
+      ],
+      "cwd": "server",
+      "port": 8000
+    },
+    {
+      "name": "server-lab",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "lab"
+      ],
       "cwd": "server",
       "port": 8000
     }

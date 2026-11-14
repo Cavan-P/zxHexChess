@@ -164,11 +164,11 @@ class Room {
     getMatchInfo(){
         const colorInfo = color => {
             const meta = this.botMeta[color]
-            if(meta) return { type: 'bot', id: meta.id, name: meta.name, elo: meta.elo, icon: meta.icon }
+            if(meta) return { type: 'bot', id: meta.id, name: meta.name, elo: meta.elo, icon: meta.icon, title: meta.title }
 
             const profile = this.seatProfiles[color] && this.profiles?.get(this.seatProfiles[color])
             return profile
-                ? { type: 'human', name: profile.name, elo: profile.elo, provisional: profile.provisional }
+                ? { type: 'human', name: profile.name, elo: profile.elo, provisional: profile.provisional, title: profile.title }
                 : { type: 'human' }
         }
 
@@ -200,6 +200,8 @@ class Room {
         const white = this.seatProfiles.white
         const black = this.seatProfiles.black
         let changes = null
+        const titlesBefore = {}
+        for(const id of [white, black]) if(id) titlesBefore[id] = this.profiles.get(id)?.title || null
 
         if(this.isBotGame){
             const humanColor = this.bots.white ? 'black' : 'white'
@@ -219,10 +221,13 @@ class Room {
         if(!changes) return null
         this.rated = true
 
-        // Push updated profiles to whoever is still connected.
+        // Push updated profiles to whoever is still connected, announcing any newly earned title.
         for(const socket of this.players){
             const profile = socket.profileId && this.profiles.get(socket.profileId)
-            if(profile) this.send(socket, { type: 'profile', player: profile })
+            if(!profile) continue
+            this.send(socket, { type: 'profile', player: profile })
+            const before = titlesBefore[socket.profileId]
+            if(profile.title && profile.title.code != before?.code) this.send(socket, { type: 'titleEarned', title: profile.title })
         }
 
         return changes

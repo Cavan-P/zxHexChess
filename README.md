@@ -35,5 +35,5 @@ cd server && npm install && npm start
 Then open http://localhost:8000.
 
 - `npm test` runs the tests
-- `npm run lab` turns on bot tournaments and training (off by default since they're slow and write files)
+- `npm run lab` turns on bot tournaments and training (off by default since they're CPU-heavy and write files). "Train a bot" evolves a new bot by having slightly different versions of the engine play each other, and "Open live view" shows every game of the current generation as a grid you can click into. Do this on your own machine, then commit the new bot file in `server/src/ai/strategies/evolved/`
 - If you change Tailwind classes, rebuild the CSS with `cd client && npx tailwindcss -i css/style.css -o css/output.css`

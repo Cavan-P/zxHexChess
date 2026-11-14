@@ -12,11 +12,50 @@ matchmaker.profiles = profiles
 const MAX_REGISTRATIONS_PER_CONNECTION = 3
 
 const LAB_ENABLED = process.env.ENABLE_BOT_LAB == '1'
+
+// ------ Live training view ------
+// The current training run, kept on the server so the Lab view can be opened (or reloaded) at any
+// point. Changes are batched and pushed to everyone watching a few times a second.
+const lab = {
+    running: false,
+    settings: null,
+    generation: 0,
+    generations: 0,
+    games: new Map(),        // id -> { id, white, black, fen, from, to, ply, done, result }
+    history: [],             // per-generation summaries
+    lastBot: null,
+    watchers: new Set(),
+    dirty: new Set(),
+    timer: null
+}
+
+const labSnapshot = _ => ({
+    type: 'labState',
+    running: lab.running,
+    settings: lab.settings,
+    generation: lab.generation,
+    generations: lab.generations,
+    games: [...lab.games.values()],
+    history: lab.history,
+    lastBot: lab.lastBot
+})
+
+const toWatchers = msg => {
+    const json = JSON.stringify(msg)
+    for(const s of lab.watchers) if(s.readyState == 1) s.send(json)
+}
+
+const flushLab = _ => {
+    if(!lab.dirty.size) return
+    toWatchers({ type: 'labUpdate', games: [...lab.dirty].map(id => lab.games.get(id)).filter(Boolean) })
+    lab.dirty.clear()
+}
+
 let labJobRunning = false
 
 const getBotMeta = id => {
     const meta = getBotList().find(b => b.id == id)
-    return meta ? { id: meta.id, name: meta.name, elo: meta.elo, icon: meta.icon } : null
+    return meta ? { id: meta.id, name: meta.name, elo: meta.elo, icon: meta.icon, title: meta.title } : null
 }
 
 const send = (socket, msg) => {
@@ -149,18 +188,70 @@ const handlers = {
         }, 'Tournament')
     },
 
+    watchLab(socket){
+        if(!LAB_ENABLED) return send(socket, { type: 'error', message: 'Bot lab is disabled on this server' })
+        lab.watchers.add(socket)
+        send(socket, labSnapshot())
+    },
+
+    unwatchLab(socket){
+        lab.watchers.delete(socket)
+    },
+
     startTraining(socket, data){
         const generations = Math.min(30, Math.max(1, +data.generations || 6))
         const populationSize = Math.min(20, Math.max(4, +data.populationSize || 8))
         const gamesPerMatch = Math.min(4, Math.max(1, +data.gamesPerMatch || 1))
+        const paceMs = data.watchable ? 250 : 0
+        // How the finished bot will play: any depth up to 12, and up to 60 seconds per move.
+        const playDepth = Math.min(12, Math.max(1, Math.round(+data.playDepth || 6)))
+        const playMs = Math.round(Math.min(60, Math.max(0.5, +data.playSeconds || 5)) * 1000)
 
         runLabJob(socket, async _ => {
-            const best = await runEvolution({
-                generations, populationSize, gamesPerMatch,
-                onProgress: progress => send(socket, { type: 'trainingProgress', ...progress })
-            })
-            const created = materializeGenome(best.genome, { generations, populationSize })
-            send(socket, { type: 'trainingComplete', bot: created, fitness: best.fitness, bots: getBotList() })
+            Object.assign(lab, { running: true, settings: { generations, populationSize, gamesPerMatch, watchable: Boolean(data.watchable) }, generation: 0, generations, history: [], lastBot: null })
+            lab.games.clear()
+            lab.timer = setInterval(flushLab, 200)
+            toWatchers(labSnapshot())
+
+            try {
+                const best = await runEvolution({
+                    generations, populationSize, gamesPerMatch, paceMs,
+                    onGeneration: ({ generation, games }) => {
+                        lab.generation = generation
+                        lab.games.clear()
+                        for(const g of games) lab.games.set(g.id, { ...g, fen: null, ply: 0, done: false, result: null })
+                        lab.dirty.clear()
+                        toWatchers(labSnapshot())
+                    },
+                    onGameMove: (id, m) => {
+                        const g = lab.games.get(id)
+                        if(!g) return
+                        Object.assign(g, { fen: m.fen, from: m.from, to: m.to, ply: m.ply })
+                        lab.dirty.add(id)
+                    },
+                    onGameEnd: (id, { result }) => {
+                        const g = lab.games.get(id)
+                        if(!g) return
+                        Object.assign(g, { done: true, result })
+                        lab.dirty.add(id)
+                    },
+                    onProgress: progress => {
+                        flushLab()
+                        lab.history.push(progress)
+                        toWatchers({ type: 'labProgress', ...progress })
+                        send(socket, { type: 'trainingProgress', ...progress })
+                    }
+                })
+                const created = materializeGenome(best.genome, { generations, populationSize, playDepth, playMs })
+                lab.lastBot = { ...created, fitness: best.fitness }
+                send(socket, { type: 'trainingComplete', bot: created, fitness: best.fitness, bots: getBotList() })
+            }
+            finally {
+                clearInterval(lab.timer)
+                flushLab()
+                lab.running = false
+                toWatchers(labSnapshot())
+            }
         }, 'Training')
     }
 }
@@ -197,6 +288,7 @@ module.exports = function attachWebSocket(server){
         })
 
         socket.on('close', _ => {
+            lab.watchers.delete(socket)
             socket.room?.removeClient(socket)
             socket.room = null
         })

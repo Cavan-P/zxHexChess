@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const eloStore = require('./eloStore')
+const { titleFor } = require('../players/titles')
 
 const bots = {}
 const botFolder = path.join(__dirname, 'strategies')
@@ -45,7 +46,7 @@ loadBots()
 module.exports = {
     getBotList: _ => Object.values(bots).map(b => {
         const record = eloStore.getRecord(b.meta.id, b.meta.elo)
-        return { ...b.meta, elo: record.elo, wins: record.wins, losses: record.losses, draws: record.draws, gamesPlayed: record.gamesPlayed }
+        return { ...b.meta, elo: record.elo, title: titleFor(record.elo), wins: record.wins, losses: record.losses, draws: record.draws, gamesPlayed: record.gamesPlayed }
     }),
     getBotByName: id => bots[id]?.play,
     hasBot: id => typeof id == 'string' && Object.prototype.hasOwnProperty.call(bots, id),

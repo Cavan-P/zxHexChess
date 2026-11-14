@@ -32,6 +32,16 @@ export const markBotBeaten = botId => {
     storage.set(BEATEN_KEY, [...local])
 }
 
+// A small "HGM"-style badge for a title (or nothing). Hover shows the full name.
+export const titleBadge = title => {
+    if(!title) return null
+    const badge = document.createElement('span')
+    badge.className = 'title-badge'
+    badge.textContent = title.code
+    badge.title = title.name
+    return badge
+}
+
 export const ratingLabel = (elo, provisional) => `${elo}${provisional ? '?' : ''}`
 
 // ------ Rating history chart ------
@@ -96,10 +106,12 @@ const openProfile = _ => {
     $('profile-view').classList.remove('hidden')
 
     $('profile-avatar').textContent = initial(p.name)
-    $('profile-name').textContent = p.name
-    $('profile-subtitle').textContent = p.provisional
-        ? `Provisional rating · ${Math.max(0, 20 - p.gamesPlayed)} more games to settle`
-        : 'Established rating'
+    $('profile-name').replaceChildren(...[titleBadge(p.title), document.createTextNode(p.name)].filter(Boolean))
+    $('profile-subtitle').textContent = p.title
+        ? p.title.name
+        : p.provisional
+            ? `Provisional rating · ${Math.max(0, 20 - p.gamesPlayed)} more games to settle`
+            : 'Established rating · titles start at 1200'
     $('profile-elo').textContent = p.elo
     $('profile-peak').textContent = p.peak
     $('profile-games').textContent = p.gamesPlayed
@@ -120,7 +132,7 @@ const renderChip = _ => {
     if(!p) return
 
     $('profile-chip-avatar').textContent = initial(p.name)
-    $('profile-chip-name').textContent = p.name
+    $('profile-chip-name').replaceChildren(...[titleBadge(p.title), document.createTextNode(p.name)].filter(Boolean))
     $('profile-chip-elo').textContent = ratingLabel(p.elo, p.provisional)
 }
 
@@ -153,7 +165,7 @@ const renderLeaderboard = players => {
 
         const name = document.createElement('span')
         name.className = 'min-w-0 flex-1 truncate font-medium text-(--text-strong)'
-        name.textContent = isMe ? `${p.name} (you)` : p.name
+        name.replaceChildren(...[titleBadge(p.title), document.createTextNode(isMe ? `${p.name} (you)` : p.name)].filter(Boolean))
 
         const games = document.createElement('span')
         games.className = 'hidden text-xs text-(--text-muted) sm:inline'

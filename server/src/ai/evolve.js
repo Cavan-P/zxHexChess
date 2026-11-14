@@ -1,18 +1,20 @@
 const fs = require('fs')
 const path = require('path')
 const { evaluateWeighted, DEFAULT_WEIGHTS, searchBot } = require('./engine')
-const { playGame } = require('./selfPlay')
+const { playTrainingGame } = require('./trainPool')
 const botManager = require('./botManager')
 
 // Training games run shallow/fast - the goal here is discovering good weights quickly via many
 // games, not final playing strength (the bot we eventually write out searches much deeper).
-const TRAIN_DEPTH = 2
+const TRAIN_DEPTH = 3
 const TRAIN_TIME_MS = 250
 const TRAIN_MAX_PLIES = 120
 const TRAIN_NO_PROGRESS_LIMIT = 50
 
-const PLAY_DEPTH = 4
-const PLAY_TIME_MS = 3000
+// How the finished bot plays (overridable per training run): it stops at whichever comes first,
+// the depth or the time limit, and always follows capture sequences to the end.
+const PLAY_DEPTH = 6
+const PLAY_TIME_MS = 5000
 
 const clamp = (v, min, max) => Math.min(max, Math.max(min, v))
 const jitter = (value, min, max, spread) => clamp(value + (Math.random() * 2 - 1) * spread, min, max)
@@ -31,19 +33,16 @@ const mutate = genome => ({
     kingSafetyWeight: jitter(genome.kingSafetyWeight, 0, 0.4, 0.05)
 })
 
-const genomeToTrainingPlay = genome => ({ fen, turn, enPassant }) => searchBot({
-    fen, turn, enPassant,
-    maxDepth: TRAIN_DEPTH,
-    timeLimitMs: TRAIN_TIME_MS,
-    evaluate: (board, color, ep, toMove) => evaluateWeighted(board, color, ep, genome, toMove)
-})
-
-const yieldToEventLoop = _ => new Promise(resolve => setImmediate(resolve))
-
 // Runs `generations` rounds of a population of mutated evaluation-weight genomes playing each
-// other headlessly; the fittest (by win rate within the generation) survive and reseed the next
-// generation. Returns the best genome found across the whole run.
-const runEvolution = async ({ generations = 6, populationSize = 8, gamesPerMatch = 1, baseGenome = DEFAULT_WEIGHTS, onProgress } = {}) => {
+// other; the fittest (by points within the generation) survive and reseed the next generation.
+// Every game of a generation is played at once across the training worker pool.
+//
+// Callbacks (all optional): onGeneration({ generation, generations, games }) when a generation
+// starts; onGameMove(id, { fen, from, to, ply }); onGameEnd(id, { result, plies });
+// onProgress({ generation, generations, bestFitnessThisGen, bestFitnessEver, standings }).
+// Returns the best genome found across the whole run.
+// paceMs: pause after each move so the games can be followed live (0 = full speed).
+const runEvolution = async ({ generations = 6, populationSize = 8, gamesPerMatch = 1, baseGenome = DEFAULT_WEIGHTS, paceMs = 0, onGeneration, onGameMove, onGameEnd, onProgress } = {}) => {
     let population = [
         { ...baseGenome, pieceValues: { ...baseGenome.pieceValues } },
         ...Array.from({ length: Math.max(0, populationSize - 1) }, _ => mutate(baseGenome))
@@ -52,35 +51,38 @@ const runEvolution = async ({ generations = 6, populationSize = 8, gamesPerMatch
     let best = { genome: population[0], fitness: -Infinity }
 
     for(let gen = 0; gen < generations; gen++){
-        const wins = population.map(_ => 0)
-        const plays = population.map(genomeToTrainingPlay)
+        const points = population.map(_ => 0)
 
+        // Every pairing, colours alternating between repeat games.
+        const games = []
         for(let i = 0; i < population.length; i++){
             for(let j = i + 1; j < population.length; j++){
                 for(let g = 0; g < gamesPerMatch; g++){
-                    const iIsWhite = g % 2 == 0
-                    const playWhite = iIsWhite ? plays[i] : plays[j]
-                    const playBlack = iIsWhite ? plays[j] : plays[i]
-
-                    const result = await playGame({
-                        playA: playWhite,
-                        playB: playBlack,
-                        maxPlies: TRAIN_MAX_PLIES,
-                        noProgressLimit: TRAIN_NO_PROGRESS_LIMIT
-                    })
-
-                    const winnerIdx = result.result == 'draw' ? null : (result.result == 'white') == iIsWhite ? i : j
-
-                    if(winnerIdx == null){ wins[i] += 0.5; wins[j] += 0.5 }
-                    else wins[winnerIdx]++
-
-                    await yieldToEventLoop()
+                    const [white, black] = g % 2 == 0 ? [i, j] : [j, i]
+                    games.push({ id: `${gen + 1}-${white}-${black}-${g}`, white, black })
                 }
             }
         }
+        onGeneration?.({ generation: gen + 1, generations, populationSize, games })
+
+        await Promise.all(games.map(async game => {
+            const { result, plies } = await playTrainingGame({
+                white: population[game.white],
+                black: population[game.black],
+                depth: TRAIN_DEPTH,
+                timeMs: TRAIN_TIME_MS,
+                maxPlies: TRAIN_MAX_PLIES,
+                noProgressLimit: TRAIN_NO_PROGRESS_LIMIT,
+                paceMs
+            }, move => onGameMove?.(game.id, move))
+
+            if(!result.winner){ points[game.white] += 0.5; points[game.black] += 0.5 }
+            else points[result.winner == 'white' ? game.white : game.black] += 1
+            onGameEnd?.(game.id, { result, plies })
+        }))
 
         const ranked = population
-            .map((genome, idx) => ({ genome, fitness: wins[idx] }))
+            .map((genome, idx) => ({ genome, idx, fitness: points[idx] }))
             .sort((a, b) => b.fitness - a.fitness)
 
         if(ranked[0].fitness > best.fitness){
@@ -91,7 +93,8 @@ const runEvolution = async ({ generations = 6, populationSize = 8, gamesPerMatch
             generation: gen + 1,
             generations,
             bestFitnessThisGen: ranked[0].fitness,
-            bestFitnessEver: best.fitness
+            bestFitnessEver: best.fitness,
+            standings: ranked.map(r => ({ variant: r.idx + 1, points: r.fitness }))
         })
 
         const survivorCount = Math.max(2, Math.floor(populationSize / 2))
@@ -143,8 +146,9 @@ const weights = ${weightsLiteral}
 function strategy(state) {
     return searchBot({
         ...state,
-        maxDepth: ${PLAY_DEPTH},
-        timeLimitMs: ${PLAY_TIME_MS},
+        maxDepth: ${meta.playDepth ?? PLAY_DEPTH},
+        timeLimitMs: ${meta.playMs ?? PLAY_TIME_MS},
+        quiescence: true,
         evaluate: (board, color, ep, toMove) => evaluateWeighted(board, color, ep, weights, toMove)
     })
 }

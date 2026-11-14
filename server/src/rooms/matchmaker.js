@@ -21,6 +21,7 @@ class Matchmaker {
                 host: profile?.name || 'Guest',
                 elo: profile?.elo ?? null,
                 provisional: profile?.provisional ?? false,
+                title: profile?.title || null,
                 timeControl: room.timeControl,
                 hostColor: host.color,
                 createdAt: room.createdAt

@@ -9,6 +9,7 @@ import { setSystemMessage } from './utils.js'
 import { setupProfile, requestLeaderboard } from './profile.js'
 import { setupThemePicker } from './theme.js'
 import { setupReview } from './review.js'
+import { setupLab } from './lab.js'
 import { play } from './sound.js'
 
 // ------ GLOBALS ------
@@ -50,6 +51,7 @@ Game.resyncBoard = fen => populateBoardFromFen(fen)
 
 setupThemePicker()
 setupReview()
+setupLab()
 setupProfile()
 setupRoomMenu()
 setupInput()

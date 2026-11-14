@@ -16,6 +16,8 @@ const K_PROVISIONAL = 40
 const K_ESTABLISHED = 20
 const HISTORY_LENGTH = 50
 
+const { titleFor } = require('./titles')
+
 const NAME_PATTERN = /^[\p{L}\p{N} _.'-]{2,20}$/u
 
 const hashToken = token => crypto.createHash('sha256').update(String(token)).digest('hex')
@@ -27,6 +29,9 @@ const kFactor = player => player.gamesPlayed < PROVISIONAL_GAMES ? K_PROVISIONAL
 // New rating after scoring `score` (1 win, 0.5 draw, 0.75 Gliński stalemate win, ...) against `opponentRating`.
 const nextRating = (player, opponentRating, score) =>
     Math.max(ELO_FLOOR, Math.round(player.elo + kFactor(player) * (score - expectedScore(player.elo, opponentRating))))
+
+// A player's title: from their best established rating, kept even if they drop back down.
+const titleOf = player => player.gamesPlayed >= PROVISIONAL_GAMES ? titleFor(Math.max(player.titlePeak || 0, player.elo)) : null
 
 const cleanName = name => typeof name == 'string' ? name.trim().replace(/\s+/g, ' ') : ''
 
@@ -114,6 +119,7 @@ class PlayerStore {
         const { tokenHash, ...profile } = this.players[id]
         return {
             ...profile,
+            title: titleOf(profile),
             provisional: profile.gamesPlayed < PROVISIONAL_GAMES,
             history: [...profile.history],
             botsBeaten: { ...(profile.botsBeaten || {}) }
@@ -125,6 +131,8 @@ class PlayerStore {
         player.elo = nextRating(player, opponentRating, score)
         player.peak = Math.max(player.peak, player.elo)
         player.gamesPlayed++
+        // Titles go by the best rating reached once the rating is established.
+        if(player.gamesPlayed >= PROVISIONAL_GAMES) player.titlePeak = Math.max(player.titlePeak || 0, player.elo)
 
         if(score > 0.5) player.wins++
         else if(score < 0.5) player.losses++
@@ -176,7 +184,7 @@ class PlayerStore {
             .filter(p => p.gamesPlayed > 0)
             .sort((a, b) => b.elo - a.elo || b.gamesPlayed - a.gamesPlayed)
             .slice(0, limit)
-            .map(p => ({ id: p.id, name: p.name, elo: p.elo, gamesPlayed: p.gamesPlayed, provisional: p.gamesPlayed < PROVISIONAL_GAMES }))
+            .map(p => ({ id: p.id, name: p.name, elo: p.elo, gamesPlayed: p.gamesPlayed, provisional: p.gamesPlayed < PROVISIONAL_GAMES, title: titleOf(p) }))
     }
 }
 

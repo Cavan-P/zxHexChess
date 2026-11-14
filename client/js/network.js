@@ -98,6 +98,10 @@ export const setupNetwork = onFenInit => {
                 return
 
             case 'profile': return Game.onProfile?.(data.player)
+            case 'titleEarned':
+                addSystemMessage(`🎉 New title! You're now a ${data.title.name} (${data.title.code}).`)
+                play('promote')
+                return
             case 'registered': return Game.onRegistered?.(data.player, data.token)
             case 'profileInvalid': return Game.onProfileInvalid?.()
             case 'profileError': return Game.onProfileError?.(data.message)
@@ -184,6 +188,12 @@ export const setupNetwork = onFenInit => {
 
             case 'tournamentComplete':
                 Game.onTournamentComplete?.(data)
+                return
+
+            case 'labState':
+            case 'labUpdate':
+            case 'labProgress':
+                Game.onLab?.(data)
                 return
 
             case 'trainingProgress':
@@ -286,8 +296,9 @@ export const sendBotVsBot = (botA, botB, timeControl = null) => send({ type: 'st
 
 export const sendStartTournament = (botIds, gamesPerPairing) => send({ type: 'startTournament', botIds, gamesPerPairing })
 
-export const sendStartTraining = (generations, populationSize, gamesPerMatch) =>
-    send({ type: 'startTraining', generations, populationSize, gamesPerMatch })
+export const sendStartTraining = (generations, populationSize, gamesPerMatch, watchable = false, playDepth = 6, playSeconds = 5) =>
+    send({ type: 'startTraining', generations, populationSize, gamesPerMatch, watchable, playDepth, playSeconds })
+export const sendWatchLab = watching => send({ type: watching ? 'watchLab' : 'unwatchLab' })
 
 export const sendResign = _ => send({ type: 'resign' })
 export const sendOfferDraw = _ => send({ type: 'offerDraw' })
