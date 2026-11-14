@@ -73,6 +73,6 @@ module.exports = {
     description: 'Loves to capture pieces!  Problem is, he misses a lot of the board...',
     category: 'Novice',
     icon: 'fa-chess-pawn',
-    elo: 365,
+    elo: 345,
     play: strategy
 }

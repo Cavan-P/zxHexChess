@@ -5,7 +5,8 @@ function strategy(state) {
         ...state,
         maxDepth: 2,
         timeLimitMs: 800,
-        evaluate: evaluateMaterial
+        evaluate: evaluateMaterial,
+        oversight: 0.2
     })
 }
 
@@ -15,6 +16,7 @@ module.exports = {
     description: "Thinks two whole moves ahead now! Hasn't hung a piece for no reason in weeks. Mostly.",
     category: 'Intermediate',
     icon: 'fa-chess-rook',
-    elo: 730,
+    elo: 870,
+    titles: 'women',
     play: strategy
 }

@@ -6,7 +6,7 @@ module.exports = makeEngineBot({
     description: "Plays it safe, plays it sound, plays it the same way every time. Somehow that keeps working.",
     category: 'Advanced',
     icon: "fa-chess-bishop",
-    elo: 995
+    elo: 1055
 }, {
-    maxDepth: 3, timeLimitMs: 2000, eval: 'master'
+    maxDepth: 3, timeLimitMs: 2000, eval: 'master', oversight: 0.12
 })

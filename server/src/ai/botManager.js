@@ -23,6 +23,7 @@ const registerBotModule = (bot, categoryOverride = null) => {
             description: bot.description || '',
             icon: bot.icon || 'fa-chess-pawn',
             elo: bot.elo,
+            titles: bot.titles || 'open',
             category
         }
     }
@@ -46,7 +47,7 @@ loadBots()
 module.exports = {
     getBotList: _ => Object.values(bots).map(b => {
         const record = eloStore.getRecord(b.meta.id, b.meta.elo)
-        return { ...b.meta, elo: record.elo, title: titleFor(record.elo), wins: record.wins, losses: record.losses, draws: record.draws, gamesPlayed: record.gamesPlayed }
+        return { ...b.meta, elo: record.elo, title: titleFor(record.elo, b.meta.titles), wins: record.wins, losses: record.losses, draws: record.draws, gamesPlayed: record.gamesPlayed }
     }),
     getBotByName: id => bots[id]?.play,
     hasBot: id => typeof id == 'string' && Object.prototype.hasOwnProperty.call(bots, id),

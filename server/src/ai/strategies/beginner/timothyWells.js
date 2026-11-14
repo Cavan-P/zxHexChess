@@ -29,6 +29,6 @@ module.exports = {
     description: 'Timothy is learning how the pieces move!  He practices by just playing randomly.',
     category: 'Beginner',
     icon: 'fa-chess-pawn',
-    elo: 150,
+    elo: 100,
     play: strategy
 }

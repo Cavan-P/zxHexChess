@@ -6,7 +6,8 @@ module.exports = makeEngineBot({
     description: "Reads the whole board at once. Every piece has a job, and every job gets done. Yours too, eventually.",
     category: 'Master',
     icon: "fa-crown",
-    elo: 1775
+    elo: 1775,
+    titles: 'women',
 }, {
     maxDepth: 5, timeLimitMs: 4000, eval: 'positional', quiescence: true
 })

@@ -17,5 +17,6 @@ module.exports = {
     category: 'Expert',
     icon: 'fa-chess-queen',
     elo: 1505,
+    titles: 'women',
     play: strategy
 }

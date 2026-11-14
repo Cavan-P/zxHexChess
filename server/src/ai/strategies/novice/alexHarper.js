@@ -74,6 +74,7 @@ module.exports = {
     description: 'Alex likes to trade.  She usually doesn\'t make good trades.',
     category: 'Novice',
     icon: 'fa-chess-knight',
-    elo: 260,
+    elo: 290,
+    titles: 'women',
     play: strategy
 }

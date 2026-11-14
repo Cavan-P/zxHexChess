@@ -5,7 +5,8 @@ function strategy(state) {
         ...state,
         maxDepth: 3,
         timeLimitMs: 1500,
-        evaluate: evaluateCentral
+        evaluate: evaluateCentral,
+        oversight: 0.15
     })
 }
 
@@ -15,6 +16,6 @@ module.exports = {
     description: "The middle of the board belongs to Marcus. Thinks a few moves deep to keep it that way.",
     category: 'Advanced',
     icon: 'fa-chess-knight',
-    elo: 940,
+    elo: 1040,
     play: strategy
 }

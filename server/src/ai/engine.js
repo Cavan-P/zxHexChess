@@ -272,7 +272,36 @@ const SHUFFLE_PENALTY = 0.75
 // `quiescence` (optional) keeps searching captures past the depth limit (see `quiesce`).
 const QUIESCENCE_DEPTH = 6
 
-const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLimitMs, evaluate, seen = null, recentOwnMoves = [], quiescence = false) => {
+// Blind spots: a human-style way to be weaker. Each move has a chance of simply not being
+// noticed - by the bot for its own moves (so it misses a mate in 1 or a free piece) and for yours
+// (so it walks into a capture it never saw coming). Which moves are invisible is decided once per
+// turn, so the bot is consistently blind to them while it thinks. Captures stand out more than
+// quiet moves, long moves are easier to miss, and when in check every option gets a proper look.
+const blindSpotCheck = (oversight, seed) => (board, move, inCheck) => {
+    let p = oversight
+    if(board[move.to].piece) p *= 0.6
+    if(inCheck) p *= 0.3
+    const [fq, fr] = board[move.from].coords, [tq, tr] = board[move.to].coords
+    if(Math.max(Math.abs(fq - tq), Math.abs(fr - tr), Math.abs(fq + fr - tq - tr)) >= 3) p *= 1.3
+
+    let h = (seed ^ Math.imul(move.from + 1, 0x9E3779B1) ^ Math.imul(move.to + 1, 0x85EBCA77)) >>> 0
+    h = Math.imul(h ^ (h >>> 16), 0x7FEB352D) >>> 0
+    h = Math.imul(h ^ (h >>> 15), 0x846CA68B) >>> 0
+    h = (h ^ (h >>> 16)) >>> 0
+    return h / 4294967296 < Math.min(p, 0.9)
+}
+
+const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLimitMs, evaluate, seen = null, recentOwnMoves = [], quiescence = false, oversight = 0) => {
+    const isBlind = oversight ? blindSpotCheck(oversight, (Math.random() * 4294967296) >>> 0) : null
+    // Splits moves into the ones this bot notices and the ones it doesn't. The unnoticed ones are
+    // only looked at if none of the noticed ones turn out to be legal.
+    const noticed = (board, moves, inCheck) => {
+        if(!isBlind) return { moves, visible: moves.length }
+        const seen = [], missed = []
+        for(const m of moves) (isBlind(board, m, inCheck) ? missed : seen).push(m)
+        return { moves: seen, missed, visible: seen.length }
+    }
+
     // Cells each of our pieces has recently stood on, traced back through our own recent moves.
     const recentCells = from => {
         const cells = new Set()
@@ -338,7 +367,7 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
         if(maximizing){ if(value >= beta) return { score: value }; alpha = Math.max(alpha, value) }
         else { if(value <= alpha) return { score: value }; beta = Math.min(beta, value) }
 
-        const captures = pseudoMoves(board, turn, null).filter(m => board[m.to].piece)
+        const captures = noticed(board, pseudoMoves(board, turn, null).filter(m => board[m.to].piece), false).moves
         captures.sort((a, b) => orderScore(board, b) - orderScore(board, a))
 
         for(const move of captures){
@@ -392,7 +421,7 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
             if(cached.flag == TT_UPPER && cached.score <= alpha) return { score: cached.score, move: cached.move }
         }
 
-        const moves = pseudoMoves(board, turn, ply == 0 ? enPassant : null)
+        const { moves, missed } = noticed(board, pseudoMoves(board, turn, ply == 0 ? enPassant : null), inCheck)
 
         // At the root, shuffle before sorting so equally-good moves are chosen at random.
         // Otherwise ties go to whichever piece comes first on the board, and a bot with nothing
@@ -414,7 +443,13 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
         const maximizing = turn == maximizingColor
         let value = maximizing ? -Infinity : Infinity
 
-        for(const move of moves){
+        // Moves the bot didn't notice go last, and only count if nothing it did notice was legal.
+        const visibleCount = moves.length
+        if(missed?.length) moves.push(...missed)
+
+        for(let i = 0; i < moves.length; i++){
+            const move = moves[i]
+            if(i >= visibleCount && legalCount) break
             const nextBoard = playOnCopy(board, move.from, move.to)
 
             // En passant only lasts one move, so children search without it.
@@ -477,8 +512,10 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
 //   noise          - random error (in pawns) added to every position the bot evaluates, so it
 //                    misjudges close positions the way a human does
 //   blunderChance  - probability of skipping the search and playing a random legal move
+//   oversight      - 0-1, how often a move goes unnoticed (see blindSpotCheck): the human way to
+//                    miss a mate in 1 or hang a piece
 // `timeBudgetMs` (optional) caps thinking time when the bot is on a clock.
-const searchBot = ({ fen, turn, enPassant, seen = null, recentOwnMoves = null, lastOwnMove = null, maxDepth, timeLimitMs, timeBudgetMs = null, evaluate, noise = 0, blunderChance = 0, quiescence = false }) => {
+const searchBot = ({ fen, turn, enPassant, seen = null, recentOwnMoves = null, lastOwnMove = null, maxDepth, timeLimitMs, timeBudgetMs = null, evaluate, noise = 0, blunderChance = 0, quiescence = false, oversight = 0 }) => {
     if(timeBudgetMs != null) timeLimitMs = Math.min(timeLimitMs, timeBudgetMs)
     const board = parseFen(fen)
     const legal = generateAllMoves(board, turn, enPassant)
@@ -495,7 +532,7 @@ const searchBot = ({ fen, turn, enPassant, seen = null, recentOwnMoves = null, l
             : evaluate
         const seenSet = Array.isArray(seen) ? new Set(seen) : null
         const recent = recentOwnMoves || (lastOwnMove ? [lastOwnMove] : [])
-        move = iterativeDeepening(board, turn, enPassant, maxDepth, timeLimitMs, noisyEvaluate, seenSet, recent, quiescence) || legal[0]
+        move = iterativeDeepening(board, turn, enPassant, maxDepth, timeLimitMs, noisyEvaluate, seenSet, recent, quiescence, oversight) || legal[0]
     }
 
     const piece = board[move.from]
