@@ -36,7 +36,7 @@ export const setupNetwork = onFenInit => {
                 return
 
             case 'roomJoined':
-                Game.onRoomJoined?.()
+                Game.onRoomJoined?.(data)
                 if(data.code) setRoomCodeDisplay(data.code)
                 onFenInit(Game.fen)
                 if(Game.result) handleGameOver(Game.result, { quiet: true })
@@ -62,6 +62,7 @@ export const setupNetwork = onFenInit => {
             case 'presence':
                 Game.presence = { white: data.white, black: data.black }
                 Game.updatePlayers?.()
+                Game.onDrawOfferChanged?.()
                 return
 
             case 'assignColor':
@@ -104,6 +105,7 @@ export const setupNetwork = onFenInit => {
                 }
 
                 Game.pendingMove = null
+                Game.selectedPiece = null
                 Game.cells.forEach(cell => cell.isLegalTarget = false)
                 Game.legalMoves = []
                 Game.draggedPiece = null
@@ -117,6 +119,18 @@ export const setupNetwork = onFenInit => {
                 promoUi.dataset.to = data.to
                 return
             }
+
+            case 'rematchOffered':
+                Game.rematchOffer = data.by
+                Game.onDrawOfferChanged?.()
+                if(data.by != Game.playerColor) addSystemMessage('Your opponent wants a rematch.')
+                return
+
+            case 'rematchUnavailable':
+                addSystemMessage('Your opponent has left, so a rematch isn\'t possible.')
+                Game.rematchOffer = null
+                Game.onDrawOfferChanged?.()
+                return
 
             case 'drawOffered':
                 Game.drawOffer = data.by
@@ -170,6 +184,7 @@ export const setupNetwork = onFenInit => {
 
 const handleMove = data => {
     if(Game.state == 'idle') return
+    Game.selectedPiece = null
     Game.turn = data.turn
     Game.legalMap = data.legal || null
     Game.pendingMove = null
@@ -226,7 +241,8 @@ export const setRoomCodeDisplay = code => {
     if (el) el.textContent = code
 }
 
-export const sendStartBotGame = (botId, playerColor = 'white') => send({ type: 'startBotGame', botId, playerColor })
+export const sendStartBotGame = (botId, playerColor = 'white', timeControl = null) => send({ type: 'startBotGame', botId, playerColor, timeControl })
+export const sendRematch = _ => send({ type: 'rematch' })
 
 export const sendBotVsBot = (botA, botB) => send({ type: 'startBotVsBot', botA, botB })
 

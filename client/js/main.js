@@ -132,6 +132,46 @@ const updateStatus = _ => {
     }
 }
 
+// ------ Coordinates ------
+
+// Gliński files run a-l (no j); ranks are chevrons, numbered 1-11 from White's side.
+const FILES = 'abcdefghikl'
+const cellFile = c => FILES[c.q + 5]
+const cellRank = c => 6 - c.r - Math.max(0, c.q)
+
+// Each file is labelled beside its rank-1 cell, and each rank beside its end cell on the viewer's left. Labels are drawn upright in screen space, outside the board's rotation.
+const drawCoordinates = ctx => {
+    const black = Game.playerColor == 'black'
+    const { x: cx, y: cy } = Game.boardCenter
+    const view = c => black ? { x: 2 * cx - c.x, y: 2 * cy - c.y } : { x: c.x, y: c.y }
+
+    ctx.save()
+    ctx.fillStyle = Game.palette.label
+    ctx.font = '600 19px Inter, system-ui, sans-serif'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+
+    // Files are labelled at their rank-1 end: along the bottom for White, along the top for Black
+    // (the far ends of the files share cells with the rank labels, so they'd collide).
+    for(const file of FILES){
+        const cells = Game.cells.filter(c => cellFile(c) == file)
+        const end = cells.reduce((a, b) => cellRank(b) < cellRank(a) ? b : a)
+        const p = view(end)
+        ctx.fillText(file, p.x, p.y + (black ? -56 : 56))
+    }
+
+    for(let rank = 1; rank <= 11; rank++){
+        const cells = Game.cells.filter(c => cellRank(c) == rank)
+        const end = cells.reduce((a, b) => (black ? b.x > a.x : b.x < a.x) ? b : a)
+        const p = view(end)
+        // Ranks 1-6 end on the straight side; 7-11 on the slanted edge above (or below, as Black).
+        const [dx, dy] = rank <= 6 ? [-62, 0] : [-50, black ? 29 : -29]
+        ctx.fillText(String(rank), p.x + dx, p.y + dy)
+    }
+
+    ctx.restore()
+}
+
 const render = _ => {
     const ctx = Game.ctx
     const { scale, ox, oy } = Game.view
@@ -166,6 +206,8 @@ const render = _ => {
     Game.pieces.forEach(piece => piece.display(false, Game.playerColor))
 
     ctx.restore()
+
+    if(Game.palette.coords) drawCoordinates(ctx)
 
     if(Game.playerColor) updateStatus()
 }

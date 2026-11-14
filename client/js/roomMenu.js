@@ -1,6 +1,7 @@
 import { Game } from './game.js'
+import { addSystemMessage } from './chat.js'
 import { ratingLabel, requestLeaderboard, getBeatenBots, markBotBeaten } from './profile.js'
-import { sendRoomCreate, sendRoomJoin, sendStartBotGame, sendBotVsBot, sendStartTournament, sendStartTraining, sendResign, sendOfferDraw, sendAcceptDraw, sendDeclineDraw, sendLeaveRoom } from './network.js'
+import { sendRematch, sendRoomCreate, sendRoomJoin, sendStartBotGame, sendBotVsBot, sendStartTournament, sendStartTraining, sendResign, sendOfferDraw, sendAcceptDraw, sendDeclineDraw, sendLeaveRoom } from './network.js'
 
 const categoryOrder = [
     'Beginner',
@@ -185,6 +186,10 @@ export const setupRoomMenu = _ => {
         btn.replaceChildren(el('i', icon), el('span', '', label))
     }
 
+    const rematchBtn = document.getElementById('rematch-btn')
+    const rematchModalBtn = document.getElementById('rematch-modal-btn')
+    const rematchOfferBox = document.getElementById('rematch-offer')
+
     const updateControls = _ => {
         const playing = isPlaying()
         const showDraw = playing && !isBotGame()
@@ -202,6 +207,28 @@ export const setupRoomMenu = _ => {
 
         const theyOffered = playing && Game.drawOffer && Game.drawOffer != Game.playerColor
         drawOfferBox.classList.toggle('hidden', !theyOffered)
+
+        // Rematch: after the game, for players (and for anyone watching a bot battle).
+        const seated = Game.playerColor == 'white' || Game.playerColor == 'black'
+        const botBattle = Game.matchInfo?.white?.type == 'bot' && Game.matchInfo?.black?.type == 'bot'
+        const over = Game.state == 'gameOver'
+        const canRematch = over && (seated || botBattle)
+        const opponent = Game.playerColor == 'white' ? 'black' : 'white'
+        const opponentGone = seated && !isBotGame() && Game.presence && !Game.presence[opponent]
+        const iAsked = Game.rematchOffer && Game.rematchOffer == Game.playerColor
+
+        for(const btn of [rematchBtn, rematchModalBtn]){
+            btn.classList.toggle('hidden', !canRematch)
+            btn.disabled = Boolean(iAsked || opponentGone)
+            setButton(btn, 'fa-solid fa-rotate', opponentGone ? 'Opponent left' : iAsked ? 'Waiting for opponent…' : 'Rematch')
+        }
+        rematchOfferBox.classList.toggle('hidden', !(over && seated && Game.rematchOffer && !iAsked && !opponentGone))
+    }
+
+    const requestRematch = _ => {
+        if(!isBotGame() && (Game.playerColor == 'white' || Game.playerColor == 'black')) Game.rematchOffer = Game.playerColor
+        sendRematch()
+        updateControls()
     }
 
     Game.onDrawOfferChanged = updateControls
@@ -352,6 +379,9 @@ export const setupRoomMenu = _ => {
     document.getElementById('draw-decline-btn').onclick = _ => sendDeclineDraw()
 
     document.getElementById('view-board').onclick = _ => gameOverOverlay.classList.add('hidden')
+    rematchBtn.onclick = requestRematch
+    rematchModalBtn.onclick = requestRematch
+    document.getElementById('rematch-accept-btn').onclick = requestRematch
 
     const returnHome = _ => {
         layout.classList.add('hidden')
@@ -380,6 +410,7 @@ export const setupRoomMenu = _ => {
         Game.playerColor = null
 
         Game.draggedPiece = null
+        Game.selectedPiece = null
         Game.pendingMove = null
         Game.legalMoves = []
         Game.lastMove = null
@@ -415,6 +446,16 @@ export const setupRoomMenu = _ => {
     renderColorChoice()
 
     const pickBotColor = _ => botColorChoice == 'random' ? (Math.random() < 0.5 ? 'white' : 'black') : botColorChoice
+
+    // Clock against the computer.
+    let botTimeControl = ''
+    const botTcButtons = [...document.querySelectorAll('.bot-tc-btn')]
+    const renderBotTimeControl = _ => botTcButtons.forEach(btn => {
+        btn.classList.toggle('is-active', btn.dataset.botTc == botTimeControl)
+        btn.setAttribute('aria-pressed', btn.dataset.botTc == botTimeControl)
+    })
+    botTcButtons.forEach(btn => btn.onclick = _ => { botTimeControl = btn.dataset.botTc; renderBotTimeControl() })
+    renderBotTimeControl()
 
     // ------ Bot list ------
 
@@ -456,7 +497,7 @@ export const setupRoomMenu = _ => {
                 if(tierBeaten) heading.append(el('span', `tier-progress${tierBeaten == inTier.length ? ' is-complete' : ''}`, `${tierBeaten}/${inTier.length}`))
                 container.append(heading)
             }
-            container.append(renderBotCard(bot, { beaten: beaten.has(bot.id), onClick: b => sendStartBotGame(b.id, pickBotColor()) }))
+            container.append(renderBotCard(bot, { beaten: beaten.has(bot.id), onClick: b => sendStartBotGame(b.id, pickBotColor(), botTimeControl || null) }))
         }
     }
 
@@ -615,13 +656,20 @@ export const setupRoomMenu = _ => {
 
     Game.onRoomCreated = _ => showStatus('')
 
-    Game.onRoomJoined = _ => {
+    Game.onRoomJoined = (data = {}) => {
         menu.classList.add('hidden')
         layout.classList.remove('hidden')
         gameOverOverlay.classList.add('hidden')
-        window.scrollTo(0, 0)
+        if(!data.rematch) window.scrollTo(0, 0)
 
         Game.state = 'playing'
+        Game.rematchOffer = null
+        Game.drawOffer = null
+        Game.check = null
+        if(data.rematch){
+            const you = Game.playerColor == 'white' || Game.playerColor == 'black' ? ` You have ${Game.playerColor == 'white' ? 'White' : 'Black'}.` : ''
+            addSystemMessage(`Rematch started.${you}`)
+        }
         updatePlayers()
         updateControls()
 

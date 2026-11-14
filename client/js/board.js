@@ -5,8 +5,9 @@ import { Piece } from './piece.js'
 
 export let cells = []
 
-export const BOARD_WIDTH = 800
-export const BOARD_HEIGHT = 880
+// Logical drawing area: the board plus a margin for the coordinate labels.
+export const BOARD_WIDTH = 880
+export const BOARD_HEIGHT = 950
 
 export const drawBoard = (colors, stroke, strokeWeight, populateCells) => {
     let cellNum = 0

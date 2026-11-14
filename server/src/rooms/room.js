@@ -20,7 +20,8 @@ class Room {
     // bots: { white?: botId, black?: botId }   botMeta: { white?: {id,name,elo}, black?: {id,name,elo} }
     // profiles: the PlayerStore used to look up and rate signed-in players (optional)
     // timeControl: a key of TIME_CONTROLS, or null for an untimed game
-    constructor(id, { bots = {}, botMeta = {}, profiles = null, timeControl = null, onEmpty } = {}){
+    // spawn: creates a new room with the given options (used for rematches)
+    constructor(id, { bots = {}, botMeta = {}, profiles = null, timeControl = null, onEmpty, spawn = null } = {}){
         this.id = id
         this.players = []
         this.spectators = []
@@ -47,6 +48,10 @@ class Room {
         // (e.g. a stranger fills a disconnected player's spot), the game becomes unrated.
         this.seatProfiles = { white: null, black: null }
         this.unrated = false
+
+        this.spawn = spawn
+        this.timeControl = timeControl
+        this.rematchOffers = new Set()       // colours that have asked for a rematch
         this.rated = false
 
         // Each bot gets a voice. Messages go out as ordinary chat, flagged as coming from a bot.
@@ -318,6 +323,7 @@ class Room {
             case 'acceptDraw': return this.handleAcceptDraw(socket)
             case 'declineDraw': return this.handleDeclineDraw(socket)
             case 'leaveRoom': return this.handleLeave(socket)
+            case 'rematch': return this.handleRematch(socket)
         }
     }
 
@@ -400,10 +406,15 @@ class Room {
         this.botThinking = true
         const ply = this.game.history.length
 
+        // On a clock, a bot budgets its time like a person: roughly a 30th of what's left plus most
+        // of the increment, so a slow Master speeds up instead of losing on time.
+        const budget = this.botTimeBudget(color)
+        const hurried = budget != null && budget < 2000
+
         setTimeout(async _ => {
             let move = null
             try {
-                move = await requestBotMove(botId, { fen: this.game.fen, turn: color, enPassant: this.game.enPassant, seen: this.game.seenPositions(), recentOwnMoves: this.game.recentMovesBy(color) })
+                move = await requestBotMove(botId, { fen: this.game.fen, turn: color, enPassant: this.game.enPassant, seen: this.game.seenPositions(), recentOwnMoves: this.game.recentMovesBy(color), timeBudgetMs: budget })
             }
             catch(e){
                 console.error(`[room ${this.id}] Bot ${botId} failed:`, e.message)
@@ -431,9 +442,17 @@ class Room {
 
             // "Free bishop!" ...then take it, a beat later.
             const announced = move && this.chatters[color]?.beforeOwnMove(move)
-            if(announced) setTimeout(play, BOT_ANNOUNCE_PAUSE_MS)
+            if(announced) setTimeout(play, hurried ? 150 : BOT_ANNOUNCE_PAUSE_MS)
             else play()
-        }, BOT_MOVE_DELAY_MS)
+        }, hurried ? 50 : BOT_MOVE_DELAY_MS)
+    }
+
+    // How long a bot may think this move, or null if it isn't on a clock.
+    botTimeBudget(color){
+        const clock = this.clockState()
+        if(!clock) return null
+        const remaining = clock.remaining[color]
+        return Math.max(150, Math.min(remaining / 30 + clock.incrementMs * 0.7, remaining / 3))
     }
 
     handleResign(socket){
@@ -456,6 +475,58 @@ class Room {
         if(!this.isPlayer(socket) || !this.drawOffer || this.drawOffer == socket.color) return
         this.drawOffer = null
         this.broadcast({ type: 'drawDeclined', by: socket.color })
+    }
+
+    // ------ Rematch ------
+
+    // Moves a client into another room, as if they'd joined it themselves.
+    moveClient(socket, room){
+        this.players = this.players.filter(p => p != socket)
+        this.spectators = this.spectators.filter(s => s != socket)
+        socket.room = room
+        room.addClient(socket)
+        this.send(socket, { type: 'roomJoined', code: room.id, rematch: true })
+    }
+
+    // Same opponent(s), colours swapped, same clock. Against a bot (or watching two bots) it starts
+    // straight away; between two people both have to ask.
+    handleRematch(socket){
+        if(!this.game.result || !this.spawn || this.destroyed) return
+        const swap = c => c == 'white' ? 'black' : 'white'
+
+        if(this.isBotVsBot){
+            const room = this.spawn({
+                bots: { white: this.bots.black, black: this.bots.white },
+                botMeta: { white: this.botMeta.black, black: this.botMeta.white }
+            })
+            for(const s of [...this.spectators]) this.moveClient(s, room)
+            return this.destroy()
+        }
+
+        if(!this.isPlayer(socket)) return
+
+        if(this.isBotGame){
+            const botColor = swap(socket.color)
+            const room = this.spawn({
+                bots: { [socket.color]: this.bots[botColor] },
+                botMeta: { [socket.color]: this.botMeta[botColor] },
+                timeControl: this.timeControl
+            })
+            this.moveClient(socket, room)
+            if(!this.players.length) this.destroy()
+            return
+        }
+
+        if(this.players.length < 2) return this.send(socket, { type: 'rematchUnavailable' })
+
+        this.rematchOffers.add(socket.color)
+        if(this.rematchOffers.size < 2) return this.broadcast({ type: 'rematchOffered', by: socket.color })
+
+        // Both agreed. Seat last game's Black first so they get White this time.
+        const room = this.spawn({ timeControl: this.timeControl })
+        const order = [...this.players].sort((a, b) => (a.color == 'black' ? -1 : 1) - (b.color == 'black' ? -1 : 1))
+        for(const s of order) this.moveClient(s, room)
+        if(!this.players.length && !this.spectators.length) this.destroy()
     }
 
     // Leaving mid-game is a resignation; leaving after it ends is just leaving.

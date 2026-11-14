@@ -443,7 +443,9 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
 //   noise          - random error (in pawns) added to every position the bot evaluates, so it
 //                    misjudges close positions the way a human does
 //   blunderChance  - probability of skipping the search and playing a random legal move
-const searchBot = ({ fen, turn, enPassant, seen = null, recentOwnMoves = null, lastOwnMove = null, maxDepth, timeLimitMs, evaluate, noise = 0, blunderChance = 0, quiescence = false }) => {
+// `timeBudgetMs` (optional) caps thinking time when the bot is on a clock.
+const searchBot = ({ fen, turn, enPassant, seen = null, recentOwnMoves = null, lastOwnMove = null, maxDepth, timeLimitMs, timeBudgetMs = null, evaluate, noise = 0, blunderChance = 0, quiescence = false }) => {
+    if(timeBudgetMs != null) timeLimitMs = Math.min(timeLimitMs, timeBudgetMs)
     const board = parseFen(fen)
     const legal = generateAllMoves(board, turn, enPassant)
     if(!legal.length) return null

@@ -65,3 +65,58 @@ test('untimed games have no clock; unknown time controls fall back to untimed', 
     const r2 = new Room('X', { timeControl: '1+0' })
     assert.strictEqual(r2.clock, null)
 })
+
+test('rematch: both players must ask; then a new game starts with colours swapped and the same clock', _ => {
+    const matchmaker = require('../src/rooms/matchmaker')
+    const room = matchmaker.createRoom({ timeControl: '5+3' })
+    const white = fakeSocket(), black = fakeSocket()
+    room.addClient(white); white.room = room
+    room.addClient(black); black.room = room
+
+    room.handleMessage(white, { type: 'rematch' })               // game not over yet: ignored
+    assert.strictEqual(white.last('rematchOffered'), undefined)
+
+    room.handleMessage(white, { type: 'resign' })
+    room.handleMessage(white, { type: 'rematch' })
+    assert.strictEqual(black.last('rematchOffered').by, 'white')
+    assert.strictEqual(white.room, room)
+
+    room.handleMessage(black, { type: 'rematch' })
+    assert.notStrictEqual(white.room, room)
+    assert.strictEqual(white.room, black.room)
+    assert.strictEqual(white.last('assignColor').color, 'black')
+    assert.strictEqual(black.last('assignColor').color, 'white')
+    assert.strictEqual(white.room.clock.name, '5+3')
+    assert.ok(room.destroyed, 'the old room is cleaned up')
+    white.room.destroy()
+})
+
+test('rematch against a bot starts at once with colours swapped', _ => {
+    const matchmaker = require('../src/rooms/matchmaker')
+    // Keep bots from actually thinking (that would start worker threads and keep the test alive).
+    const realSchedule = Room.prototype.scheduleBotMove
+    Room.prototype.scheduleBotMove = _ => {}
+    test.after(_ => { Room.prototype.scheduleBotMove = realSchedule })
+
+    const room = matchmaker.createRoom({ bots: { black: 'timothyWells' }, botMeta: { black: { id: 'timothyWells', name: 'Timothy Wells', elo: 100 } }, timeControl: '3+2' })
+    const me = fakeSocket()
+    room.addClient(me); me.room = room
+    room.handleMessage(me, { type: 'resign' })
+    room.handleMessage(me, { type: 'rematch' })
+
+    assert.notStrictEqual(me.room, room)
+    assert.strictEqual(me.last('assignColor').color, 'black')
+    assert.strictEqual(me.room.bots.white, 'timothyWells')
+    assert.strictEqual(me.room.clock.name, '3+2')
+    me.room.destroy()
+})
+
+test('a bot on a clock budgets its thinking time', _ => {
+    const room = new Room('B', { bots: { black: 'victorKane' }, timeControl: '3+2' })
+    room.clock.remaining.black = 30000
+    const budget = room.botTimeBudget('black')
+    assert.ok(budget > 1000 && budget < 3000, `30s left on 3+2 -> about 2.4s per move (got ${budget})`)
+    room.clock.remaining.black = 600
+    assert.ok(room.botTimeBudget('black') <= 300, 'nearly flagged -> hurry')
+    room.destroy()
+})

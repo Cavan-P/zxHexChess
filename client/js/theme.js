@@ -11,7 +11,7 @@ export const SCHEMES = [
 ]
 
 const STORAGE_KEY = 'qrs.theme'
-const DEFAULTS = { scheme: 'classic', mode: 'light', finish: 'wood' }
+const DEFAULTS = { scheme: 'classic', mode: 'light', finish: 'wood', coords: 'on' }
 
 const load = _ => {
     try { return { ...DEFAULTS, ...JSON.parse(localStorage.getItem(STORAGE_KEY)) } }
@@ -103,6 +103,8 @@ const buildPalette = _ => {
         edge,
         ink: alpha => `rgba(${er}, ${eg}, ${eb}, ${alpha})`,
         hint: cssVar('--hint'),
+        label: cssVar('--text-muted'),
+        coords: prefs.coords != 'off',
         highlight: alpha => `rgba(${cssVar('--highlight-rgb')}, ${alpha})`
     }
 }
@@ -138,6 +140,7 @@ const renderPicker = _ => {
     })
     document.querySelectorAll('[data-theme-mode]').forEach(btn => btn.classList.toggle('is-active', btn.dataset.themeMode == prefs.mode))
     document.querySelectorAll('[data-theme-finish]').forEach(btn => btn.classList.toggle('is-active', btn.dataset.themeFinish == prefs.finish))
+    document.querySelectorAll('[data-theme-coords]').forEach(btn => btn.classList.toggle('is-active', btn.dataset.themeCoords == prefs.coords))
 }
 
 export const setupThemePicker = _ => {
@@ -162,6 +165,7 @@ export const setupThemePicker = _ => {
 
     document.querySelectorAll('[data-theme-mode]').forEach(btn => btn.onclick = _ => applyTheme({ mode: btn.dataset.themeMode }))
     document.querySelectorAll('[data-theme-finish]').forEach(btn => btn.onclick = _ => applyTheme({ finish: btn.dataset.themeFinish }))
+    document.querySelectorAll('[data-theme-coords]').forEach(btn => btn.onclick = _ => applyTheme({ coords: btn.dataset.themeCoords }))
 
     const open = _ => { renderPicker(); modal.classList.remove('hidden') }
     const close = _ => modal.classList.add('hidden')

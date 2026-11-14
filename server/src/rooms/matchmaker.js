@@ -22,7 +22,12 @@ class Matchmaker {
             code = this.generateCode()
         } while (this.rooms.has(code))
 
-        const room = new Room(code, { profiles: this.profiles, ...options, onEmpty: r => this.removeRoom(r.id) })
+        const room = new Room(code, {
+            profiles: this.profiles,
+            ...options,
+            onEmpty: r => this.removeRoom(r.id),
+            spawn: opts => this.createRoom(opts)      // lets a room start its own rematch
+        })
         this.rooms.set(code, room)
         return room
     }

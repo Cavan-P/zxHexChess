@@ -92,9 +92,11 @@ const handlers = {
         const playerColor = data.playerColor == 'black' ? 'black' : 'white'
         const botColor = playerColor == 'white' ? 'black' : 'white'
 
+        const timeControl = Object.prototype.hasOwnProperty.call(Room.TIME_CONTROLS, data.timeControl) ? data.timeControl : null
         const room = matchmaker.createRoom({
             bots: { [botColor]: data.botId },
-            botMeta: { [botColor]: getBotMeta(data.botId) }
+            botMeta: { [botColor]: getBotMeta(data.botId) },
+            timeControl
         })
 
         joinRoom(socket, room)

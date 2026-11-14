@@ -1,4 +1,5 @@
 import { Game } from "./game.js";
+import { clearSelection } from "./piece.js";
 
 // Converts a pointer position on the page into the board's logical coordinate space,
 // undoing the canvas scale/offset and the 180° flip used when playing Black.
@@ -29,6 +30,20 @@ export const setupInput = _ => {
 
     Game.canvas.addEventListener('pointerdown', e => {
         updatePosition(e)
+
+        // Tap-to-move: with a piece selected, tapping a highlighted cell plays the move.
+        const selected = Game.selectedPiece
+        if(selected && Game.state == 'playing' && Game.turn == Game.playerColor){
+            const cell = Game.cells.find(c => c.checkMouseHover())
+            if(cell?.isLegalTarget){
+                selected.tapMoveTo(cell)
+                return
+            }
+            // Tapping anywhere that isn't one of our own pieces cancels the selection.
+            const ownPiece = cell?.occupied && cell.occupiedByMyColor(Game.playerColor)
+            if(!ownPiece) clearSelection()
+        }
+
         Game.mouse.pressed = true
     })
 

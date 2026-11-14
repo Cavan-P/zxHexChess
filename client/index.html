@@ -134,6 +134,17 @@
               </div>
             </div>
 
+            <div class="mt-3 flex flex-wrap items-center gap-3">
+              <span class="text-sm font-medium"><i class="fa-regular fa-clock mr-1"></i>Clock</span>
+              <div class="segmented" role="group" aria-label="Time control against the computer">
+                <button data-bot-tc="" class="bot-tc-btn">None</button>
+                <button data-bot-tc="3+2" class="bot-tc-btn">3+2</button>
+                <button data-bot-tc="5+3" class="bot-tc-btn">5+3</button>
+                <button data-bot-tc="10+5" class="bot-tc-btn">10+5</button>
+                <button data-bot-tc="15+10" class="bot-tc-btn">15+10</button>
+              </div>
+            </div>
+
             <a href="#local" class="btn btn-primary mt-5 w-full py-3 text-base">
               Choose an opponent <i class="fa-solid fa-arrow-down"></i>
             </a>
@@ -338,6 +349,14 @@
         </div>
 
         <!-- Controls -->
+        <!-- Incoming rematch request -->
+        <div id="rematch-offer" class="hidden card flex items-center justify-between gap-2 border-(--accent-deep)! px-3 py-2 text-sm">
+          <span class="font-medium text-(--text-strong)"><i class="fa-solid fa-rotate mr-1.5 text-(--accent-deep)"></i>Rematch?</span>
+          <button id="rematch-accept-btn" class="btn btn-primary btn-sm">Accept</button>
+        </div>
+
+        <button id="rematch-btn" class="btn btn-primary btn-sm hidden"><i class="fa-solid fa-rotate"></i><span>Rematch</span></button>
+
         <div id="game-controls" class="grid grid-cols-2 gap-2 empty:hidden">
           <button id="draw-btn" class="btn btn-secondary btn-sm"><i class="fa-solid fa-handshake"></i><span>Offer draw</span></button>
           <button id="resign-btn" class="btn btn-danger btn-sm"><i class="fa-solid fa-flag"></i><span>Resign</span></button>
@@ -372,8 +391,9 @@
         <p id="game-over-rating" class="mt-3 hidden text-sm font-semibold"></p>
         <div class="mb-6"></div>
         <div class="grid grid-cols-2 gap-2">
+          <button id="rematch-modal-btn" class="btn btn-primary col-span-2"><i class="fa-solid fa-rotate"></i><span>Rematch</span></button>
           <button id="view-board" class="btn btn-secondary">View board</button>
-          <button id="return-home" class="btn btn-primary">New game</button>
+          <button id="return-home" class="btn btn-secondary">New game</button>
         </div>
       </div>
     </div>
@@ -400,6 +420,13 @@
           <div class="segmented" role="group" aria-label="Board finish">
             <button data-theme-finish="wood">Wood</button>
             <button data-theme-finish="flat">Flat</button>
+          </div>
+        </div>
+        <div class="mt-3 flex items-center justify-between gap-3">
+          <span class="text-sm font-medium">Coordinates</span>
+          <div class="segmented" role="group" aria-label="Board coordinates">
+            <button data-theme-coords="on">Show</button>
+            <button data-theme-coords="off">Hide</button>
           </div>
         </div>
       </div>

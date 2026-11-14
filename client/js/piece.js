@@ -12,6 +12,12 @@ const SPRITES = {
     "k":[0,200],    "K":[0,0]
 }
 
+// Drops any tap-selection and its move highlights.
+export const clearSelection = _ => {
+    Game.selectedPiece = null
+    Game.cells.forEach(cell => cell.isLegalTarget = false)
+}
+
 export class Piece {
     constructor(piece, x, y, cellSize, ctx){
         this.piece = piece
@@ -56,7 +62,6 @@ export class Piece {
     drop(){
         this.isDragging = false
         Game.draggedPiece = null
-        Game.cells.forEach(cell => cell.isLegalTarget = false)
         this.targetSize = this.defaultSize
 
         let dropCell = null
@@ -67,29 +72,55 @@ export class Piece {
             }
         }
 
+        // Released on its own cell: that's a tap. Select the piece (keeping its highlights) so the
+        // next tap on a highlighted cell moves it - or deselect it if it was already selected.
+        if(dropCell == this.originalCell){
+            this.snapBack()
+            if(this.wasSelected) clearSelection()
+            else Game.selectedPiece = this
+            return
+        }
+
+        clearSelection()
+
         if(!dropCell || !Game.legalMoves.includes(dropCell.num)){
             this.snapBack()
             return
         }
 
+        // Park the piece on its new cell right away. Its animation target must move too, or it
+        // slides back to where it came from while waiting for the server to confirm the move.
+        this.sendMove(dropCell)
+        this.x = dropCell.x
+        this.y = dropCell.y
+    }
+
+    // Tap-to-move: glide from the selected piece's cell to the tapped one.
+    tapMoveTo(cell){
+        this.originalCell = this.currentCell
+        this.startX = this.currentCell.x
+        this.startY = this.currentCell.y
+        clearSelection()
+        this.sendMove(cell)
+    }
+
+    sendMove(cell){
         Game.socket.send(JSON.stringify({
             type: 'attemptMove',
             from: this.originalCell.num,
-            to: dropCell.num
+            to: cell.num
         }))
 
         Game.pendingMove = {
             piece: this,
             from: this.originalCell.num,
-            to: dropCell.num,
+            to: cell.num,
             originalX: this.startX,
             originalY: this.startY
         }
 
-        // Park the piece on its new cell right away. Its animation target must move too, or it
-        // slides back to where it came from while waiting for the server to confirm the move.
-        this.x = this.targetX = dropCell.x
-        this.y = this.targetY = dropCell.y
+        this.targetX = cell.x
+        this.targetY = cell.y
     }
 
     // Glide back to the starting cell (an illegal drop, or the server rejected the move).
@@ -119,6 +150,7 @@ export class Piece {
             if(this.isMyPiece(Game.playerColor)){
 
                 Game.draggedPiece = this
+                this.wasSelected = Game.selectedPiece == this
 
                 this.isDragging = true
                 this.startX = this.x

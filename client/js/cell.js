@@ -69,7 +69,7 @@ export class Cell {
         }
 
         // The cell a piece is being dragged from.
-        if(Game.draggedPiece?.originalCell == this){
+        if(Game.draggedPiece?.originalCell == this || (Game.selectedPiece?.currentCell == this && !Game.pendingMove)){
             drawHexagon(this.x, this.y, this.size - 3, Game.palette.highlight(0.55), true, Game.palette.ink(0.6), 3, this.ctx)
         }
 
