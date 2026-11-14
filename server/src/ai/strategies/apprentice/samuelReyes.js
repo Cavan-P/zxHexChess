@@ -6,7 +6,7 @@ module.exports = makeEngineBot({
     description: "Every piece needs a job. Never gives anything away for free. Rarely. Okay, sometimes.",
     category: 'Apprentice',
     icon: "fa-chess-rook",
-    elo: 471
+    elo: 500
 }, {
     maxDepth: 2, timeLimitMs: 1000, eval: 'positional', blunderChance: 0.05
 })

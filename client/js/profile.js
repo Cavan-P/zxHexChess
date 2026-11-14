@@ -203,6 +203,13 @@ export const setupProfile = _ => {
         send({ type: 'register', name })
     }
 
+    // Back to a fresh 800 rating with no games, history or beaten bots (the name stays).
+    $('profile-reset').onclick = _ => {
+        if(!confirm('Reset your rating, record and beaten bots? This can\'t be undone.')) return
+        storage.remove(BEATEN_KEY)
+        send({ type: 'resetProfile' })
+    }
+
     $('profile-rename-form').onsubmit = e => {
         e.preventDefault()
         const name = $('profile-rename-input').value.trim()

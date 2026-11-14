@@ -15,6 +15,6 @@ module.exports = {
     description: "The middle of the board belongs to Marcus. Thinks a few moves deep to keep it that way.",
     category: 'Advanced',
     icon: 'fa-chess-knight',
-    elo: 930,
+    elo: 940,
     play: strategy
 }

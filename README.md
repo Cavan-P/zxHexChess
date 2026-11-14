@@ -1,7 +1,7 @@
 # QRSChess
 
 QRSChess is my third, and probably final, attempt at a Hexagonal chess engine.
-It's a web-based implementation of Gliński's variant of hexagonal chess. You can play a friend online, join someone's open game, or play one of 23 bots.
+It's a web-based implementation of Gliński's variant of hexagonal chess. You can play a friend online, join someone's open game, or play one of 27 bots.
 
 Play it at qrschess.itscavanp.dev.
 
@@ -9,7 +9,7 @@ Play it at qrschess.itscavanp.dev.
 
 - Online games with a room code, or post an open game that anyone can join from the home page
 - Clocks (bullet up to classical, with or without increment), rematches, draw offers, resigning
-- 23 bots from "plays randomly" up to a few that'll actually beat you. They also talk a bit of trash in chat
+- 27 bots from "plays randomly" up to a few that'll actually beat you. They also talk a bit of trash in chat
 - Elo ratings and a leaderboard. You just pick a name, no accounts or passwords
 - Drag or tap to move, premoves, step back through the moves, board coordinates
 - A few color themes (light and dark), a wood board, and sound effects

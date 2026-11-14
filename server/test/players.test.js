@@ -159,3 +159,19 @@ test('titles: earned from an established peak, kept after a drop, and given to b
     const cornelius = require('../src/ai/botManager').getBotList().find(b => b.id == 'corneliusAshby')
     assert.ok(cornelius.title, 'top bots carry titles')
 })
+
+test('resetting progress keeps the name and token but wipes rating, record and beaten bots', _ => {
+    const store = tempStore()
+    const { player, token } = store.register('Fresh Start')
+    store.recordBotGame(player.id, 1500, 1, 'elenaVoss')
+    store.players[player.id].titlePeak = 1500
+
+    const res = store.resetProgress(player.id)
+    assert.strictEqual(res.player.name, 'Fresh Start')
+    assert.strictEqual(res.player.elo, STARTING_ELO)
+    assert.strictEqual(res.player.gamesPlayed, 0)
+    assert.deepStrictEqual(res.player.botsBeaten, {})
+    assert.strictEqual(res.player.title, null)
+    assert.ok(store.authenticate(player.id, token))
+    assert.ok(store.resetProgress('missing').error)
+})

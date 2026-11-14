@@ -513,6 +513,53 @@ const BOTS = {
         }
     },
 
+    felixMarsh: {
+        chattiness: 0.35,
+        awareness: 0.75,
+        lines: {
+            greeting: ['Evening, {name}. Nothing fancy from me, I\'m afraid.', 'Good luck. I\'ll be doing the sensible thing.'],
+            idle: ['No rush. The sensible move will still be there.', 'Same plan as always. It usually works.'],
+            playerHangs: ['Your {piece} on {cell} wasn\'t protected. I\'ll take the sensible option.'],
+            botBlunder: ['Hm. That wasn\'t sensible of me.', 'Well. That\'s not in the plan.'],
+            brilliantSac: ['That was not sensible. It was also very good.'],
+            playerChecks: ['Check. Fine. King steps aside.'],
+            botChecks: ['Check.'],
+            winning: ['Slow and steady, as usual.'],
+            losing: ['Steady isn\'t cutting it tonight.'],
+            drawish: ['Nothing happening. Suits me fine. Draw?'],
+            win: ['Checkmate. Nothing fancy. Good game, {name}.'],
+            loss: ['Well played. You broke the routine.'],
+            draw: ['A draw. Sensible result.'],
+            replyHello: ['Evening.'],
+            replyGG: ['Good game.'],
+            reply: ['Mm.', 'Fair enough.']
+        }
+    },
+
+    danaWhitlock: {
+        chattiness: 0.6,
+        awareness: 0.85,
+        lines: {
+            greeting: ['Hi {name}! Hope you like trading.', 'Let\'s make a mess. A mess I come out of a pawn up.'],
+            idle: ['Anything you want to swap? I\'m open.', 'So many pieces still on the board. We should fix that.'],
+            playerHangs: ['Free {piece}? Even better than a trade.', 'That {piece} on {cell} is just sitting there. Mine.'],
+            botBlunder: ['Wait, that wasn\'t an even trade. Ugh.', 'Okay, I lost that swap.'],
+            brilliantSac: ['You traded down on purpose and it WORKED? Rude. Nice.'],
+            playerChecks: ['Check, sure. Want to trade queens instead?'],
+            botChecks: ['Check!', 'Check. Shall we swap something?'],
+            botCaptures: ['Trade accepted.', 'I\'ll take that {piece}.'],
+            winning: ['Every trade makes my extra pawn bigger.'],
+            losing: ['These trades are not going my way.'],
+            drawish: ['We traded everything. Draw-ish, I guess.'],
+            win: ['Checkmate! Good game, {name}.'],
+            loss: ['Well played! You won the trades.'],
+            draw: ['A draw. Fair swap.'],
+            replyHello: ['Hey! Good luck.'],
+            replyGG: ['GG!'],
+            reply: ['Ha, maybe.', 'Trade you for it.']
+        }
+    },
+
     yukiTanaka: {
         chattiness: 0.35,
         awareness: 0.85,
@@ -533,6 +580,29 @@ const BOTS = {
             replyHello: ['Hello. Thank you for playing.'],
             replyGG: ['Thank you. Good game.'],
             reply: ['Mm.', 'Perhaps.']
+        }
+    },
+
+    miraCastellanos: {
+        chattiness: 0.25,
+        awareness: 0.9,
+        lines: {
+            greeting: ['Hello, {name}.', 'Good luck.'],
+            idle: ['...', 'Take your time.'],
+            playerHangs: ['Your {piece} on {cell}. Thank you.'],
+            botBlunder: ['Oh. I missed that.', 'Hm. Well found.'],
+            brilliantSac: ['That was beautiful.'],
+            playerChecks: ['Check. I know.'],
+            botChecks: ['Check.'],
+            winning: ['It\'s almost done.'],
+            losing: ['You\'ve seen further than me.'],
+            drawish: ['Level. A draw is fine.'],
+            win: ['Checkmate. Good game, {name}.'],
+            loss: ['Well played. Really.'],
+            draw: ['A draw.'],
+            replyHello: ['Hi.'],
+            replyGG: ['Good game.'],
+            reply: ['Mm.', '...']
         }
     },
 
@@ -560,6 +630,29 @@ const BOTS = {
     },
 
     // ---------------- Master ----------------
+
+    henrikSolberg: {
+        chattiness: 0.45,
+        awareness: 0.9,
+        lines: {
+            greeting: ['Good evening, {name}. Let us see how your structure holds up.', 'Hello. I\'ll be checking your foundations.'],
+            idle: ['Every position has a weak point. I am looking for yours.', 'Measure twice, move once.'],
+            playerHangs: ['Your {piece} on {cell} carries no support. It will not hold.'],
+            botBlunder: ['A design flaw. I will note it.', 'Hm. My tolerances were off.'],
+            brilliantSac: ['You removed a load-bearing piece on purpose. Impressive engineering.'],
+            playerChecks: ['Check. The structure holds.'],
+            botChecks: ['Check.'],
+            winning: ['Your position is starting to buckle.'],
+            losing: ['My structure is failing. Well built, {name}.'],
+            drawish: ['Both structures are sound. A draw is the honest result.'],
+            win: ['Checkmate. Good game, {name}. Load exceeded.'],
+            loss: ['Well played. You found the weak point.'],
+            draw: ['A draw. Solid work on both sides.'],
+            replyHello: ['Good evening.'],
+            replyGG: ['Good game. Well built.'],
+            reply: ['Hm.', 'Perhaps.']
+        }
+    },
 
     victorKane: {
         chattiness: 0.3,

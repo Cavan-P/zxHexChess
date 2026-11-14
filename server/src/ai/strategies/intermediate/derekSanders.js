@@ -15,6 +15,6 @@ module.exports = {
     description: "Finally stopped guessing! Actually looks at the board now. Just... not very far into it.",
     category: 'Intermediate',
     icon: 'fa-chess-bishop',
-    elo: 564,
+    elo: 590,
     play: strategy
 }

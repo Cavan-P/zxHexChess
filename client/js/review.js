@@ -1,3 +1,4 @@
+import { cancelPremove } from './premove.js'
 import { Game } from './game.js'
 import { populateBoardFromFen } from './board.js'
 import { clearSelection } from './piece.js'
@@ -19,7 +20,7 @@ const showPosition = ply => {
 
 export const showPly = ply => {
     if(!Game.positions?.length) return
-    Game.premove = null
+    cancelPremove()
     ply = Math.max(0, Math.min(lastPly(), ply))
     if(ply == lastPly()) return goLive()
     Game.viewPly = ply

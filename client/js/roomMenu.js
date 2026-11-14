@@ -492,7 +492,7 @@ export const setupRoomMenu = _ => {
 
         Game.draggedPiece = null
         Game.selectedPiece = null
-        Game.premove = null
+        Game.premoves = []
         Game.viewPly = null
         Game.positions = []
         Game.plyMoves = []
@@ -553,12 +553,9 @@ export const setupRoomMenu = _ => {
 
     const renderBotGrid = _ => {
         const beaten = getBeatenBots()
-        const beatenCount = Game.botList.filter(b => beaten.has(b.id)).length
         const tiers = new Set(Game.botList.map(b => b.category)).size
 
-        document.getElementById('bot-count').textContent = beatenCount
-            ? `${Game.botList.length} opponents across ${tiers} skill levels · ${beatenCount} beaten`
-            : `${Game.botList.length} opponents across ${tiers} skill levels.`
+        document.getElementById('bot-count').textContent = `${Game.botList.length} opponents across ${tiers} skill levels.`
 
         const container = document.getElementById('bot-grid')
         container.replaceChildren()
@@ -567,11 +564,7 @@ export const setupRoomMenu = _ => {
         for(const bot of Game.botList){
             if(bot.category != currentCategory){
                 currentCategory = bot.category
-                const inTier = Game.botList.filter(b => b.category == currentCategory)
-                const tierBeaten = inTier.filter(b => beaten.has(b.id)).length
-                const heading = el('h3', 'tier-heading', currentCategory)
-                if(tierBeaten) heading.append(el('span', `tier-progress${tierBeaten == inTier.length ? ' is-complete' : ''}`, `${tierBeaten}/${inTier.length}`))
-                container.append(heading)
+                container.append(el('h3', 'tier-heading', currentCategory))
             }
             container.append(renderBotCard(bot, { beaten: beaten.has(bot.id), onClick: b => sendStartBotGame(b.id, pickBotColor(), botTimeControl()) }))
         }

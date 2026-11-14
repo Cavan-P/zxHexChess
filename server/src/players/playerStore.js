@@ -111,6 +111,19 @@ class PlayerStore {
         return { player: this.publicProfile(id) }
     }
 
+    // Wipes a player's rating, record, history and beaten bots, keeping their name and token.
+    resetProgress(id){
+        const player = this.players[id]
+        if(!player) return { error: 'Unknown player' }
+        Object.assign(player, {
+            elo: STARTING_ELO, peak: STARTING_ELO, wins: 0, losses: 0, draws: 0, gamesPlayed: 0,
+            history: [{ t: Date.now(), elo: STARTING_ELO }], botsBeaten: {}
+        })
+        delete player.titlePeak
+        this.save()
+        return { player: this.publicProfile(id) }
+    }
+
     get(id){
         return this.players[id] ? this.publicProfile(id) : null
     }

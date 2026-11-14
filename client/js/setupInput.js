@@ -1,7 +1,7 @@
 import { Game } from "./game.js";
 import { clearSelection } from "./piece.js";
 import { goLive } from "./review.js";
-import { canPremove, setPremove, cancelPremove } from "./premove.js";
+import { canPremove, setPremove, cancelPremove, virtualOccupant } from "./premove.js";
 
 // Converts a pointer position on the page into the board's logical coordinate space,
 // undoing the canvas scale/offset and the 180° flip used when playing Black.
@@ -40,9 +40,12 @@ export const setupInput = _ => {
         }
 
         const cell = Game.cells.find(c => c.checkMouseHover())
-        const ownPiece = cell?.occupied && cell.occupiedByMyColor(Game.playerColor)
         const myTurn = Game.state == 'playing' && Game.turn == Game.playerColor
         const premoving = canPremove()
+        // While premoving, "your piece" means where it will be once the queued premoves play.
+        const ownPiece = cell && (premoving
+            ? Boolean(virtualOccupant(cell.num)?.isMyPiece(Game.playerColor))
+            : cell.occupied && cell.occupiedByMyColor(Game.playerColor))
 
         // Tap-to-move: with a piece selected, tapping a highlighted cell plays the move (or, during
         // the opponent's turn, queues it as a premove).
@@ -50,15 +53,15 @@ export const setupInput = _ => {
         if(selected && (myTurn || premoving)){
             if(cell?.isLegalTarget){
                 if(myTurn) selected.tapMoveTo(cell)
-                else { setPremove(selected.currentCell.num, cell.num); clearSelection() }
+                else { setPremove(selected.homeCell().num, cell.num); clearSelection() }
                 return
             }
             // Tapping anywhere that isn't one of our own pieces cancels the selection.
             if(!ownPiece) clearSelection()
         }
 
-        // Tapping an empty cell (or an enemy piece) clears a queued premove.
-        if(Game.premove && !ownPiece) cancelPremove()
+        // Tapping an empty cell (or an enemy piece) clears the queued premoves.
+        if(Game.premoves?.length && !ownPiece) cancelPremove()
 
         Game.mouse.pressed = true
     })

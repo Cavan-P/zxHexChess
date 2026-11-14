@@ -16,6 +16,6 @@ module.exports = {
     description: "Calculates the long lines so you don't have to. An undefended piece is basically an invitation.",
     category: 'Expert',
     icon: 'fa-chess-queen',
-    elo: 1528,
+    elo: 1505,
     play: strategy
 }

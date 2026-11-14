@@ -68,8 +68,8 @@ export class Cell {
             drawHexagon(this.x, this.y, this.size, Game.palette.highlight(0.75), false, 'black', 0, this.ctx)
         }
 
-        // A queued premove: both cells tinted blue.
-        if(Game.premove && (Game.premove.from == this.num || Game.premove.to == this.num)){
+        // Queued premoves: their cells tinted blue.
+        if(Game.premoves?.some(m => m.from == this.num || m.to == this.num)){
             drawHexagon(this.x, this.y, this.size, 'rgba(70, 130, 220, 0.42)', false, 'black', 0, this.ctx)
         }
 

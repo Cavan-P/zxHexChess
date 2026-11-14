@@ -16,6 +16,6 @@ module.exports = {
     description: "Keeps his king locked down tight and waits for you to slip. Bring your best game. Seriously.",
     category: 'Master',
     icon: 'fa-chess-king',
-    elo: 1766,
+    elo: 1725,
     play: strategy
 }

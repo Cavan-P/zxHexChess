@@ -117,6 +117,14 @@ const handlers = {
         send(socket, { type: 'profile', player: res.player })
     },
 
+    resetProfile(socket){
+        if(!socket.profileId) return send(socket, { type: 'profileError', message: 'Create a profile first' })
+        const res = profiles.resetProgress(socket.profileId)
+        if(res.error) return send(socket, { type: 'profileError', message: res.error })
+        send(socket, { type: 'profile', player: res.player })
+        send(socket, { type: 'leaderboard', players: profiles.leaderboard(25) })
+    },
+
     getLeaderboard(socket){
         send(socket, { type: 'leaderboard', players: profiles.leaderboard(25) })
     },

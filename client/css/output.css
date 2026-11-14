@@ -894,6 +894,9 @@
   .decoration-dotted {
     text-decoration-style: dotted;
   }
+  .underline-offset-2 {
+    text-underline-offset: 2px;
+  }
   .antialiased {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -954,10 +957,24 @@
       }
     }
   }
+  .hover\:text-\(--danger\) {
+    &:hover {
+      @media (hover: hover) {
+        color: var(--danger);
+      }
+    }
+  }
   .hover\:text-\(--text-strong\) {
     &:hover {
       @media (hover: hover) {
         color: var(--text-strong);
+      }
+    }
+  }
+  .hover\:underline {
+    &:hover {
+      @media (hover: hover) {
+        text-decoration-line: underline;
       }
     }
   }
@@ -1655,20 +1672,6 @@
     color: #fff;
     font-size: 0.6rem;
     box-shadow: 0 0 0 2px var(--bg-card);
-  }
-  .tier-progress {
-    order: 2;
-    margin-left: 0.25rem;
-    padding: 0 0.45rem;
-    border-radius: 999px;
-    background: var(--bg-sunken);
-    color: var(--text-main);
-    font-size: 0.7rem;
-    letter-spacing: 0.04em;
-  }
-  .tier-progress.is-complete {
-    background: var(--success);
-    color: #fff;
   }
   .captured-strip {
     display: flex;

@@ -6,7 +6,7 @@ module.exports = makeEngineBot({
     description: "Plays fast and goes with his gut. His gut is right about half the time, which he considers a great record.",
     category: 'Apprentice',
     icon: "fa-bolt",
-    elo: 388
+    elo: 425
 }, {
     maxDepth: 1, timeLimitMs: 600, eval: 'material', noise: 1.5
 })

@@ -443,17 +443,6 @@
         box-shadow: 0 0 0 2px var(--bg-card);
     }
 
-    .tier-progress {
-        order: 2;
-        margin-left: 0.25rem;
-        padding: 0 0.45rem;
-        border-radius: 999px;
-        background: var(--bg-sunken);
-        color: var(--text-main);
-        font-size: 0.7rem;
-        letter-spacing: 0.04em;
-    }
-    .tier-progress.is-complete { background: var(--success); color: #fff; }
 
     .captured-strip {
         display: flex;

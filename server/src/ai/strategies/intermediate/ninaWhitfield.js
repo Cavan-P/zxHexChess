@@ -15,6 +15,6 @@ module.exports = {
     description: "Thinks two whole moves ahead now! Hasn't hung a piece for no reason in weeks. Mostly.",
     category: 'Intermediate',
     icon: 'fa-chess-rook',
-    elo: 709,
+    elo: 730,
     play: strategy
 }

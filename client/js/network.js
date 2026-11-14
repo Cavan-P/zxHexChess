@@ -2,7 +2,7 @@ import { Game } from "./game.js"
 import { addChatMessage, addSystemMessage } from "./chat.js"
 import { setSystemMessage } from "./utils.js"
 import { play } from "./sound.js"
-import { executePremove } from "./premove.js"
+import { executePremove, cancelPremove, refreshPremoves } from "./premove.js"
 
 const host = window.location.hostname
 const isLocal = host == 'localhost' || host == '127.0.0.1'
@@ -40,7 +40,7 @@ export const setupNetwork = onFenInit => {
 
             case 'roomJoined':
                 Game.endSoundPlayed = false
-                Game.premove = null
+                Game.premoves = []
                 Game.onRoomJoined?.(data)
                 if(data.code) setRoomCodeDisplay(data.code)
                 onFenInit(Game.fen)
@@ -265,10 +265,15 @@ const handleMove = data => {
     }
 
     Game.fen = fen
-    Game.draggedPiece = null
-    Game.cells.forEach(cell => cell.isLegalTarget = false)
-    Game.legalMoves = []
+    // A piece still being dragged stays in hand (you might be lining up a premove); only let go
+    // of it if it was just captured.
+    if(Game.draggedPiece && !Game.pieces.includes(Game.draggedPiece)) Game.draggedPiece = null
+    if(!Game.draggedPiece){
+        Game.cells.forEach(cell => cell.isLegalTarget = false)
+        Game.legalMoves = []
+    }
 
+    refreshPremoves()
     if(data.result) handleGameOver(data.result)
     else if(Game.turn == Game.playerColor) executePremove()
 }
@@ -364,7 +369,7 @@ const renderRatingChange = ratings => {
 }
 
 const handleGameOver = (result, { quiet = false, ratings } = {}) => {
-    Game.premove = null
+    cancelPremove()
     // Ignore the result of a game we've already left (leaving mid-game resigns, and the server's
     // game-over message arrives after we're back on the home screen).
     if(!result || Game.state == 'idle') return

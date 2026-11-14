@@ -6,7 +6,7 @@ module.exports = makeEngineBot({
     description: "Patient, tidy, king tucked safely away. Happy to wait for you to overreach. You will overreach.",
     category: 'Expert',
     icon: "fa-chess-rook",
-    elo: 1216
+    elo: 1205
 }, {
     maxDepth: 3, timeLimitMs: 2500, eval: 'master', quiescence: true
 })

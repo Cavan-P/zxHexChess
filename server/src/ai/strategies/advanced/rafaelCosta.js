@@ -6,7 +6,7 @@ module.exports = makeEngineBot({
     description: "Takes your space, then a little more, then waits. Very comfortable. You won't be.",
     category: 'Advanced',
     icon: "fa-chess-knight",
-    elo: 799
+    elo: 815
 }, {
     maxDepth: 3, timeLimitMs: 2000, eval: 'positional'
 })

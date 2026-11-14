@@ -1,76 +1,76 @@
 {
   "marcusWebb": {
-    "elo": 930,
+    "elo": 940,
     "wins": 0,
     "losses": 1,
     "draws": 1,
     "gamesPlayed": 2
   },
   "derekSanders": {
-    "elo": 564,
+    "elo": 590,
     "wins": 4,
     "losses": 0,
     "draws": 2,
     "gamesPlayed": 6
   },
   "kyleMorton": {
-    "elo": 329,
+    "elo": 365,
     "wins": 0,
     "losses": 2,
     "draws": 0,
     "gamesPlayed": 2
   },
   "evanBrooks": {
-    "elo": 70,
+    "elo": 120,
     "wins": 0,
     "losses": 1,
     "draws": 1,
     "gamesPlayed": 2
   },
   "hannahLewis": {
-    "elo": 162,
+    "elo": 205,
     "wins": 0,
     "losses": 0,
     "draws": 0,
     "gamesPlayed": 0
   },
   "sarahMitchell": {
-    "elo": 50,
-    "wins": 0,
-    "losses": 0,
-    "draws": 0,
-    "gamesPlayed": 0
-  },
-  "timothyWells": {
     "elo": 100,
     "wins": 0,
     "losses": 0,
     "draws": 0,
     "gamesPlayed": 0
   },
+  "timothyWells": {
+    "elo": 150,
+    "wins": 0,
+    "losses": 0,
+    "draws": 0,
+    "gamesPlayed": 0
+  },
   "elenaVoss": {
-    "elo": 1528,
+    "elo": 1505,
     "wins": 0,
     "losses": 0,
     "draws": 0,
     "gamesPlayed": 0
   },
   "ninaWhitfield": {
-    "elo": 709,
+    "elo": 730,
     "wins": 0,
     "losses": 0,
     "draws": 0,
     "gamesPlayed": 0
   },
   "victorKane": {
-    "elo": 1766,
+    "elo": 1725,
     "wins": 0,
     "losses": 0,
     "draws": 0,
     "gamesPlayed": 0
   },
   "alexHarper": {
-    "elo": 217,
+    "elo": 260,
     "wins": 0,
     "losses": 0,
     "draws": 0,

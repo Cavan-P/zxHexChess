@@ -74,6 +74,6 @@ module.exports = {
     description: '"It\'s good to move the chair before the floor notices, because momentum remembers what the pieces forgot and the clock was never the point anyway." - Sarah, probably',
     category: 'Beginner',
     icon: 'fa-chess-knight',
-    elo: 50,
+    elo: 100,
     play: strategy
 }

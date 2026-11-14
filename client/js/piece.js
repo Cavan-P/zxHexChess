@@ -56,6 +56,11 @@ export class Piece {
         return pointInHexagon(Game.mouse, this, this.size)
     }
 
+    // Where the piece rests: its premoved cell if moves are queued for it, else its real cell.
+    homeCell(){
+        return this.premoveCell || this.currentCell
+    }
+
     isMyPiece(myColor){
         return (this.piece == this.piece.toUpperCase()) == (myColor == 'white')
     }
@@ -88,7 +93,10 @@ export class Piece {
         // while you were still holding the piece, play it now if it's legal).
         if(this.pickedForPremove){
             const myTurnNow = Game.turn == Game.playerColor
-            const ok = dropCell && (myTurnNow ? Game.legalMap?.[this.originalCell.num]?.includes(dropCell.num) : Game.legalMoves.includes(dropCell.num))
+            // If the turn arrived mid-drag, only a piece with no other premoves queued can play now.
+            const ok = dropCell && (myTurnNow
+                ? this.originalCell == this.currentCell && !Game.premoves?.length && Game.legalMap?.[this.originalCell.num]?.includes(dropCell.num)
+                : Game.legalMoves.includes(dropCell.num))
             if(!ok){ this.snapBack(); return }
             if(!myTurnNow){
                 setPremove(this.originalCell.num, dropCell.num)
@@ -142,11 +150,12 @@ export class Piece {
         this.targetY = cell.y
     }
 
-    // Glide back to the starting cell (an illegal drop, or the server rejected the move).
+    // Glide back to where the piece rests (an illegal drop, a tap, or a queued premove).
     snapBack(){
-        this.targetX = this.startX
-        this.targetY = this.startY
-        this.currentCell = this.originalCell
+        const home = this.homeCell()
+        if(!home) return
+        this.targetX = home.x
+        this.targetY = home.y
     }
 
     update(){
@@ -169,18 +178,20 @@ export class Piece {
 
         if(Game.draggedPiece && Game.draggedPiece != this) return
 
-        if(!this.isDragging && this.hovering && Game.mouse.pressed){
-            if(this.isMyPiece(Game.playerColor)){
+        if(!this.isDragging && this.hovering && Game.mouse.pressed && !Game.draggedPiece){
+            if(this.isMyPiece(Game.playerColor) && !this.premoveCaptured){
 
                 Game.draggedPiece = this
                 this.wasSelected = Game.selectedPiece == this
 
                 this.isDragging = true
-                this.startX = this.x
-                this.startY = this.y
-
-                this.originalCell = this.currentCell
                 this.pickedForPremove = !myTurn
+
+                // Measure from the cell itself, not from where the piece happens to be drawn: it
+                // may still be mid-slide, and snapping back there would strand it between cells.
+                this.originalCell = myTurn ? this.currentCell : this.homeCell()
+                this.startX = this.originalCell.x
+                this.startY = this.originalCell.y
 
                 // Legal moves for this turn arrive with the opponent's move, so highlights can show
                 // instantly. Only ask the server if we somehow don't have them.
@@ -239,7 +250,14 @@ export class Piece {
             this.ctx.restore()
         }
 
-        this.drawSprite(this.x, this.y, this.size, colorPerspective)
+        // A piece a queued premove would capture is shown faded.
+        if(this.premoveCaptured && !this.isDragging){
+            this.ctx.save()
+            this.ctx.globalAlpha = 0.35
+            this.drawSprite(this.x, this.y, this.size, colorPerspective)
+            this.ctx.restore()
+        }
+        else this.drawSprite(this.x, this.y, this.size, colorPerspective)
 
         if(showCurrentCell){
             this.ctx.fillStyle = '#A00'
