@@ -24,6 +24,9 @@ const registerBotModule = (bot, categoryOverride = null) => {
             icon: bot.icon || 'fa-chess-pawn',
             elo: bot.elo,
             titles: bot.titles || 'open',
+            // Lab-only bots (frozen training snapshots) are sparring partners for tournaments and
+            // A/B matches - hidden from the player-facing list and not playable in normal games.
+            labOnly: Boolean(bot.labOnly),
             category
         }
     }
@@ -37,7 +40,12 @@ const loadBots = _ => {
 
         const tierPath = path.join(botFolder, tier.name)
         for(const file of fs.readdirSync(tierPath)){
-            if(file.endsWith('.js')) registerBotModule(require(path.join(tierPath, file)), tier.name)
+            if(!file.endsWith('.js')) continue
+            // Drop the cached copy so a rescan also picks up bots whose files were rewritten by
+            // further training, not just brand new ones.
+            const filePath = path.join(tierPath, file)
+            delete require.cache[require.resolve(filePath)]
+            registerBotModule(require(filePath), tier.name)
         }
     }
 }

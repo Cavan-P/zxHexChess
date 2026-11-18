@@ -19,6 +19,18 @@
       ],
       "cwd": "server",
       "port": 8000
+    },
+    {
+      "name": "server-lab-8010",
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "PORT=8010",
+        "ENABLE_BOT_LAB=1",
+        "node",
+        "src/index.js"
+      ],
+      "cwd": "server",
+      "port": 8010
     }
   ]
 }

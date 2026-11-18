@@ -209,6 +209,10 @@ export const setupNetwork = onFenInit => {
             case 'trainingComplete':
                 Game.onTrainingComplete?.(data)
                 return
+
+            case 'botFrozen':
+                Game.onBotFrozen?.(data.bot)
+                return
         }
     }
 
@@ -307,8 +311,9 @@ export const sendBotVsBot = (botA, botB, timeControl = null) => send({ type: 'st
 
 export const sendStartTournament = (botIds, gamesPerPairing) => send({ type: 'startTournament', botIds, gamesPerPairing })
 
-export const sendStartTraining = (generations, populationSize, gamesPerMatch, watchable = false, playDepth = 6, playSeconds = 5) =>
-    send({ type: 'startTraining', generations, populationSize, gamesPerMatch, watchable, playDepth, playSeconds })
+export const sendStartTraining = (generations, populationSize, gamesPerMatch, watchable = false, playDepth = 6, playSeconds = 5, continueFrom = null, trainDepth = 3, trainSeconds = 0.25) =>
+    send({ type: 'startTraining', generations, populationSize, gamesPerMatch, watchable, playDepth, playSeconds, continueFrom, trainDepth, trainSeconds })
+export const sendFreezeBot = botId => send({ type: 'freezeBot', botId })
 export const sendWatchLab = watching => send({ type: watching ? 'watchLab' : 'unwatchLab' })
 
 export const sendResign = _ => send({ type: 'resign' })

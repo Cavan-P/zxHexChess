@@ -3,8 +3,9 @@ const matchmaker = require('./rooms/matchmaker')
 const Room = require('./rooms/room')
 const { getBotList, hasBot } = require('./ai/botManager')
 const { DEFINITIONS: ACHIEVEMENTS } = require('./players/achievements')
-const { runTournament } = require('./ai/tournament')
-const { runEvolution, materializeGenome } = require('./ai/evolve')
+const { runTournament, buildSchedule } = require('./ai/tournament')
+const { runEvolution, materializeGenome, readEvolvedBot, snapshotEvolvedBot } = require('./ai/evolve')
+const { reloadBots } = require('./ai/botPool')
 const { PlayerStore } = require('./players/playerStore')
 
 const profiles = new PlayerStore(process.env.PLAYERS_FILE || undefined)
@@ -14,10 +15,12 @@ const MAX_REGISTRATIONS_PER_CONNECTION = 3
 
 const LAB_ENABLED = process.env.ENABLE_BOT_LAB == '1'
 
-// ------ Live training view ------
-// The current training run, kept on the server so the Lab view can be opened (or reloaded) at any
-// point. Changes are batched and pushed to everyone watching a few times a second.
+// ------ Live lab view ------
+// The current training run or tournament, kept on the server so the Lab view can be opened (or
+// reloaded) at any point. Changes are batched and pushed to everyone watching a few times a second.
 const lab = {
+    mode: null,              // 'training' | 'tournament'
+    names: {},               // tournament only: bot id -> { name, elo } at the start
     running: false,
     settings: null,
     generation: 0,
@@ -32,6 +35,8 @@ const lab = {
 
 const labSnapshot = _ => ({
     type: 'labState',
+    mode: lab.mode,
+    names: lab.names,
     running: lab.running,
     settings: lab.settings,
     generation: lab.generation,
@@ -53,6 +58,11 @@ const flushLab = _ => {
 }
 
 let labJobRunning = false
+
+// Lab-only bots (frozen training snapshots) are only listed, and only playable bot-vs-bot, when the
+// lab is on; nobody can start a normal game against one.
+const visibleBots = _ => LAB_ENABLED ? getBotList() : getBotList().filter(b => !b.labOnly)
+const isLabOnly = id => Boolean(getBotList().find(b => b.id == id)?.labOnly)
 
 const getBotMeta = id => {
     const meta = getBotList().find(b => b.id == id)
@@ -135,11 +145,11 @@ const handlers = {
     },
 
     getBotList(socket){
-        send(socket, { type: 'botList', bots: getBotList(), labEnabled: LAB_ENABLED })
+        send(socket, { type: 'botList', bots: visibleBots(), labEnabled: LAB_ENABLED })
     },
 
     startBotGame(socket, data){
-        if(!hasBot(data.botId)) return send(socket, { type: 'error', message: 'Bot not found' })
+        if(!hasBot(data.botId) || isLabOnly(data.botId)) return send(socket, { type: 'error', message: 'Bot not found' })
 
         const playerColor = data.playerColor == 'black' ? 'black' : 'white'
         const botColor = playerColor == 'white' ? 'black' : 'white'
@@ -156,6 +166,7 @@ const handlers = {
 
     startBotVsBot(socket, data){
         if(!hasBot(data.botA) || !hasBot(data.botB)) return send(socket, { type: 'error', message: 'Bot not found' })
+        if(!LAB_ENABLED && (isLabOnly(data.botA) || isLabOnly(data.botB))) return send(socket, { type: 'error', message: 'Bot not found' })
 
         const timeControl = Object.prototype.hasOwnProperty.call(Room.TIME_CONTROLS, data.timeControl) ? data.timeControl : null
         const room = matchmaker.createRoom({
@@ -192,13 +203,64 @@ const handlers = {
         const gamesPerPairing = Math.min(10, Math.max(1, +data.gamesPerPairing || 2))
 
         runLabJob(socket, async _ => {
-            const summary = await runTournament({
-                botIds,
-                gamesPerPairing,
-                onProgress: progress => send(socket, { type: 'tournamentProgress', ...progress })
-            })
-            send(socket, { type: 'tournamentComplete', ...summary })
+            const schedule = buildSchedule(botIds, gamesPerPairing)
+            const bots = getBotList()
+            const names = Object.fromEntries(botIds.map(id => { const b = bots.find(b => b.id == id); return [id, { name: b?.name || id, elo: b?.elo }] }))
+
+            // Each finished game goes into `history`, the tournament's equivalent of a generation summary.
+            Object.assign(lab, { mode: 'tournament', names, running: true, settings: { botCount: botIds.length, gamesPerPairing }, generation: 0, generations: 0, history: [], lastBot: null })
+            lab.games.clear()
+            for(const g of schedule) lab.games.set(g.id, { id: g.id, white: g.white, black: g.black, fen: null, ply: 0, done: false, result: null })
+            lab.timer = setInterval(flushLab, 200)
+            toWatchers(labSnapshot())
+
+            try {
+                const summary = await runTournament({
+                    botIds, schedule,
+                    onGameMove: (id, m) => {
+                        const g = lab.games.get(id)
+                        if(!g) return
+                        Object.assign(g, { fen: m.fen, from: m.from, to: m.to, ply: m.ply })
+                        lab.dirty.add(id)
+                    },
+                    onProgress: progress => {
+                        const g = lab.games.get(progress.id)
+                        if(g){
+                            // Shape the result like a training game's ({ winner, reason }) for the live view.
+                            Object.assign(g, { done: true, result: { winner: progress.result.result == 'draw' ? null : progress.result.result, reason: progress.result.reason } })
+                            lab.dirty.add(progress.id)
+                        }
+                        flushLab()
+                        const summary = { id: progress.id, white: progress.white, black: progress.black, result: progress.result, ratings: progress.ratings, gamesPlayed: progress.gamesPlayed, totalGames: progress.totalGames }
+                        lab.history.push(summary)
+                        toWatchers({ type: 'labProgress', ...summary })
+                        send(socket, { type: 'tournamentProgress', ...progress })
+                    }
+                })
+                send(socket, { type: 'tournamentComplete', ...summary })
+            }
+            finally {
+                clearInterval(lab.timer)
+                flushLab()
+                lab.running = false
+                toWatchers(labSnapshot())
+            }
         }, 'Tournament')
+    },
+
+    // Freezes an evolved bot as a lab-only snapshot (e.g. "Ada Kessler v2") to measure later versions against.
+    freezeBot(socket, data){
+        if(!LAB_ENABLED) return send(socket, { type: 'error', message: 'Bot lab is disabled on this server' })
+        if(labJobRunning) return send(socket, { type: 'error', message: 'Wait for the current tournament or training run to finish' })
+        try {
+            const snap = snapshotEvolvedBot(data.botId)
+            reloadBots()
+            send(socket, { type: 'botFrozen', bot: snap })
+            send(socket, { type: 'botList', bots: visibleBots(), labEnabled: LAB_ENABLED })
+        }
+        catch(e){
+            send(socket, { type: 'error', message: e.message })
+        }
     },
 
     watchLab(socket){
@@ -212,25 +274,34 @@ const handlers = {
     },
 
     startTraining(socket, data){
-        const generations = Math.min(30, Math.max(1, +data.generations || 6))
-        const populationSize = Math.min(20, Math.max(4, +data.populationSize || 8))
-        const gamesPerMatch = Math.min(4, Math.max(1, +data.gamesPerMatch || 1))
+        const generations = Math.min(100, Math.max(1, +data.generations || 6))
+        const populationSize = Math.min(32, Math.max(4, +data.populationSize || 8))
+        const gamesPerMatch = Math.min(4, Math.max(1, +data.gamesPerMatch || 2))
+        // How the training games themselves are played (shallow and fast; see evolve.js).
+        const trainDepth = Math.min(6, Math.max(1, Math.round(+data.trainDepth || 3)))
+        const trainMs = Math.round(Math.min(5, Math.max(0.05, +data.trainSeconds || 0.25)) * 1000)
         const paceMs = data.watchable ? 250 : 0
         // How the finished bot will play: any depth up to 12, and up to 60 seconds per move.
         const playDepth = Math.min(12, Math.max(1, Math.round(+data.playDepth || 6)))
         const playMs = Math.round(Math.min(60, Math.max(0.5, +data.playSeconds || 5)) * 1000)
+        // Optionally carry on evolving an existing trained bot instead of starting from the defaults.
+        const continueFrom = data.continueFrom ? readEvolvedBot(data.continueFrom) : null
+        if(data.continueFrom && !continueFrom) return send(socket, { type: 'error', message: 'Only bots made by training can be trained further' })
+        if(continueFrom?.labOnly) return send(socket, { type: 'error', message: 'Snapshots stay frozen - train the original bot instead' })
 
         runLabJob(socket, async _ => {
-            Object.assign(lab, { running: true, settings: { generations, populationSize, gamesPerMatch, watchable: Boolean(data.watchable) }, generation: 0, generations, history: [], lastBot: null })
+            Object.assign(lab, { mode: 'training', names: {}, running: true, settings: { generations, populationSize, gamesPerMatch, trainDepth, trainMs, watchable: Boolean(data.watchable), continuing: continueFrom?.name || null, playoff: false }, generation: 0, generations, history: [], lastBot: null })
             lab.games.clear()
             lab.timer = setInterval(flushLab, 200)
             toWatchers(labSnapshot())
 
             try {
                 const best = await runEvolution({
-                    generations, populationSize, gamesPerMatch, paceMs,
-                    onGeneration: ({ generation, games }) => {
+                    generations, populationSize, gamesPerMatch, paceMs, trainDepth, trainMs,
+                    baseGenome: continueFrom?.genome,
+                    onGeneration: ({ generation, games, playoff }) => {
                         lab.generation = generation
+                        lab.settings.playoff = playoff
                         lab.games.clear()
                         for(const g of games) lab.games.set(g.id, { ...g, fen: null, ply: 0, done: false, result: null })
                         lab.dirty.clear()
@@ -255,9 +326,10 @@ const handlers = {
                         send(socket, { type: 'trainingProgress', ...progress })
                     }
                 })
-                const created = materializeGenome(best.genome, { generations, populationSize, playDepth, playMs })
+                const created = materializeGenome(best.genome, { generations, populationSize, playDepth, playMs, continueFrom })
+                if(created.updated) reloadBots()
                 lab.lastBot = { ...created, fitness: best.fitness }
-                send(socket, { type: 'trainingComplete', bot: created, fitness: best.fitness, bots: getBotList() })
+                send(socket, { type: 'trainingComplete', bot: created, fitness: best.fitness, bots: visibleBots() })
             }
             finally {
                 clearInterval(lab.timer)

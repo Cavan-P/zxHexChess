@@ -133,4 +133,4 @@ const forEachCover = (board, i, color, enPassant, visit) => {
     }
 }
 
-module.exports = { fastMoves, forEachCover, rookRays, bishopRays, knightJumps, kingSteps, pawnCaptures }
+module.exports = { fastMoves, forEachCover, rookRays, bishopRays, knightJumps, kingSteps, pawnCaptures, pawnForward }

@@ -243,7 +243,8 @@ class Room {
     awardAchievements(result, changes){
         const awarded = {}
         try {
-            const bots = getBotList()
+            // Lab-only snapshots can't be played, so they never count towards clearing a tier.
+            const bots = getBotList().filter(b => !b.labOnly)
             for(const color of ['white', 'black']){
                 const profileId = this.seatProfiles[color]
                 const change = changes[color]

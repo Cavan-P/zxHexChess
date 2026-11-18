@@ -254,6 +254,7 @@
               <label for="tournament-games" class="text-sm font-medium">Games per pairing</label>
               <input id="tournament-games" type="number" min="1" max="10" value="2" class="input w-20 text-center" />
               <button id="tournament-start-btn" class="btn btn-primary">Start tournament</button>
+              <button id="tournament-watch-btn" class="btn btn-secondary"><i class="fa-solid fa-table-cells"></i> Open live view</button>
             </div>
             <div id="tournament-log" class="mt-4 max-h-48 space-y-1 overflow-y-auto rounded-lg bg-(--bg-sunken) p-3 font-mono text-xs"></div>
             <div id="tournament-standings" class="mt-3 text-sm"></div>
@@ -266,17 +267,32 @@
             <p class="mt-1 mb-4 text-sm text-(--text-muted)">
               Evolves a new bot's evaluation weights through self-play: mutated variants play each other and the winners survive into the next generation.
             </p>
+            <div class="mb-3 flex items-end gap-2">
+              <label class="flex flex-1 flex-col gap-1 text-xs font-medium">Start from
+                <select id="train-base" class="input py-1.5 pr-8 text-sm">
+                  <option value="">A new bot (default weights)</option>
+                </select>
+              </label>
+              <button id="train-freeze-btn" class="btn btn-secondary btn-sm" disabled title="Save a frozen, lab-only copy of this bot to measure later versions against"><i class="fa-solid fa-snowflake"></i> Freeze snapshot</button>
+            </div>
             <div class="grid grid-cols-3 gap-3">
               <label class="flex flex-col gap-1 text-xs font-medium">Generations
-                <input id="train-generations" type="number" min="1" max="30" value="6" class="input text-center" />
+                <input id="train-generations" type="number" min="1" max="100" value="6" class="input text-center" />
               </label>
               <label class="flex flex-col gap-1 text-xs font-medium">Population
-                <input id="train-population" type="number" min="4" max="20" value="8" class="input text-center" />
+                <input id="train-population" type="number" min="4" max="32" value="8" class="input text-center" />
               </label>
               <label class="flex flex-col gap-1 text-xs font-medium">Games/match
-                <input id="train-games" type="number" min="1" max="4" value="1" class="input text-center" />
+                <input id="train-games" type="number" min="1" max="4" value="2" class="input text-center" />
+              </label>
+              <label class="flex flex-col gap-1 text-xs font-medium">Training depth
+                <input id="train-depth" type="number" min="1" max="6" value="3" class="input text-center" />
+              </label>
+              <label class="flex flex-col gap-1 text-xs font-medium">Training sec/move
+                <input id="train-seconds" type="number" min="0.05" max="5" step="0.05" value="0.25" class="input text-center" />
               </label>
             </div>
+            <p class="mt-1 text-xs text-(--text-muted)">Training games are quick on purpose. Depth 4+ turns on the stronger search (and opening variety), at a big cost in speed.</p>
             <p class="mt-4 mb-1 text-xs font-semibold tracking-wide text-(--text-muted) uppercase">How the finished bot plays</p>
             <div class="grid grid-cols-2 gap-3">
               <label class="flex flex-col gap-1 text-xs font-medium">Search depth (moves ahead)
@@ -371,7 +387,7 @@
         <div class="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-3 sm:px-6">
           <button id="lab-back" class="btn btn-ghost btn-sm"><i class="fa-solid fa-arrow-left"></i>Back</button>
           <div class="min-w-0 flex-1">
-            <h1 class="font-display text-xl font-semibold">Training lab</h1>
+            <h1 id="lab-title" class="font-display text-xl font-semibold">Training lab</h1>
             <p id="lab-status" class="text-sm text-(--text-muted)">Not training right now.</p>
           </div>
           <div class="h-2 w-full overflow-hidden rounded-full bg-(--bg-sunken) sm:w-64">
@@ -384,7 +400,7 @@
         <section>
           <div id="lab-banner" class="card mb-4 hidden px-4 py-3 text-sm"></div>
           <div id="lab-grid" class="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-3"></div>
-          <p id="lab-empty" class="py-16 text-center text-(--text-muted)">Start a training run from the home page (Train a bot) to watch the games here.</p>
+          <p id="lab-empty" class="py-16 text-center text-(--text-muted)">Start a training run or a tournament from the home page to watch the games here.</p>
         </section>
 
         <aside class="flex flex-col gap-4 wide:sticky wide:top-20 wide:self-start">
@@ -396,12 +412,12 @@
             <canvas id="lab-focus" class="aspect-[880/950] w-full"></canvas>
           </div>
           <div class="card p-3">
-            <h2 class="mb-2 text-sm font-semibold">Variations this generation</h2>
+            <h2 id="lab-standings-title" class="mb-2 text-sm font-semibold">Variations this generation</h2>
             <ol id="lab-standings" class="space-y-1 text-sm"></ol>
           </div>
           <div class="card p-3">
-            <h2 class="mb-2 text-sm font-semibold">Generations</h2>
-            <ol id="lab-history" class="space-y-1 font-mono text-xs"></ol>
+            <h2 id="lab-history-title" class="mb-2 text-sm font-semibold">Generations</h2>
+            <ol id="lab-history" class="max-h-80 space-y-1 overflow-y-auto font-mono text-xs"></ol>
           </div>
         </aside>
       </main>

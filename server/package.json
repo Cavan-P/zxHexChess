@@ -6,7 +6,12 @@
   "scripts": {
     "start": "node src/index.js",
     "lab": "ENABLE_BOT_LAB=1 node src/index.js",
-    "test": "node --test"
+    "test": "node --test",
+    "match": "node scripts/match.js",
+    "collect": "node scripts/collectPositions.js",
+    "tune": "node scripts/texelTune.js",
+    "train": "node scripts/train.js",
+    "overnight": "node scripts/overnight.js"
   },
   "keywords": [],
   "author": "",

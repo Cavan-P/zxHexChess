@@ -1,8 +1,10 @@
-const { playGame } = require('./selfPlay')
 const eloStore = require('./eloStore')
 const botManager = require('./botManager')
+const { playTrainingGame } = require('./trainPool')
 
-const yieldToEventLoop = _ => new Promise(resolve => setImmediate(resolve))
+// Same limits a live game would hit: the full 300-ply cap and the 50-move rule.
+const MAX_PLIES = 300
+const NO_PROGRESS_LIMIT = 100
 
 const buildPairings = botIds => {
     const pairings = []
@@ -14,56 +16,43 @@ const buildPairings = botIds => {
     return pairings
 }
 
-// Round-robin tournament: every pair of bots plays `gamesPerPairing` games (colors alternate),
-// with Elo updated sequentially after each individual game.
-const runTournament = async ({ botIds, gamesPerPairing = 2, maxPlies, noProgressLimit, onProgress }) => {
-    const bots = {}
-    for(const id of botIds){
-        const play = botManager.getBotByName(id)
-        if(!play) throw new Error(`Unknown bot id: ${id}`)
-        bots[id] = play
-    }
+// Every game of the tournament, in order: each pair plays `gamesPerPairing` games, colours alternating.
+const buildSchedule = (botIds, gamesPerPairing) => buildPairings(botIds).flatMap(([idA, idB], p) =>
+    Array.from({ length: gamesPerPairing }, (_, g) => ({
+        id: `${p + 1}-${g + 1}`,
+        pairing: [idA, idB],
+        white: g % 2 == 0 ? idA : idB,
+        black: g % 2 == 0 ? idB : idA
+    }))
+)
 
-    const pairings = buildPairings(botIds)
-    const totalGames = pairings.length * gamesPerPairing
+// Round-robin tournament. Games run in parallel on the training worker threads (so they don't block
+// the server), and Elo is updated after each individual game as it finishes.
+//
+// Callbacks (all optional): onGameMove(id, { fen, from, to, ply }); onProgress({ id, pairing, white,
+// black, result, ratings, gamesPlayed, totalGames }) after each game.
+const runTournament = async ({ botIds, gamesPerPairing = 2, schedule = buildSchedule(botIds, gamesPerPairing), onGameMove, onProgress }) => {
+    for(const id of botIds) if(!botManager.hasBot(id)) throw new Error(`Unknown bot id: ${id}`)
+
+    const seedElo = id => botManager.getBotList().find(b => b.id == id)?.elo
     let gamesPlayed = 0
 
-    for(const [idA, idB] of pairings){
-        for(let g = 0; g < gamesPerPairing; g++){
-            const aIsWhite = g % 2 == 0
-            const whiteId = aIsWhite ? idA : idB
-            const blackId = aIsWhite ? idB : idA
+    await Promise.all(schedule.map(async game => {
+        const { result: outcome } = await playTrainingGame({
+            whiteBot: game.white,
+            blackBot: game.black,
+            maxPlies: MAX_PLIES,
+            noProgressLimit: NO_PROGRESS_LIMIT
+        }, move => onGameMove?.(game.id, move))
 
-            const result = await playGame({
-                playA: bots[whiteId],
-                playB: bots[blackId],
-                maxPlies,
-                noProgressLimit
-            })
+        const result = { result: outcome.winner || 'draw', reason: outcome.reason }
+        const [idA, idB] = game.pairing
+        const eloResult = result.result == 'draw' ? 'draw' : (result.result == 'white' ? game.white : game.black) == idA ? 'A' : 'B'
+        const ratings = eloStore.recordResult(idA, idB, eloResult, seedElo(idA), seedElo(idB))
 
-            let eloResult
-            if(result.result == 'draw') eloResult = 'draw'
-            else if(result.result == 'white') eloResult = whiteId == idA ? 'A' : 'B'
-            else eloResult = blackId == idA ? 'A' : 'B'
-
-            const seedElo = id => botManager.getBotList().find(b => b.id == id)?.elo
-            const ratings = eloStore.recordResult(idA, idB, eloResult, seedElo(idA), seedElo(idB))
-
-            gamesPlayed++
-
-            onProgress?.({
-                pairing: [idA, idB],
-                white: whiteId,
-                black: blackId,
-                result,
-                ratings,
-                gamesPlayed,
-                totalGames
-            })
-
-            await yieldToEventLoop()
-        }
-    }
+        gamesPlayed++
+        onProgress?.({ id: game.id, pairing: game.pairing, white: game.white, black: game.black, result, ratings, gamesPlayed, totalGames: schedule.length })
+    }))
 
     return {
         standings: eloStore.getAllRatings(),
@@ -71,4 +60,4 @@ const runTournament = async ({ botIds, gamesPerPairing = 2, maxPlies, noProgress
     }
 }
 
-module.exports = { runTournament, buildPairings }
+module.exports = { runTournament, buildPairings, buildSchedule }

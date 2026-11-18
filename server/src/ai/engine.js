@@ -1,5 +1,5 @@
 const { parseFen, boardToFen, generateFilteredLegals, isKingAttacked, promotionCells } = require('../game/moves')
-const { fastMoves, forEachCover, rookRays, bishopRays, knightJumps, kingSteps, pawnCaptures } = require('./fastMoves')
+const { fastMoves, forEachCover, rookRays, bishopRays, knightJumps, kingSteps, pawnCaptures, pawnForward } = require('./fastMoves')
 
 const pieceValues = {
     p: 1,
@@ -69,6 +69,121 @@ const hexDistance = (a, b) => hexDistanceFromCenter([a[0] - b[0], a[1] - b[1], a
 // Black's view is the board turned 180 degrees, i.e. every coordinate negated.
 const pawnRank = ([q, r], color) => color == 'white' ? 6 - r - Math.max(0, q) : 6 + r - Math.max(0, -q)
 
+// ---- Tables for the extended evaluation terms (only used by genomes that switch them on) ----
+// Hex facts: a pawn's file is its q coordinate (it moves along [0,∓1,±1]); bishops never change
+// the (q - r) mod 3 "tone" of their cell; a colour-c pawn on any cell in pawnCaptures[other(c)][i]
+// protects cell i (the two sides' capture directions are exact opposites).
+const NUM = 91
+const cellCoords = parseFen('9'.repeat(10) + '1').map(c => c.coords)
+const cellTone = cellCoords.map(([q, r]) => (((q - r) % 3) + 3) % 3)
+const fileOf = cellCoords.map(([q]) => q + CENTER)          // 0..10
+const forwardRay = {}, passedStoppers = {}, outpostStoppers = {}, shieldCells = {}, cellRank = {}
+for(const c of ['white', 'black']){
+    forwardRay[c] = [...Array(NUM).keys()].map(i => {
+        const out = []
+        for(let j = pawnForward[c][i]; j >= 0; j = pawnForward[c][j]) out.push(j)
+        return out
+    })
+    // Cells an enemy pawn could stand on now and still, by moving down the board, block this pawn
+    // or capture it on its way to promotion. None of them occupied = a passed pawn.
+    passedStoppers[c] = [...Array(NUM).keys()].map(i => {
+        const set = new Set(forwardRay[c][i])
+        for(const f of [i, ...forwardRay[c][i]]) for(const e of pawnCaptures[c][f]){ set.add(e); forwardRay[c][e].forEach(x => set.add(x)) }
+        return [...set]
+    })
+    // Cells an enemy pawn could stand on now and one day attack cell i from.
+    outpostStoppers[c] = [...Array(NUM).keys()].map(i => {
+        const set = new Set()
+        for(const e of pawnCaptures[c][i]){ set.add(e); forwardRay[c][e].forEach(x => set.add(x)) }
+        return [...set]
+    })
+    // The pawn cover in front of a king: the cell ahead of it and the two it "sees" diagonally.
+    shieldCells[c] = [...Array(NUM).keys()].map(i => [pawnForward[c][i], ...pawnCaptures[c][i]].filter(j => j >= 0))
+    cellRank[c] = cellCoords.map(xy => pawnRank(xy, c))
+}
+const kingZone = [...Array(NUM).keys()].map(i => [i, ...kingSteps[i]])
+const ATTACK_UNITS = { p: 1, n: 2, b: 2, r: 3, q: 5, k: 0 }
+const KING_DANGER_CAP = 20
+// Officer material at the start (per side: Q, 2R, 3B, 2N at standard values), for the game phase.
+const PHASE_VALUES = { n: 3, b: 3, r: 5, q: 9 }
+const START_OFFICERS = 2 * (9 + 2 * 5 + 3 * 3 + 2 * 3)
+
+// 1 = all officers on the board (middlegame), 0 = none left (pure endgame).
+const gamePhase = board => {
+    let officers = 0
+    for(let i = 0; i < board.length; i++){
+        const p = board[i].piece
+        if(p) officers += PHASE_VALUES[p.toLowerCase()] || 0
+    }
+    return Math.min(1, officers / START_OFFICERS)
+}
+
+// coverageMap plus what the extended terms need: mobility per piece type and how hard each king's
+// zone (its cell and every cell it could step to) is attacked, in ATTACK_UNITS.
+const extendedCoverage = { mobByType: { white: { p: 0, n: 0, b: 0, r: 0, q: 0, k: 0 }, black: { p: 0, n: 0, b: 0, r: 0, q: 0, k: 0 } }, zoneUnits: { white: 0, black: 0 } }
+const zoneMarks = new Uint8Array(NUM)       // bit 1: in white king's zone, bit 2: black's
+const coverageMapExtended = (board, enPassant, values) => {
+    const cheapest = cheapestBuffers
+    cheapest.white.fill(NONE)
+    cheapest.black.fill(NONE)
+    const mobility = { white: 0, black: 0 }
+    const { mobByType, zoneUnits } = extendedCoverage
+    for(const c of ['white', 'black']){ const m = mobByType[c]; m.p = m.n = m.b = m.r = m.q = m.k = 0; zoneUnits[c] = 0 }
+
+    zoneMarks.fill(0)
+    for(let i = 0; i < board.length; i++){
+        const p = board[i].piece
+        if(p == 'K') for(const j of kingZone[i]) zoneMarks[j] |= 1
+        else if(p == 'k') for(const j of kingZone[i]) zoneMarks[j] |= 2
+    }
+
+    for(let i = 0; i < board.length; i++){
+        const cell = board[i]
+        if(!cell?.piece) continue
+
+        const color = cell.color
+        const lower = cell.piece.toLowerCase()
+        const value = lower == 'k' ? 100 : (values[lower] || 0)
+        const covers = cheapest[color]
+        const enemyZone = color == 'white' ? 2 : 1
+        const units = ATTACK_UNITS[lower]
+        const byType = mobByType[color]
+        let zoneHits = 0
+
+        forEachCover(board, i, color, enPassant, to => {
+            if(board[to].color != color){ mobility[color]++; byType[lower]++ }
+            if(value < covers[to]) covers[to] = value
+            if(zoneMarks[to] & enemyZone) zoneHits++
+        })
+        // Pawn pushes aren't attacks: count only the two capture cells for pawns.
+        if(lower == 'p'){
+            zoneHits = 0
+            for(const j of pawnCaptures[color][i]) if(zoneMarks[j] & enemyZone) zoneHits++
+        }
+        zoneUnits[other(color)] += zoneHits * units
+    }
+
+    return { cheapest, mobility, mobByType, zoneUnits }
+}
+
+// Which optional terms a weights object switches on, worked out once per object.
+const compiledWeights = new WeakMap()
+const EXTENDED_KEYS = ['passedPawnWeight', 'isolatedPawnWeight', 'doubledPawnWeight', 'protectedPawnWeight', 'kingDangerWeight', 'kingShieldWeight',
+    'kingCentralityEnd', 'bishopSetWeight', 'rookOpenWeight', 'rookHalfOpenWeight', 'knightOutpostWeight', 'threatWeight', 'tempoWeight', 'tradeDownWeight']
+const compileWeights = weights => {
+    let cw = compiledWeights.get(weights)
+    if(cw) return cw
+    cw = {}
+    for(const k of EXTENDED_KEYS) cw[k] = weights[k] || 0
+    cw.centralityBonus = weights.centralityBonus || null
+    cw.mobilityBonus = weights.mobilityBonus || null
+    cw.end = weights.end || null
+    cw.extended = Boolean(cw.end || cw.centralityBonus || cw.mobilityBonus || EXTENDED_KEYS.some(k => cw[k]))
+    cw.pv = { p: 0, n: 0, b: 0, r: 0, q: 0 }    // per-call scratch for tapered piece values
+    compiledWeights.set(weights, cw)
+    return cw
+}
+
 const generateAllMoves = (board, turn, enPassant) => {
     const moves = []
 
@@ -101,14 +216,37 @@ const DEFAULT_WEIGHTS = {
 const evaluateWeighted = (board, maximizingColor, enPassant, weights, toMove = other(maximizingColor)) => {
     let score = 0
 
-    const { cheapest, mobility } = coverageMap(board, enPassant, weights.pieceValues)
+    // Genomes with the newer knobs get the extended evaluation; every other weights object (all the
+    // hand-written tiers, Ada v1) runs exactly the original code below - see test/evalBaseline.test.js.
+    const cw = compileWeights(weights)
+    const ext = cw.extended
+    let pv = weights.pieceValues
+    let pawnAdvance = weights.pawnAdvanceWeight ?? 0.03
+    let passedW = cw.passedPawnWeight
+    let phase = 1
+    if(ext){
+        phase = gamePhase(board)
+        if(cw.end){
+            // Tapered evaluation: blend midgame and endgame values by how much material is left.
+            const mid = weights.pieceValues, end = cw.end.pieceValues || mid, out = cw.pv, f = 1 - phase
+            out.p = phase * mid.p + f * (end.p ?? mid.p)
+            out.n = phase * mid.n + f * (end.n ?? mid.n)
+            out.b = phase * mid.b + f * (end.b ?? mid.b)
+            out.r = phase * mid.r + f * (end.r ?? mid.r)
+            out.q = phase * mid.q + f * (end.q ?? mid.q)
+            pv = out
+            pawnAdvance = phase * pawnAdvance + (1 - phase) * (cw.end.pawnAdvanceWeight ?? pawnAdvance)
+            passedW = phase * passedW + (1 - phase) * (cw.end.passedPawnWeight ?? passedW)
+        }
+    }
+
+    const { cheapest, mobility, mobByType, zoneUnits } = ext ? coverageMapExtended(board, enPassant, weights.pieceValues) : coverageMap(board, enPassant, weights.pieceValues)
     const enemyColor = other(maximizingColor)
     const worstExposure = { white: 0, black: 0 }
     const material = { white: 0, black: 0 }        // everything but kings
     const officers = { white: 0, black: 0 }        // everything but kings and pawns
     const kings = {}
     const kingCells = {}
-    const pawnAdvance = weights.pawnAdvanceWeight ?? 0.03
 
     if(weights.mobilityWeight){
         score += (mobility[maximizingColor] - mobility[enemyColor]) * weights.mobilityWeight
@@ -122,7 +260,7 @@ const evaluateWeighted = (board, maximizingColor, enPassant, weights, toMove = o
         const friendly = cell.color == maximizingColor
         const sign = friendly ? 1 : -1
 
-        const v = lower == 'k' ? 0 : (weights.pieceValues[lower] || 0)
+        const v = lower == 'k' ? 0 : (pv[lower] || 0)
         score += sign * v
         material[cell.color] += v
         if(lower == 'k'){ kings[cell.color] = cell.coords; kingCells[cell.color] = i }
@@ -142,6 +280,10 @@ const evaluateWeighted = (board, maximizingColor, enPassant, weights, toMove = o
 
         if(weights.centralityWeight && lower != 'k' && lower != 'p'){
             score += sign * (CENTER - hexDistanceFromCenter(cell.coords)) * weights.centralityWeight
+        }
+
+        if(ext && cw.centralityBonus && lower != 'k' && lower != 'p'){
+            score += sign * (CENTER - hexDistanceFromCenter(cell.coords)) * (cw.centralityBonus[lower] || 0)
         }
 
     }
@@ -176,14 +318,135 @@ const evaluateWeighted = (board, maximizingColor, enPassant, weights, toMove = o
     }
 
     if(weights.kingSafetyWeight){
-        const king = board.find(p => p.piece?.toLowerCase() == 'k' && p.color == maximizingColor)
-        if(king){
+        const k = kings[maximizingColor]
+        if(k){
             let defenders = 0
-            for(const cell of board){
-                if(!cell?.piece || cell.color != maximizingColor || cell.cell == king.cell) continue
-                if(hexDistanceFromCenter(cell.coords.map((c, idx) => c - king.coords[idx])) <= 2) defenders++
+            for(let i = 0; i < board.length; i++){
+                const cell = board[i]
+                if(!cell.piece || cell.color != maximizingColor || i == kingCells[maximizingColor]) continue
+                const [q, r, s] = cell.coords
+                if(Math.max(Math.abs(q - k[0]), Math.abs(r - k[1]), Math.abs(s - k[2])) <= 2) defenders++
             }
             score += defenders * weights.kingSafetyWeight
+        }
+    }
+
+    if(ext) score += extendedTerms(board, maximizingColor, toMove, cw, { phase, pv, passedW, cheapest, mobByType, zoneUnits, material, kingCells })
+
+    return score
+}
+
+// The newer evaluation terms, from `maximizingColor`'s point of view. Each is skipped when its
+// weight is 0. See genome.js for what each knob means and its range.
+const pawnFiles = { white: new Int8Array(11), black: new Int8Array(11) }
+const pawnAt = { white: new Uint8Array(NUM), black: new Uint8Array(NUM) }   // 1 where that side has a pawn
+const anyAt = (cells, at) => { for(let k = 0; k < cells.length; k++) if(at[cells[k]]) return true; return false }
+const extendedTerms = (board, me, toMove, cw, { phase, pv, passedW, cheapest, mobByType, zoneUnits, material, kingCells }) => {
+    const enemy = other(me)
+    let score = 0
+    const side = c => c == me ? 1 : -1
+
+    // Per-piece mobility, on top of the shared mobility weight.
+    if(cw.mobilityBonus){
+        for(const k of ['n', 'b', 'r', 'q']){
+            const w = cw.mobilityBonus[k]
+            if(w) score += (mobByType[me][k] - mobByType[enemy][k]) * w
+        }
+    }
+
+    // King danger: attacks on the cells around each king, squared (one attacker is nothing, four
+    // usually means mate). Fades out as material comes off.
+    if(cw.kingDangerWeight){
+        const d = c => Math.min(KING_DANGER_CAP, zoneUnits[c]) ** 2
+        score += (d(enemy) - d(me)) * cw.kingDangerWeight * phase
+    }
+
+    if(cw.tempoWeight) score += toMove == me ? cw.tempoWeight : -cw.tempoWeight
+
+    // Trading down when ahead: a lead counts for more the fewer pieces are left.
+    if(cw.tradeDownWeight){
+        const start = 2 * (9 * pv.p + 2 * pv.n + 3 * pv.b + 2 * pv.r + pv.q)
+        const lead = material[me] - material[enemy]
+        score += lead * Math.max(0, 1 - (material.white + material.black) / start) * cw.tradeDownWeight
+    }
+
+    const needPawns = passedW || cw.isolatedPawnWeight || cw.doubledPawnWeight || cw.protectedPawnWeight || cw.knightOutpostWeight || cw.rookOpenWeight || cw.rookHalfOpenWeight || cw.kingShieldWeight
+    const needPieces = needPawns || cw.bishopSetWeight || cw.threatWeight
+    if(!needPieces && !cw.kingCentralityEnd) return score
+
+    pawnFiles.white.fill(0)
+    pawnFiles.black.fill(0)
+    pawnAt.white.fill(0)
+    pawnAt.black.fill(0)
+    for(let i = 0; i < board.length; i++){
+        const p = board[i].piece
+        if(p == 'P'){ pawnFiles.white[fileOf[i]]++; pawnAt.white[i] = 1 }
+        else if(p == 'p'){ pawnFiles.black[fileOf[i]]++; pawnAt.black[i] = 1 }
+    }
+
+    const tones = { white: 0, black: 0 }       // bit per bishop tone still on the board
+    const threats = { white: 0, black: 0 }     // pieces attacked by something cheaper
+
+    for(let i = 0; i < board.length; i++){
+        const cell = board[i]
+        if(!cell.piece) continue
+        const c = cell.color, e = other(c), s = side(c)
+        const lower = cell.piece.toLowerCase()
+
+        if(cw.threatWeight && lower != 'k'){
+            const v = pv[lower] || 0
+            if(cheapest[e][i] < v) threats[c]++
+        }
+
+        if(lower == 'p'){
+            if(passedW && !anyAt(passedStoppers[c][i], pawnAt[e])){
+                const r = cellRank[c][i] - 1
+                score += s * r * r * passedW
+            }
+            const f = fileOf[i]
+            if(cw.isolatedPawnWeight && !(f > 0 && pawnFiles[c][f - 1]) && !(f < 10 && pawnFiles[c][f + 1])) score -= s * cw.isolatedPawnWeight
+            if(cw.protectedPawnWeight && anyAt(pawnCaptures[e][i], pawnAt[c])) score += s * cw.protectedPawnWeight
+        }
+        else if(lower == 'b') tones[c] |= 1 << cellTone[i]
+        else if(lower == 'n'){
+            if(cw.knightOutpostWeight && cellRank[c][i] >= 5 && anyAt(pawnCaptures[e][i], pawnAt[c]) && !anyAt(outpostStoppers[c][i], pawnAt[e])){
+                score += s * cw.knightOutpostWeight
+            }
+        }
+        else if(lower == 'r' && (cw.rookOpenWeight || cw.rookHalfOpenWeight)){
+            const mine = pawnAt[c], their = pawnAt[e]
+            for(const ray of rookRays[i]){
+                let own = false, theirs = false
+                for(let k = 0; k < ray.length; k++){ const j = ray[k]; if(mine[j]) { own = true; break } if(their[j]) theirs = true }
+                if(!own) score += s * (theirs ? cw.rookHalfOpenWeight : cw.rookOpenWeight)
+            }
+        }
+    }
+
+    if(cw.doubledPawnWeight){
+        for(let f = 0; f < 11; f++){
+            if(pawnFiles[me][f] > 1) score -= (pawnFiles[me][f] - 1) * cw.doubledPawnWeight
+            if(pawnFiles[enemy][f] > 1) score += (pawnFiles[enemy][f] - 1) * cw.doubledPawnWeight
+        }
+    }
+
+    if(cw.bishopSetWeight){
+        if(tones[me] == 7) score += cw.bishopSetWeight
+        if(tones[enemy] == 7) score -= cw.bishopSetWeight
+    }
+
+    if(cw.threatWeight) score += (threats[enemy] - threats[me]) * cw.threatWeight
+
+    for(const c of ['white', 'black']){
+        const k = kingCells[c]
+        if(k == null) continue
+        if(cw.kingShieldWeight){
+            let shield = 0
+            for(const j of shieldCells[c][k]) if(pawnAt[c][j]) shield++
+            score += side(c) * shield * cw.kingShieldWeight * phase
+        }
+        if(cw.kingCentralityEnd){
+            score += side(c) * (CENTER - hexDistanceFromCenter(cellCoords[k])) * cw.kingCentralityEnd * (1 - phase)
         }
     }
 
@@ -319,7 +582,7 @@ const hasOfficers = (board, color) => {
 }
 const OPENING_PLIES = 16
 
-const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLimitMs, evaluate, seen = null, recentOwnMoves = [], quiescence = false, oversight = 0, { variety = 0, extendChecks = false, prune = false } = {}) => {
+const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLimitMs, evaluate, seen = null, recentOwnMoves = [], quiescence = false, oversight = 0, { variety = 0, extendChecks = false, prune = false, checkBonus = CHECK_BONUS } = {}) => {
     const nullMoves = prune === true || prune == 'null'
     // Reductions would cut short exactly the near-best alternatives opening variety picks from,
     // so they only start once the opening is over.
@@ -378,7 +641,7 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
 
     const staticScore = (board, turn, maximizingColor, enPassant) => {
         let s = evaluate(board, maximizingColor, enPassant, turn)
-        if(kingAttacked(board, other(turn))) s += CHECK_BONUS
+        if(kingAttacked(board, other(turn))) s += checkBonus
         return s
     }
 
@@ -448,7 +711,7 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
             let s = evaluate(board, maximizingColor, enPassant, turn)
 
             const enemy = other(turn)
-            if(kingAttacked(board, enemy)) s += CHECK_BONUS
+            if(kingAttacked(board, enemy)) s += checkBonus
 
             return { score: s, move: null }
         }
@@ -614,7 +877,7 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
 //   oversight      - 0-1, how often a move goes unnoticed (see blindSpotCheck): the human way to
 //                    miss a mate in 1 or hang a piece
 // `timeBudgetMs` (optional) caps thinking time when the bot is on a clock.
-const searchBot = ({ fen, turn, enPassant, seen = null, recentOwnMoves = null, lastOwnMove = null, ply = null, maxDepth, timeLimitMs, timeBudgetMs = null, evaluate, noise = 0, blunderChance = 0, quiescence = false, oversight = 0, prune = null }) => {
+const searchBot = ({ fen, turn, enPassant, seen = null, recentOwnMoves = null, lastOwnMove = null, ply = null, maxDepth, timeLimitMs, timeBudgetMs = null, evaluate, noise = 0, blunderChance = 0, quiescence = false, oversight = 0, prune = null, checkBonus = CHECK_BONUS }) => {
     if(timeBudgetMs != null) timeLimitMs = Math.min(timeLimitMs, timeBudgetMs)
     const board = parseFen(fen)
 
@@ -645,7 +908,7 @@ const searchBot = ({ fen, turn, enPassant, seen = null, recentOwnMoves = null, l
             : evaluate
         const seenSet = Array.isArray(seen) ? new Set(seen) : null
         const recent = recentOwnMoves || (lastOwnMove ? [lastOwnMove] : [])
-        move = iterativeDeepening(board, turn, enPassant, depthLimit, timeLimitMs, noisyEvaluate, seenSet, recent, quiescence, oversight, { variety, extendChecks: strong, prune: prune ?? (strong ? 'lmr' : false) }) || legal[0]
+        move = iterativeDeepening(board, turn, enPassant, depthLimit, timeLimitMs, noisyEvaluate, seenSet, recent, quiescence, oversight, { variety, extendChecks: strong, prune: prune ?? (strong ? 'lmr' : false), checkBonus }) || legal[0]
     }
 
     const piece = board[move.from]
@@ -685,6 +948,7 @@ module.exports = {
     makeEngineBot,
     evaluateWeighted,
     DEFAULT_WEIGHTS,
+    PRESET_WEIGHTS: { material: MATERIAL_WEIGHTS, central: CENTRAL_WEIGHTS, positional: POSITIONAL_WEIGHTS, master: MASTER_WEIGHTS },
     evaluateMaterial,
     evaluateCentral,
     evaluatePositional,

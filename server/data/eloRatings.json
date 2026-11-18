@@ -1,79 +1,198 @@
 {
   "marcusWebb": {
-    "elo": 1040,
-    "wins": 0,
-    "losses": 1,
+    "elo": 1012,
+    "wins": 31,
+    "losses": 24,
     "draws": 1,
-    "gamesPlayed": 2
+    "gamesPlayed": 56
   },
   "derekSanders": {
-    "elo": 790,
-    "wins": 4,
-    "losses": 0,
-    "draws": 2,
-    "gamesPlayed": 6
+    "elo": 698,
+    "wins": 21,
+    "losses": 35,
+    "draws": 4,
+    "gamesPlayed": 60
   },
   "kyleMorton": {
-    "elo": 345,
-    "wins": 0,
-    "losses": 2,
-    "draws": 0,
-    "gamesPlayed": 2
+    "elo": 336,
+    "wins": 7,
+    "losses": 45,
+    "draws": 4,
+    "gamesPlayed": 56
   },
   "evanBrooks": {
-    "elo": 140,
-    "wins": 0,
-    "losses": 1,
-    "draws": 1,
-    "gamesPlayed": 2
-  },
-  "hannahLewis": {
-    "elo": 260,
-    "wins": 0,
-    "losses": 0,
-    "draws": 0,
-    "gamesPlayed": 0
-  },
-  "sarahMitchell": {
-    "elo": 205,
-    "wins": 0,
-    "losses": 0,
-    "draws": 0,
-    "gamesPlayed": 0
-  },
-  "timothyWells": {
     "elo": 100,
     "wins": 0,
-    "losses": 0,
-    "draws": 0,
-    "gamesPlayed": 0
+    "losses": 53,
+    "draws": 3,
+    "gamesPlayed": 56
+  },
+  "hannahLewis": {
+    "elo": 280,
+    "wins": 7,
+    "losses": 45,
+    "draws": 2,
+    "gamesPlayed": 54
+  },
+  "sarahMitchell": {
+    "elo": 158,
+    "wins": 3,
+    "losses": 49,
+    "draws": 2,
+    "gamesPlayed": 54
+  },
+  "timothyWells": {
+    "elo": 105,
+    "wins": 0,
+    "losses": 51,
+    "draws": 3,
+    "gamesPlayed": 54
   },
   "elenaVoss": {
-    "elo": 1505,
-    "wins": 0,
-    "losses": 0,
-    "draws": 0,
-    "gamesPlayed": 0
+    "elo": 1540,
+    "wins": 45,
+    "losses": 8,
+    "draws": 1,
+    "gamesPlayed": 54
   },
   "ninaWhitfield": {
     "elo": 870,
-    "wins": 0,
-    "losses": 0,
-    "draws": 0,
-    "gamesPlayed": 0
+    "wins": 25,
+    "losses": 26,
+    "draws": 3,
+    "gamesPlayed": 54
   },
   "victorKane": {
-    "elo": 1725,
-    "wins": 0,
-    "losses": 0,
-    "draws": 0,
-    "gamesPlayed": 0
+    "elo": 1723,
+    "wins": 47,
+    "losses": 5,
+    "draws": 2,
+    "gamesPlayed": 54
   },
   "alexHarper": {
-    "elo": 290,
-    "wins": 0,
-    "losses": 0,
+    "elo": 275,
+    "wins": 6,
+    "losses": 46,
+    "draws": 2,
+    "gamesPlayed": 54
+  },
+  "felixMarsh": {
+    "elo": 1069,
+    "wins": 33,
+    "losses": 21,
     "draws": 0,
-    "gamesPlayed": 0
+    "gamesPlayed": 54
+  },
+  "ingridHalvorsen": {
+    "elo": 1042,
+    "wins": 31,
+    "losses": 21,
+    "draws": 2,
+    "gamesPlayed": 54
+  },
+  "miraCastellanos": {
+    "elo": 1191,
+    "wins": 38,
+    "losses": 16,
+    "draws": 0,
+    "gamesPlayed": 54
+  },
+  "yukiTanaka": {
+    "elo": 1156,
+    "wins": 36,
+    "losses": 17,
+    "draws": 1,
+    "gamesPlayed": 54
+  },
+  "priyaNandakumar": {
+    "elo": 678,
+    "wins": 18,
+    "losses": 34,
+    "draws": 2,
+    "gamesPlayed": 54
+  },
+  "samuelReyes": {
+    "elo": 620,
+    "wins": 15,
+    "losses": 36,
+    "draws": 3,
+    "gamesPlayed": 54
+  },
+  "adaKessler": {
+    "elo": 1421,
+    "wins": 48,
+    "losses": 6,
+    "draws": 0,
+    "gamesPlayed": 54
+  },
+  "antonVarga": {
+    "elo": 1569,
+    "wins": 49,
+    "losses": 4,
+    "draws": 1,
+    "gamesPlayed": 54
+  },
+  "danaWhitlock": {
+    "elo": 1219,
+    "wins": 37,
+    "losses": 16,
+    "draws": 1,
+    "gamesPlayed": 54
+  },
+  "graceOkafor": {
+    "elo": 761,
+    "wins": 20,
+    "losses": 31,
+    "draws": 3,
+    "gamesPlayed": 54
+  },
+  "rafaelCosta": {
+    "elo": 965,
+    "wins": 29,
+    "losses": 23,
+    "draws": 2,
+    "gamesPlayed": 54
+  },
+  "theoLindqvist": {
+    "elo": 801,
+    "wins": 22,
+    "losses": 30,
+    "draws": 2,
+    "gamesPlayed": 54
+  },
+  "corneliusAshby": {
+    "elo": 1833,
+    "wins": 48,
+    "losses": 5,
+    "draws": 1,
+    "gamesPlayed": 54
+  },
+  "henrikSolberg": {
+    "elo": 1928,
+    "wins": 47,
+    "losses": 7,
+    "draws": 0,
+    "gamesPlayed": 54
+  },
+  "isadoraQuinn": {
+    "elo": 1759,
+    "wins": 48,
+    "losses": 5,
+    "draws": 1,
+    "gamesPlayed": 54
+  },
+  "luciaMoreno": {
+    "elo": 528,
+    "wins": 12,
+    "losses": 39,
+    "draws": 3,
+    "gamesPlayed": 54
+  },
+  "owenFairbanks": {
+    "elo": 544,
+    "wins": 13,
+    "losses": 38,
+    "draws": 3,
+    "gamesPlayed": 54
   }
 }

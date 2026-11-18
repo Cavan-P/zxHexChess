@@ -2,7 +2,10 @@
 const { parentPort } = require('worker_threads')
 const botManager = require('./botManager')
 
-parentPort.on('message', ({ jobId, botId, state }) => {
+parentPort.on('message', ({ type, jobId, botId, state }) => {
+    // Sent when a bot's file is rewritten (e.g. further training), so this thread stops using the old copy.
+    if(type == 'reload') return botManager.reload()
+
     try {
         let play = botManager.getBotByName(botId)
 

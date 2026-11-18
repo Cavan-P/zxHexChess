@@ -2,8 +2,8 @@ import { Game } from './game.js'
 import { drawHexagon } from './hexagon.js'
 import { sendWatchLab } from './network.js'
 
-// The training lab: a live grid of every game in the current generation of bot training.
-// Click a game to watch it large. The server streams positions a few times a second.
+// The lab: a live grid of every game in the current generation of bot training, or of every game
+// in a tournament. Click a game to watch it large. The server streams positions a few times a second.
 
 const $ = id => document.getElementById(id)
 
@@ -13,6 +13,8 @@ const SPRITES = { p: [1000, 200], P: [1000, 0], r: [800, 200], R: [800, 0], n: [
 
 const state = {
     open: false,
+    mode: null,              // 'training' | 'tournament'
+    names: {},               // tournament: bot id -> { name, elo }
     running: false,
     generation: 0,
     generations: 0,
@@ -88,12 +90,21 @@ const drawBoard = (canvas, game) => {
 
 // ------ Text ------
 
-const variant = i => `#${i + 1}`
+const tournament = _ => state.mode == 'tournament'
+// Players are variation numbers in training and bot ids in a tournament.
+const variant = p => tournament() ? state.names[p]?.name || p : `#${p + 1}`
 const resultText = game => {
     if(!game.done) return game.ply ? `move ${Math.ceil(game.ply / 2)}` : 'queued (waiting for a free worker)'
     const r = game.result
     if(!r?.winner) return `draw · ${r?.reason || ''}`
     return `${variant(r.winner == 'white' ? game.white : game.black)} wins · ${r.reason}`
+}
+
+// Latest Elo for each bot in the tournament: its rating after its most recent finished game.
+const liveRatings = _ => {
+    const elo = Object.fromEntries(Object.entries(state.names).map(([id, n]) => [id, n.elo]))
+    for(const h of state.history) for(const [id, r] of Object.entries(h.ratings || {})) elo[id] = r.elo
+    return elo
 }
 
 // ------ Tiles ------
@@ -161,12 +172,27 @@ const drawFocus = _ => {
 const renderHeader = _ => {
     const games = [...state.games.values()]
     const done = games.filter(g => g.done).length
+    $('lab-title').textContent = tournament() ? 'Tournament' : 'Training lab'
+
+    if(tournament()){
+        const playing = games.filter(g => !g.done && g.ply > 0).length
+        $('lab-status').textContent = state.running
+            ? `${done} of ${games.length} games finished · ${playing} being played now`
+            : `Tournament finished · ${games.length} games`
+        $('lab-progress').style.width = `${games.length ? Math.round(done / games.length * 100) : 0}%`
+        $('lab-banner').classList.add('hidden')
+        return
+    }
+
     const status = state.running
-        ? `Generation ${state.generation} of ${state.generations} · ${done} of ${games.length} games finished${state.settings?.watchable ? ' · watchable pace' : ''}`
+        ? `${state.settings?.playoff ? 'Final playoff between generation winners' : `Generation ${state.generation} of ${state.generations}`} · ${done} of ${games.length} games finished${state.settings?.continuing ? ` · continuing ${state.settings.continuing}` : ''}${state.settings?.watchable ? ' · watchable pace' : ''}`
         : state.lastBot ? 'Training finished.' : 'Not training right now.'
     $('lab-status').textContent = status
 
-    const total = state.generations ? ((state.generation - 1) + (games.length ? done / games.length : 0)) / state.generations : 0
+    // The playoff is shown as one extra step after the last generation.
+    const steps = state.generations + 1
+    const step = state.settings?.playoff ? state.generations : state.generation - 1
+    const total = state.generations ? (step + (games.length ? done / games.length : 0)) / steps : 0
     $('lab-progress').style.width = `${Math.round((state.running ? total : state.lastBot ? 1 : 0) * 100)}%`
 
     const banner = $('lab-banner')
@@ -175,7 +201,10 @@ const renderHeader = _ => {
 }
 
 const renderStandings = _ => {
-    // Live points from finished games this generation (draws count half).
+    $('lab-standings-title').textContent = tournament() ? 'Standings (points · Elo now)' : state.settings?.playoff ? 'Playoff (generation winners)' : 'Variations this generation'
+    const elo = tournament() ? liveRatings() : null
+
+    // Live points from finished games (draws count half): this generation, or the whole tournament.
     const points = new Map()
     for(const g of state.games.values()){
         for(const v of [g.white, g.black]) if(!points.has(v)) points.set(v, 0)
@@ -188,33 +217,45 @@ const renderStandings = _ => {
     ;[...points.entries()].sort((a, b) => b[1] - a[1]).forEach(([v, p], i) => {
         const row = document.createElement('li')
         row.className = 'flex justify-between'
-        row.innerHTML = `<span>${i + 1}. Variation ${variant(v)}</span><span class="font-semibold tabular-nums"></span>`
-        row.lastChild.textContent = p
+        row.innerHTML = `<span></span><span class="font-semibold tabular-nums"></span>`
+        row.firstChild.textContent = tournament() ? `${i + 1}. ${variant(v)}` : `${i + 1}. Variation ${variant(v)}`
+        row.lastChild.textContent = tournament() ? `${p} · ${elo[v] ?? '?'}` : p
         list.append(row)
     })
 }
 
 const renderHistory = _ => {
+    $('lab-history-title').textContent = tournament() ? 'Results' : 'Generations'
     const list = $('lab-history')
     list.replaceChildren()
-    for(const h of state.history){
-        const row = document.createElement('li')
-        row.textContent = `Gen ${h.generation}: best ${h.bestFitnessThisGen} pts (best so far ${h.bestFitnessEver})`
-        list.append(row)
-    }
+    for(const h of state.history) list.append(historyRow(h))
     if(!state.history.length){
         const row = document.createElement('li')
         row.className = 'font-sans text-(--text-muted)'
-        row.textContent = 'Results appear here as each generation finishes.'
+        row.textContent = tournament() ? 'Results appear here as each game finishes.' : 'Results appear here as each generation finishes.'
         list.append(row)
     }
+}
+
+const historyRow = h => {
+    const row = document.createElement('li')
+    if(!tournament()){
+        row.textContent = h.playoff
+            ? `Playoff: winner ${h.bestFitnessThisGen} pts`
+            : `Gen ${h.generation}: best ${h.bestFitnessThisGen} pts (best so far ${h.bestFitnessEver})`
+        return row
+    }
+    const r = h.result
+    const outcome = r.result == 'draw' ? 'draw' : `${variant(r.result == 'white' ? h.white : h.black)} wins`
+    row.textContent = `[${h.gamesPlayed}/${h.totalGames}] ${variant(h.white)} vs ${variant(h.black)}: ${outcome} (${r.reason})`
+    return row
 }
 
 // ------ Messages from the server ------
 
 const onLab = msg => {
     if(msg.type == 'labState'){
-        Object.assign(state, { running: msg.running, generation: msg.generation, generations: msg.generations, settings: msg.settings, history: msg.history || [], lastBot: msg.lastBot })
+        Object.assign(state, { mode: msg.mode, names: msg.names || {}, running: msg.running, generation: msg.generation, generations: msg.generations, settings: msg.settings, history: msg.history || [], lastBot: msg.lastBot })
         state.games = new Map(msg.games.map(g => [g.id, g]))
         if(!state.games.has(state.focused)){ state.focused = msg.games[0]?.id ?? null; state.pinned = false }
         if(state.open){ buildGrid(); renderHeader(); renderStandings(); renderHistory(); drawFocus() }
@@ -232,7 +273,16 @@ const onLab = msg => {
 
     if(msg.type == 'labProgress'){
         state.history.push(msg)
-        if(state.open) renderHistory()
+        if(!state.open) return
+        if(tournament()){
+            // Append rather than rebuilding: a tournament can have hundreds of results.
+            const list = $('lab-history')
+            if(state.history.length == 1) list.replaceChildren()
+            list.append(historyRow(msg))
+            list.scrollTop = list.scrollHeight
+            renderStandings()
+        }
+        else renderHistory()
     }
 }
 

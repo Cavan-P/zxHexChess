@@ -2,7 +2,7 @@ import { Game } from './game.js'
 import { addSystemMessage } from './chat.js'
 import { showPly } from './review.js'
 import { ratingLabel, titleBadge, requestLeaderboard, getBeatenBots, markBotBeaten } from './profile.js'
-import { sendRematch, sendRoomCreate, sendRoomJoin, sendStartBotGame, sendBotVsBot, sendStartTournament, sendStartTraining, sendResign, sendOfferDraw, sendAcceptDraw, sendDeclineDraw, sendLeaveRoom } from './network.js'
+import { sendRematch, sendRoomCreate, sendRoomJoin, sendStartBotGame, sendBotVsBot, sendStartTournament, sendStartTraining, sendFreezeBot, sendResign, sendOfferDraw, sendAcceptDraw, sendDeclineDraw, sendLeaveRoom } from './network.js'
 
 const categoryOrder = [
     'Beginner',
@@ -554,19 +554,54 @@ export const setupRoomMenu = _ => {
         renderBotGrid()
         renderBotVsBotPanel()
         renderTournamentGrid()
+        renderTrainingBases()
+    }
+
+    // Trained bots can be trained further: their weights seed the next run and the result replaces them.
+    const renderTrainingBases = _ => {
+        const select = document.getElementById('train-base')
+        const current = select.value
+        const evolved = Game.botList.filter(b => b.category == 'Evolved' && !b.labOnly)
+
+        select.replaceChildren(
+            new Option('A new bot (default weights)', ''),
+            ...evolved.map(b => new Option(`Keep training ${b.name} (${b.elo})`, b.id))
+        )
+        if(evolved.some(b => b.id == current)) select.value = current
+        updateFreezeButton()
+    }
+
+    // Frozen snapshots (lab-only bots) are sparring partners for tournaments, not opponents for players.
+    const playableBots = _ => Game.botList.filter(b => !b.labOnly)
+
+    const updateFreezeButton = _ => {
+        document.getElementById('train-freeze-btn').disabled = !document.getElementById('train-base').value
+    }
+    document.getElementById('train-base').onchange = updateFreezeButton
+
+    document.getElementById('train-freeze-btn').onclick = _ => {
+        const id = document.getElementById('train-base').value
+        if(id) sendFreezeBot(id)
+    }
+
+    Game.onBotFrozen = bot => {
+        const log = document.getElementById('train-log')
+        log.append(el('div', 'font-semibold text-(--text-strong)', `Frozen: ${bot.name} (lab-only, for tournaments and A/B matches)`))
+        log.scrollTop = log.scrollHeight
     }
 
     const renderBotGrid = _ => {
         const beaten = getBeatenBots()
-        const tiers = new Set(Game.botList.map(b => b.category)).size
+        const bots = playableBots()
+        const tiers = new Set(bots.map(b => b.category)).size
 
-        document.getElementById('bot-count').textContent = `${Game.botList.length} opponents across ${tiers} skill levels.`
+        document.getElementById('bot-count').textContent = `${bots.length} opponents across ${tiers} skill levels.`
 
         const container = document.getElementById('bot-grid')
         container.replaceChildren()
 
         let currentCategory = null
-        for(const bot of Game.botList){
+        for(const bot of bots){
             if(bot.category != currentCategory){
                 currentCategory = bot.category
                 container.append(el('h3', 'tier-heading', currentCategory))
@@ -667,7 +702,10 @@ export const setupRoomMenu = _ => {
         document.getElementById('tournament-standings').replaceChildren()
 
         sendStartTournament(ids, games)
+        Game.openLab?.()
     }
+
+    document.getElementById('tournament-watch-btn').onclick = _ => Game.openLab?.()
 
     const botName = id => Game.botList.find(b => b.id == id)?.name || id
 
@@ -705,12 +743,14 @@ export const setupRoomMenu = _ => {
     document.getElementById('train-start-btn').onclick = _ => {
         const generations = +document.getElementById('train-generations').value || 6
         const population = +document.getElementById('train-population').value || 8
-        const games = +document.getElementById('train-games').value || 1
+        const games = +document.getElementById('train-games').value || 2
 
         document.getElementById('train-log').replaceChildren()
 
         sendStartTraining(generations, population, games, document.getElementById('train-watchable').checked,
-            +document.getElementById('train-play-depth').value || 6, +document.getElementById('train-play-seconds').value || 5)
+            +document.getElementById('train-play-depth').value || 6, +document.getElementById('train-play-seconds').value || 5,
+            document.getElementById('train-base').value || null,
+            +document.getElementById('train-depth').value || 3, +document.getElementById('train-seconds').value || 0.25)
         Game.openLab?.()
     }
 
@@ -718,13 +758,17 @@ export const setupRoomMenu = _ => {
 
     Game.onTrainingProgress = data => {
         const log = document.getElementById('train-log')
-        log.append(el('div', '', `Generation ${data.generation}/${data.generations}: best this gen ${data.bestFitnessThisGen}, best ever ${data.bestFitnessEver}`))
+        log.append(el('div', '', data.playoff
+            ? `Playoff between generation winners: winner scored ${data.bestFitnessThisGen}`
+            : `Generation ${data.generation}/${data.generations}: best this gen ${data.bestFitnessThisGen}, best ever ${data.bestFitnessEver}`))
         log.scrollTop = log.scrollHeight
     }
 
     Game.onTrainingComplete = data => {
         const log = document.getElementById('train-log')
-        log.append(el('div', 'font-semibold text-(--text-strong)', `Done! New bot created: ${data.bot.name}`))
+        log.append(el('div', 'font-semibold text-(--text-strong)', data.bot.updated
+            ? `Done! ${data.bot.name} updated (${data.bot.generations} generations of training in total)`
+            : `Done! New bot created: ${data.bot.name}`))
         log.scrollTop = log.scrollHeight
 
         Game.onBotListReceived?.(data.bots)

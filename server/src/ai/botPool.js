@@ -67,4 +67,7 @@ const requestBotMove = (botId, state) => new Promise((resolve, reject) => {
     pump()
 })
 
-module.exports = { requestBotMove }
+// Tells every worker to rescan the bot files (queued behind whatever move it's working on).
+const reloadBots = _ => { for(const entry of workers) entry.worker.postMessage({ type: 'reload' }) }
+
+module.exports = { requestBotMove, reloadBots }

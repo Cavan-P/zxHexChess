@@ -1,22 +1,41 @@
-// Plays complete training games between two evaluation "genomes", reporting every move as it
-// happens so the Lab view can show the games live.
+// Plays complete games off the main thread, reporting every move as it happens so the Lab view can
+// show them live: training games between two evaluation "genomes", or tournament games between two
+// real bots (whiteBot/blackBot ids).
 const { parentPort } = require('worker_threads')
 const { GameState } = require('../game/rules')
 const { searchBot, evaluateWeighted } = require('./engine')
+const botManager = require('./botManager')
+const { readEvolvedBot } = require('./evolve')
 
 const other = c => c == 'white' ? 'black' : 'white'
 
 // Sleeps this worker thread (it has nothing else to do) - used for the lab's "watchable" pace.
 const pause = ms => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms)
 
-parentPort.on('message', ({ jobId, white, black, depth, timeMs, maxPlies, noProgressLimit, paceMs = 0 }) => {
+parentPort.on('message', ({ jobId, white, black, whiteBot, blackBot, depth, timeMs, quiescence = false, maxPlies, noProgressLimit, paceMs = 0, botTimeMs }) => {
     try {
         const game = new GameState()
         const player = genome => state => searchBot({
-            ...state, maxDepth: depth, timeLimitMs: timeMs,
+            ...state, maxDepth: depth, timeLimitMs: timeMs, quiescence, checkBonus: genome.checkBonus,
             evaluate: (board, color, ep, toMove) => evaluateWeighted(board, color, ep, genome, toMove)
         })
-        const players = { white: player(white), black: player(black) }
+        // botTimeMs: play an evolved bot with its own weights and depth but a different time per move
+        // (faster A/B matches).
+        const bot = id => {
+            const evolved = botTimeMs && readEvolvedBot(id)
+            if(evolved) return state => searchBot({
+                ...state, maxDepth: evolved.playDepth || 8, timeLimitMs: botTimeMs, quiescence: true, checkBonus: evolved.genome.checkBonus,
+                evaluate: (board, color, ep, toMove) => evaluateWeighted(board, color, ep, evolved.genome, toMove)
+            })
+            // Rescan once for bots added since this thread started (e.g. freshly trained ones).
+            if(!botManager.getBotByName(id)) botManager.reload()
+            const play = botManager.getBotByName(id)
+            if(!play) throw new Error(`Unknown bot: ${id}`)
+            return play
+        }
+        const players = whiteBot
+            ? { white: bot(whiteBot), black: bot(blackBot) }
+            : { white: player(white), black: player(black) }
         let result = null
 
         while(game.history.length < maxPlies){
