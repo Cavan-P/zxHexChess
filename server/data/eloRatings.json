@@ -63,11 +63,11 @@
     "gamesPlayed": 54
   },
   "victorKane": {
-    "elo": 1723,
-    "wins": 47,
-    "losses": 5,
-    "draws": 2,
-    "gamesPlayed": 54
+    "elo": 1667,
+    "wins": 61,
+    "losses": 18,
+    "draws": 5,
+    "gamesPlayed": 84
   },
   "alexHarper": {
     "elo": 275,
@@ -119,18 +119,18 @@
     "gamesPlayed": 54
   },
   "adaKessler": {
-    "elo": 1421,
-    "wins": 48,
-    "losses": 6,
-    "draws": 0,
-    "gamesPlayed": 54
+    "elo": 1815,
+    "wins": 72,
+    "losses": 9,
+    "draws": 3,
+    "gamesPlayed": 84
   },
   "antonVarga": {
-    "elo": 1569,
-    "wins": 49,
-    "losses": 4,
+    "elo": 1576,
+    "wins": 62,
+    "losses": 21,
     "draws": 1,
-    "gamesPlayed": 54
+    "gamesPlayed": 84
   },
   "danaWhitlock": {
     "elo": 1219,
@@ -161,18 +161,18 @@
     "gamesPlayed": 54
   },
   "corneliusAshby": {
-    "elo": 1833,
-    "wins": 48,
-    "losses": 5,
+    "elo": 1751,
+    "wins": 68,
+    "losses": 15,
     "draws": 1,
-    "gamesPlayed": 54
+    "gamesPlayed": 84
   },
   "henrikSolberg": {
-    "elo": 1928,
-    "wins": 47,
-    "losses": 7,
+    "elo": 1553,
+    "wins": 52,
+    "losses": 32,
     "draws": 0,
-    "gamesPlayed": 54
+    "gamesPlayed": 84
   },
   "isadoraQuinn": {
     "elo": 1759,
@@ -194,5 +194,33 @@
     "losses": 38,
     "draws": 3,
     "gamesPlayed": 54
+  },
+  "adaKesslerV1": {
+    "elo": 1533,
+    "wins": 11,
+    "losses": 19,
+    "draws": 0,
+    "gamesPlayed": 30
+  },
+  "adaKesslerV2": {
+    "elo": 1421,
+    "wins": 0,
+    "losses": 0,
+    "draws": 0,
+    "gamesPlayed": 0
+  },
+  "adaKesslerV3": {
+    "elo": 1421,
+    "wins": 0,
+    "losses": 0,
+    "draws": 0,
+    "gamesPlayed": 0
+  },
+  "adaKesslerV4": {
+    "elo": 1421,
+    "wins": 0,
+    "losses": 0,
+    "draws": 0,
+    "gamesPlayed": 0
   }
 }

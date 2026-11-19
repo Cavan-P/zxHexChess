@@ -19,6 +19,12 @@ const { fork, spawn } = require('child_process')
 
 const args = process.argv.slice(2)
 const flag = (name, fallback) => { const i = args.indexOf(`--${name}`); return i >= 0 ? args[i + 1] : fallback }
+// Without the `--` (npm run overnight --rounds 3) npm swallows the flags and passes only stray values.
+const stray = args.filter((a, i) => !a.startsWith('--') && !(i > 0 && args[i - 1].startsWith('--')))
+if(stray.length || Object.keys(process.env).some(k => /^npm_config_(rounds|gens|pop|games|match|seconds|bot)$/.test(k))){
+    console.error(`Options didn't reach the script - put -- before them, e.g.  npm run overnight -- --rounds 3`)
+    process.exit(1)
+}
 const id = flag('bot', 'adaKessler')
 const rounds = Math.max(1, Math.round(+flag('rounds', 1)))
 const matchGames = String(Math.max(2, Math.round(+flag('match', 100))))

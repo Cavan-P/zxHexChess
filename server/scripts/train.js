@@ -10,6 +10,12 @@ const { shutdown } = require('../src/ai/trainPool')
 
 const args = process.argv.slice(2)
 const flag = (name, fallback) => { const i = args.indexOf(`--${name}`); return i >= 0 ? args[i + 1] : fallback }
+// Without the `--` (npm run overnight --rounds 3) npm swallows the flags and passes only stray values.
+const stray = args.filter((a, i) => !a.startsWith('--') && !(i > 0 && args[i - 1].startsWith('--')))
+if(stray.length || Object.keys(process.env).some(k => /^npm_config_(rounds|gens|pop|games|match|seconds|bot)$/.test(k))){
+    console.error(`Options didn't reach the script - put -- before them, e.g.  npm run train -- --gens 30`)
+    process.exit(1)
+}
 const id = flag('bot', 'adaKessler')
 const generations = Math.min(200, Math.max(1, Math.round(+flag('gens', 30))))
 const populationSize = Math.min(32, Math.max(2, Math.round(+flag('pop', 16))))
