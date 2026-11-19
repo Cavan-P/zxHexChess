@@ -11,6 +11,7 @@ import { setSystemMessage } from './utils.js'
 import { setupProfile, requestLeaderboard } from './profile.js'
 import { setupThemePicker } from './theme.js'
 import { setupReview } from './review.js'
+import { setupGifExport } from './gif.js'
 import { setupLab } from './lab.js'
 import { play } from './sound.js'
 
@@ -53,6 +54,7 @@ Game.resyncBoard = fen => populateBoardFromFen(fen)
 
 setupThemePicker()
 setupReview()
+setupGifExport()
 setupLab()
 setupProfile()
 setupAchievements()

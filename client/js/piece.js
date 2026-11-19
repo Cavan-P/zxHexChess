@@ -4,7 +4,7 @@ import { premoveTargets, setPremove, cancelPremove } from "./premove.js"
 import { pointInHexagon, Smooth } from "./utils.js"
 
 // Where each piece sits in img/pieces.png (200px squares; white on the top row, black below).
-const SPRITES = {
+export const SPRITES = {
     "p":[1000,200], "P":[1000,0],
     "r":[800,200],  "R":[800,0],
     "n":[600,200],  "N":[600,0],
