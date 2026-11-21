@@ -11,7 +11,8 @@
     "collect": "node scripts/collectPositions.js",
     "tune": "node scripts/texelTune.js",
     "train": "node scripts/train.js",
-    "overnight": "node scripts/overnight.js"
+    "overnight": "node scripts/overnight.js",
+    "rate": "node scripts/rateBots.js"
   },
   "keywords": [],
   "author": "",

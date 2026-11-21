@@ -1,0 +1,1068 @@
+{"t":1795130820595,"white":"evanBrooks","black":"timothyWells","wv":"1b9c3943ef","bv":"29d40e8ec3","result":"draw","reason":"move limit"}
+{"t":1795130820894,"white":"timothyWells","black":"evanBrooks","wv":"29d40e8ec3","bv":"1b9c3943ef","result":"black","reason":"checkmate"}
+{"t":1795130821149,"white":"evanBrooks","black":"timothyWells","wv":"1b9c3943ef","bv":"29d40e8ec3","result":"draw","reason":"move limit"}
+{"t":1795130821325,"white":"timothyWells","black":"evanBrooks","wv":"29d40e8ec3","bv":"1b9c3943ef","result":"draw","reason":"move limit"}
+{"t":1795130821447,"white":"timothyWells","black":"evanBrooks","wv":"29d40e8ec3","bv":"1b9c3943ef","result":"draw","reason":"move limit"}
+{"t":1795130821609,"white":"evanBrooks","black":"timothyWells","wv":"1b9c3943ef","bv":"29d40e8ec3","result":"draw","reason":"move limit"}
+{"t":1795130822736,"white":"timothyWells","black":"evanBrooks","wv":"29d40e8ec3","bv":"1b9c3943ef","result":"draw","reason":"move limit"}
+{"t":1795130822792,"white":"timothyWells","black":"evanBrooks","wv":"29d40e8ec3","bv":"1b9c3943ef","result":"black","reason":"checkmate"}
+{"t":1795130823163,"white":"evanBrooks","black":"timothyWells","wv":"1b9c3943ef","bv":"29d40e8ec3","result":"draw","reason":"insufficient material"}
+{"t":1795130823479,"white":"evanBrooks","black":"timothyWells","wv":"1b9c3943ef","bv":"29d40e8ec3","result":"draw","reason":"move limit"}
+{"t":1795130826321,"white":"timothyWells","black":"sarahMitchell","wv":"29d40e8ec3","bv":"1ba0c192d7","result":"draw","reason":"move limit"}
+{"t":1795130826584,"white":"sarahMitchell","black":"timothyWells","wv":"1ba0c192d7","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130826878,"white":"sarahMitchell","black":"timothyWells","wv":"1ba0c192d7","bv":"29d40e8ec3","result":"black","reason":"checkmate"}
+{"t":1795130828753,"white":"timothyWells","black":"sarahMitchell","wv":"29d40e8ec3","bv":"1ba0c192d7","result":"black","reason":"checkmate"}
+{"t":1795130829313,"white":"sarahMitchell","black":"timothyWells","wv":"1ba0c192d7","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130829951,"white":"timothyWells","black":"sarahMitchell","wv":"29d40e8ec3","bv":"1ba0c192d7","result":"black","reason":"checkmate"}
+{"t":1795130829974,"white":"timothyWells","black":"sarahMitchell","wv":"29d40e8ec3","bv":"1ba0c192d7","result":"draw","reason":"move limit"}
+{"t":1795130830574,"white":"timothyWells","black":"alexHarper","wv":"29d40e8ec3","bv":"8393172b30","result":"black","reason":"checkmate"}
+{"t":1795130831027,"white":"timothyWells","black":"alexHarper","wv":"29d40e8ec3","bv":"8393172b30","result":"black","reason":"checkmate"}
+{"t":1795130831065,"white":"alexHarper","black":"timothyWells","wv":"8393172b30","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130831850,"white":"sarahMitchell","black":"timothyWells","wv":"1ba0c192d7","bv":"29d40e8ec3","result":"draw","reason":"move limit"}
+{"t":1795130832289,"white":"timothyWells","black":"sarahMitchell","wv":"29d40e8ec3","bv":"1ba0c192d7","result":"black","reason":"checkmate"}
+{"t":1795130832436,"white":"timothyWells","black":"alexHarper","wv":"29d40e8ec3","bv":"8393172b30","result":"black","reason":"checkmate"}
+{"t":1795130832510,"white":"alexHarper","black":"timothyWells","wv":"8393172b30","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130832835,"white":"alexHarper","black":"timothyWells","wv":"8393172b30","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130832959,"white":"timothyWells","black":"alexHarper","wv":"29d40e8ec3","bv":"8393172b30","result":"black","reason":"checkmate"}
+{"t":1795130833317,"white":"alexHarper","black":"timothyWells","wv":"8393172b30","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130833781,"white":"alexHarper","black":"timothyWells","wv":"8393172b30","bv":"29d40e8ec3","result":"draw","reason":"move limit"}
+{"t":1795130834369,"white":"timothyWells","black":"hannahLewis","wv":"29d40e8ec3","bv":"c62d92809e","result":"draw","reason":"move limit"}
+{"t":1795130834426,"white":"timothyWells","black":"alexHarper","wv":"29d40e8ec3","bv":"8393172b30","result":"draw","reason":"move limit"}
+{"t":1795130834948,"white":"hannahLewis","black":"timothyWells","wv":"c62d92809e","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130834966,"white":"hannahLewis","black":"timothyWells","wv":"c62d92809e","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130835056,"white":"timothyWells","black":"hannahLewis","wv":"29d40e8ec3","bv":"c62d92809e","result":"draw","reason":"move limit"}
+{"t":1795130835069,"white":"sarahMitchell","black":"timothyWells","wv":"1ba0c192d7","bv":"29d40e8ec3","result":"black","reason":"checkmate"}
+{"t":1795130836003,"white":"timothyWells","black":"hannahLewis","wv":"29d40e8ec3","bv":"c62d92809e","result":"black","reason":"checkmate"}
+{"t":1795130836045,"white":"timothyWells","black":"hannahLewis","wv":"29d40e8ec3","bv":"c62d92809e","result":"black","reason":"checkmate"}
+{"t":1795130836050,"white":"hannahLewis","black":"timothyWells","wv":"c62d92809e","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130836131,"white":"hannahLewis","black":"timothyWells","wv":"c62d92809e","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130836394,"white":"hannahLewis","black":"timothyWells","wv":"c62d92809e","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130836789,"white":"timothyWells","black":"hannahLewis","wv":"29d40e8ec3","bv":"c62d92809e","result":"black","reason":"checkmate"}
+{"t":1795130837285,"white":"kyleMorton","black":"timothyWells","wv":"037f409598","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130837387,"white":"timothyWells","black":"kyleMorton","wv":"29d40e8ec3","bv":"037f409598","result":"black","reason":"checkmate"}
+{"t":1795130837419,"white":"timothyWells","black":"kyleMorton","wv":"29d40e8ec3","bv":"037f409598","result":"black","reason":"checkmate"}
+{"t":1795130837711,"white":"timothyWells","black":"kyleMorton","wv":"29d40e8ec3","bv":"037f409598","result":"black","reason":"checkmate"}
+{"t":1795130837792,"white":"kyleMorton","black":"timothyWells","wv":"037f409598","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130837922,"white":"timothyWells","black":"miloPruitt","wv":"29d40e8ec3","bv":"3d0c388350","result":"black","reason":"stalemate"}
+{"t":1795130838039,"white":"miloPruitt","black":"timothyWells","wv":"3d0c388350","bv":"29d40e8ec3","result":"white","reason":"stalemate"}
+{"t":1795130838209,"white":"timothyWells","black":"miloPruitt","wv":"29d40e8ec3","bv":"3d0c388350","result":"black","reason":"stalemate"}
+{"t":1795130838323,"white":"miloPruitt","black":"timothyWells","wv":"3d0c388350","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130838419,"white":"timothyWells","black":"miloPruitt","wv":"29d40e8ec3","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130838487,"white":"kyleMorton","black":"timothyWells","wv":"037f409598","bv":"29d40e8ec3","result":"white","reason":"stalemate"}
+{"t":1795130838495,"white":"miloPruitt","black":"timothyWells","wv":"3d0c388350","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130838564,"white":"miloPruitt","black":"timothyWells","wv":"3d0c388350","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130838601,"white":"timothyWells","black":"miloPruitt","wv":"29d40e8ec3","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130838641,"white":"timothyWells","black":"miloPruitt","wv":"29d40e8ec3","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130838671,"white":"miloPruitt","black":"timothyWells","wv":"3d0c388350","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130838752,"white":"kyleMorton","black":"timothyWells","wv":"037f409598","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130838753,"white":"timothyWells","black":"kyleMorton","wv":"29d40e8ec3","bv":"037f409598","result":"black","reason":"checkmate"}
+{"t":1795130838793,"white":"luciaMoreno","black":"timothyWells","wv":"aa1df1d7a0","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130838810,"white":"timothyWells","black":"luciaMoreno","wv":"29d40e8ec3","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130838834,"white":"timothyWells","black":"luciaMoreno","wv":"29d40e8ec3","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130838903,"white":"luciaMoreno","black":"timothyWells","wv":"aa1df1d7a0","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130838907,"white":"luciaMoreno","black":"timothyWells","wv":"aa1df1d7a0","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130838914,"white":"timothyWells","black":"luciaMoreno","wv":"29d40e8ec3","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130838917,"white":"timothyWells","black":"luciaMoreno","wv":"29d40e8ec3","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130838987,"white":"timothyWells","black":"owenFairbanks","wv":"29d40e8ec3","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130839024,"white":"luciaMoreno","black":"timothyWells","wv":"aa1df1d7a0","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130839040,"white":"timothyWells","black":"luciaMoreno","wv":"29d40e8ec3","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130839059,"white":"luciaMoreno","black":"timothyWells","wv":"aa1df1d7a0","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130839133,"white":"timothyWells","black":"kyleMorton","wv":"29d40e8ec3","bv":"037f409598","result":"black","reason":"checkmate"}
+{"t":1795130839147,"white":"owenFairbanks","black":"timothyWells","wv":"3a730bae20","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130839180,"white":"owenFairbanks","black":"timothyWells","wv":"3a730bae20","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130839184,"white":"timothyWells","black":"owenFairbanks","wv":"29d40e8ec3","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130839232,"white":"owenFairbanks","black":"timothyWells","wv":"3a730bae20","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130839263,"white":"timothyWells","black":"owenFairbanks","wv":"29d40e8ec3","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130839279,"white":"timothyWells","black":"owenFairbanks","wv":"29d40e8ec3","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130839279,"white":"timothyWells","black":"owenFairbanks","wv":"29d40e8ec3","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130839335,"white":"owenFairbanks","black":"timothyWells","wv":"3a730bae20","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130839358,"white":"owenFairbanks","black":"timothyWells","wv":"3a730bae20","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130839375,"white":"samuelReyes","black":"timothyWells","wv":"68a2140fca","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130839376,"white":"timothyWells","black":"samuelReyes","wv":"29d40e8ec3","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130839384,"white":"timothyWells","black":"samuelReyes","wv":"29d40e8ec3","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130839441,"white":"samuelReyes","black":"timothyWells","wv":"68a2140fca","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130839471,"white":"samuelReyes","black":"timothyWells","wv":"68a2140fca","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130839474,"white":"timothyWells","black":"samuelReyes","wv":"29d40e8ec3","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130839475,"white":"timothyWells","black":"samuelReyes","wv":"29d40e8ec3","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130839496,"white":"samuelReyes","black":"timothyWells","wv":"68a2140fca","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130839502,"white":"timothyWells","black":"samuelReyes","wv":"29d40e8ec3","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130839523,"white":"timothyWells","black":"priyaNandakumar","wv":"29d40e8ec3","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130839554,"white":"timothyWells","black":"priyaNandakumar","wv":"29d40e8ec3","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130839555,"white":"priyaNandakumar","black":"timothyWells","wv":"f3c1733cfe","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130839560,"white":"samuelReyes","black":"timothyWells","wv":"68a2140fca","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130839579,"white":"priyaNandakumar","black":"timothyWells","wv":"f3c1733cfe","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130839602,"white":"timothyWells","black":"priyaNandakumar","wv":"29d40e8ec3","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130839616,"white":"priyaNandakumar","black":"timothyWells","wv":"f3c1733cfe","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130839623,"white":"timothyWells","black":"priyaNandakumar","wv":"29d40e8ec3","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130839623,"white":"timothyWells","black":"priyaNandakumar","wv":"29d40e8ec3","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130839636,"white":"kyleMorton","black":"timothyWells","wv":"037f409598","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130839647,"white":"priyaNandakumar","black":"timothyWells","wv":"f3c1733cfe","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130839680,"white":"priyaNandakumar","black":"timothyWells","wv":"f3c1733cfe","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130839720,"white":"derekSanders","black":"timothyWells","wv":"335c6fbb2f","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130839720,"white":"timothyWells","black":"derekSanders","wv":"29d40e8ec3","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130839727,"white":"timothyWells","black":"derekSanders","wv":"29d40e8ec3","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130839759,"white":"derekSanders","black":"timothyWells","wv":"335c6fbb2f","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130839763,"white":"derekSanders","black":"timothyWells","wv":"335c6fbb2f","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130839786,"white":"timothyWells","black":"derekSanders","wv":"29d40e8ec3","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130839825,"white":"timothyWells","black":"derekSanders","wv":"29d40e8ec3","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130839826,"white":"derekSanders","black":"timothyWells","wv":"335c6fbb2f","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130839845,"white":"timothyWells","black":"derekSanders","wv":"29d40e8ec3","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130839867,"white":"derekSanders","black":"timothyWells","wv":"335c6fbb2f","bv":"29d40e8ec3","result":"white","reason":"checkmate"}
+{"t":1795130844161,"white":"sarahMitchell","black":"evanBrooks","wv":"1ba0c192d7","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130844627,"white":"evanBrooks","black":"sarahMitchell","wv":"1b9c3943ef","bv":"1ba0c192d7","result":"draw","reason":"move limit"}
+{"t":1795130844693,"white":"sarahMitchell","black":"evanBrooks","wv":"1ba0c192d7","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130845881,"white":"evanBrooks","black":"sarahMitchell","wv":"1b9c3943ef","bv":"1ba0c192d7","result":"draw","reason":"move limit"}
+{"t":1795130846251,"white":"sarahMitchell","black":"evanBrooks","wv":"1ba0c192d7","bv":"1b9c3943ef","result":"draw","reason":"move limit"}
+{"t":1795130846742,"white":"evanBrooks","black":"sarahMitchell","wv":"1b9c3943ef","bv":"1ba0c192d7","result":"draw","reason":"move limit"}
+{"t":1795130848222,"white":"evanBrooks","black":"alexHarper","wv":"1b9c3943ef","bv":"8393172b30","result":"black","reason":"checkmate"}
+{"t":1795130848565,"white":"alexHarper","black":"evanBrooks","wv":"8393172b30","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130849504,"white":"evanBrooks","black":"sarahMitchell","wv":"1b9c3943ef","bv":"1ba0c192d7","result":"black","reason":"checkmate"}
+{"t":1795130849752,"white":"sarahMitchell","black":"evanBrooks","wv":"1ba0c192d7","bv":"1b9c3943ef","result":"black","reason":"checkmate"}
+{"t":1795130849878,"white":"evanBrooks","black":"sarahMitchell","wv":"1b9c3943ef","bv":"1ba0c192d7","result":"draw","reason":"move limit"}
+{"t":1795130850191,"white":"evanBrooks","black":"alexHarper","wv":"1b9c3943ef","bv":"8393172b30","result":"black","reason":"checkmate"}
+{"t":1795130850515,"white":"sarahMitchell","black":"evanBrooks","wv":"1ba0c192d7","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130850724,"white":"alexHarper","black":"evanBrooks","wv":"8393172b30","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130851405,"white":"evanBrooks","black":"alexHarper","wv":"1b9c3943ef","bv":"8393172b30","result":"black","reason":"checkmate"}
+{"t":1795130851479,"white":"evanBrooks","black":"alexHarper","wv":"1b9c3943ef","bv":"8393172b30","result":"draw","reason":"move limit"}
+{"t":1795130852155,"white":"alexHarper","black":"evanBrooks","wv":"8393172b30","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130852254,"white":"alexHarper","black":"evanBrooks","wv":"8393172b30","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130852443,"white":"alexHarper","black":"evanBrooks","wv":"8393172b30","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130852548,"white":"evanBrooks","black":"alexHarper","wv":"1b9c3943ef","bv":"8393172b30","result":"black","reason":"checkmate"}
+{"t":1795130853634,"white":"hannahLewis","black":"evanBrooks","wv":"c62d92809e","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130854031,"white":"evanBrooks","black":"hannahLewis","wv":"1b9c3943ef","bv":"c62d92809e","result":"black","reason":"checkmate"}
+{"t":1795130854665,"white":"evanBrooks","black":"hannahLewis","wv":"1b9c3943ef","bv":"c62d92809e","result":"draw","reason":"move limit"}
+{"t":1795130855281,"white":"evanBrooks","black":"hannahLewis","wv":"1b9c3943ef","bv":"c62d92809e","result":"black","reason":"checkmate"}
+{"t":1795130855329,"white":"hannahLewis","black":"evanBrooks","wv":"c62d92809e","bv":"1b9c3943ef","result":"draw","reason":"move limit"}
+{"t":1795130855333,"white":"hannahLewis","black":"evanBrooks","wv":"c62d92809e","bv":"1b9c3943ef","result":"draw","reason":"move limit"}
+{"t":1795130855429,"white":"hannahLewis","black":"evanBrooks","wv":"c62d92809e","bv":"1b9c3943ef","result":"black","reason":"checkmate"}
+{"t":1795130855572,"white":"evanBrooks","black":"hannahLewis","wv":"1b9c3943ef","bv":"c62d92809e","result":"black","reason":"checkmate"}
+{"t":1795130857005,"white":"kyleMorton","black":"evanBrooks","wv":"037f409598","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130857343,"white":"hannahLewis","black":"evanBrooks","wv":"c62d92809e","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130857871,"white":"evanBrooks","black":"kyleMorton","wv":"1b9c3943ef","bv":"037f409598","result":"black","reason":"checkmate"}
+{"t":1795130858045,"white":"evanBrooks","black":"hannahLewis","wv":"1b9c3943ef","bv":"c62d92809e","result":"draw","reason":"move limit"}
+{"t":1795130858145,"white":"evanBrooks","black":"kyleMorton","wv":"1b9c3943ef","bv":"037f409598","result":"draw","reason":"50-move rule"}
+{"t":1795130858168,"white":"kyleMorton","black":"evanBrooks","wv":"037f409598","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130859510,"white":"evanBrooks","black":"kyleMorton","wv":"1b9c3943ef","bv":"037f409598","result":"black","reason":"checkmate"}
+{"t":1795130859523,"white":"kyleMorton","black":"evanBrooks","wv":"037f409598","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130859864,"white":"evanBrooks","black":"kyleMorton","wv":"1b9c3943ef","bv":"037f409598","result":"black","reason":"checkmate"}
+{"t":1795130860235,"white":"evanBrooks","black":"kyleMorton","wv":"1b9c3943ef","bv":"037f409598","result":"black","reason":"checkmate"}
+{"t":1795130860246,"white":"miloPruitt","black":"evanBrooks","wv":"3d0c388350","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130860315,"white":"kyleMorton","black":"evanBrooks","wv":"037f409598","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130860635,"white":"evanBrooks","black":"miloPruitt","wv":"1b9c3943ef","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130860750,"white":"evanBrooks","black":"miloPruitt","wv":"1b9c3943ef","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130860778,"white":"kyleMorton","black":"evanBrooks","wv":"037f409598","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130860815,"white":"evanBrooks","black":"miloPruitt","wv":"1b9c3943ef","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130860863,"white":"miloPruitt","black":"evanBrooks","wv":"3d0c388350","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130861270,"white":"miloPruitt","black":"evanBrooks","wv":"3d0c388350","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130861325,"white":"miloPruitt","black":"evanBrooks","wv":"3d0c388350","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130861475,"white":"evanBrooks","black":"miloPruitt","wv":"1b9c3943ef","bv":"3d0c388350","result":"black","reason":"stalemate"}
+{"t":1795130861519,"white":"evanBrooks","black":"luciaMoreno","wv":"1b9c3943ef","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130861759,"white":"miloPruitt","black":"evanBrooks","wv":"3d0c388350","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130861875,"white":"luciaMoreno","black":"evanBrooks","wv":"aa1df1d7a0","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130862061,"white":"evanBrooks","black":"luciaMoreno","wv":"1b9c3943ef","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130862117,"white":"evanBrooks","black":"miloPruitt","wv":"1b9c3943ef","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130862142,"white":"luciaMoreno","black":"evanBrooks","wv":"aa1df1d7a0","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130862443,"white":"luciaMoreno","black":"evanBrooks","wv":"aa1df1d7a0","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130862518,"white":"evanBrooks","black":"luciaMoreno","wv":"1b9c3943ef","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130862697,"white":"luciaMoreno","black":"evanBrooks","wv":"aa1df1d7a0","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130862774,"white":"evanBrooks","black":"luciaMoreno","wv":"1b9c3943ef","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130862848,"white":"luciaMoreno","black":"evanBrooks","wv":"aa1df1d7a0","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130863025,"white":"evanBrooks","black":"luciaMoreno","wv":"1b9c3943ef","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130863075,"white":"evanBrooks","black":"owenFairbanks","wv":"1b9c3943ef","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130863240,"white":"owenFairbanks","black":"evanBrooks","wv":"3a730bae20","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130863466,"white":"evanBrooks","black":"owenFairbanks","wv":"1b9c3943ef","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130863563,"white":"owenFairbanks","black":"evanBrooks","wv":"3a730bae20","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130863708,"white":"evanBrooks","black":"owenFairbanks","wv":"1b9c3943ef","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130863823,"white":"owenFairbanks","black":"evanBrooks","wv":"3a730bae20","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130863861,"white":"evanBrooks","black":"owenFairbanks","wv":"1b9c3943ef","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130864004,"white":"owenFairbanks","black":"evanBrooks","wv":"3a730bae20","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130864166,"white":"evanBrooks","black":"owenFairbanks","wv":"1b9c3943ef","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130864268,"white":"owenFairbanks","black":"evanBrooks","wv":"3a730bae20","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130864435,"white":"evanBrooks","black":"samuelReyes","wv":"1b9c3943ef","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130864488,"white":"samuelReyes","black":"evanBrooks","wv":"68a2140fca","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130864657,"white":"samuelReyes","black":"evanBrooks","wv":"68a2140fca","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130864703,"white":"evanBrooks","black":"samuelReyes","wv":"1b9c3943ef","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130864910,"white":"samuelReyes","black":"evanBrooks","wv":"68a2140fca","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130865137,"white":"samuelReyes","black":"evanBrooks","wv":"68a2140fca","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130865167,"white":"evanBrooks","black":"samuelReyes","wv":"1b9c3943ef","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130865185,"white":"evanBrooks","black":"samuelReyes","wv":"1b9c3943ef","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130865549,"white":"evanBrooks","black":"samuelReyes","wv":"1b9c3943ef","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130865677,"white":"samuelReyes","black":"evanBrooks","wv":"68a2140fca","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130865794,"white":"evanBrooks","black":"priyaNandakumar","wv":"1b9c3943ef","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130865999,"white":"priyaNandakumar","black":"evanBrooks","wv":"f3c1733cfe","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130866069,"white":"priyaNandakumar","black":"evanBrooks","wv":"f3c1733cfe","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130866180,"white":"evanBrooks","black":"priyaNandakumar","wv":"1b9c3943ef","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130866585,"white":"evanBrooks","black":"priyaNandakumar","wv":"1b9c3943ef","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130866822,"white":"evanBrooks","black":"priyaNandakumar","wv":"1b9c3943ef","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130866856,"white":"priyaNandakumar","black":"evanBrooks","wv":"f3c1733cfe","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130867044,"white":"evanBrooks","black":"priyaNandakumar","wv":"1b9c3943ef","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130867333,"white":"priyaNandakumar","black":"evanBrooks","wv":"f3c1733cfe","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130867619,"white":"evanBrooks","black":"derekSanders","wv":"1b9c3943ef","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130867619,"white":"priyaNandakumar","black":"evanBrooks","wv":"f3c1733cfe","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130867632,"white":"derekSanders","black":"evanBrooks","wv":"335c6fbb2f","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130867640,"white":"evanBrooks","black":"derekSanders","wv":"1b9c3943ef","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130867984,"white":"derekSanders","black":"evanBrooks","wv":"335c6fbb2f","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130868353,"white":"evanBrooks","black":"derekSanders","wv":"1b9c3943ef","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130868395,"white":"derekSanders","black":"evanBrooks","wv":"335c6fbb2f","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130868493,"white":"evanBrooks","black":"derekSanders","wv":"1b9c3943ef","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130868665,"white":"evanBrooks","black":"derekSanders","wv":"1b9c3943ef","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130868835,"white":"derekSanders","black":"evanBrooks","wv":"335c6fbb2f","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130868881,"white":"derekSanders","black":"evanBrooks","wv":"335c6fbb2f","bv":"1b9c3943ef","result":"white","reason":"checkmate"}
+{"t":1795130871163,"white":"alexHarper","black":"sarahMitchell","wv":"8393172b30","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130873237,"white":"sarahMitchell","black":"alexHarper","wv":"1ba0c192d7","bv":"8393172b30","result":"black","reason":"checkmate"}
+{"t":1795130873397,"white":"alexHarper","black":"sarahMitchell","wv":"8393172b30","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130874127,"white":"alexHarper","black":"sarahMitchell","wv":"8393172b30","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130876100,"white":"sarahMitchell","black":"alexHarper","wv":"1ba0c192d7","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130876294,"white":"alexHarper","black":"sarahMitchell","wv":"8393172b30","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130877084,"white":"sarahMitchell","black":"alexHarper","wv":"1ba0c192d7","bv":"8393172b30","result":"black","reason":"checkmate"}
+{"t":1795130877790,"white":"alexHarper","black":"sarahMitchell","wv":"8393172b30","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130877793,"white":"sarahMitchell","black":"alexHarper","wv":"1ba0c192d7","bv":"8393172b30","result":"black","reason":"checkmate"}
+{"t":1795130879106,"white":"sarahMitchell","black":"alexHarper","wv":"1ba0c192d7","bv":"8393172b30","result":"black","reason":"checkmate"}
+{"t":1795130879692,"white":"sarahMitchell","black":"hannahLewis","wv":"1ba0c192d7","bv":"c62d92809e","result":"black","reason":"checkmate"}
+{"t":1795130879918,"white":"sarahMitchell","black":"hannahLewis","wv":"1ba0c192d7","bv":"c62d92809e","result":"black","reason":"checkmate"}
+{"t":1795130881368,"white":"sarahMitchell","black":"hannahLewis","wv":"1ba0c192d7","bv":"c62d92809e","result":"black","reason":"checkmate"}
+{"t":1795130882642,"white":"hannahLewis","black":"sarahMitchell","wv":"c62d92809e","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130883141,"white":"hannahLewis","black":"sarahMitchell","wv":"c62d92809e","bv":"1ba0c192d7","result":"draw","reason":"move limit"}
+{"t":1795130883548,"white":"sarahMitchell","black":"hannahLewis","wv":"1ba0c192d7","bv":"c62d92809e","result":"draw","reason":"50-move rule"}
+{"t":1795130883947,"white":"hannahLewis","black":"sarahMitchell","wv":"c62d92809e","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130884874,"white":"sarahMitchell","black":"kyleMorton","wv":"1ba0c192d7","bv":"037f409598","result":"black","reason":"checkmate"}
+{"t":1795130885492,"white":"sarahMitchell","black":"hannahLewis","wv":"1ba0c192d7","bv":"c62d92809e","result":"black","reason":"checkmate"}
+{"t":1795130886531,"white":"hannahLewis","black":"sarahMitchell","wv":"c62d92809e","bv":"1ba0c192d7","result":"draw","reason":"move limit"}
+{"t":1795130886791,"white":"sarahMitchell","black":"kyleMorton","wv":"1ba0c192d7","bv":"037f409598","result":"black","reason":"checkmate"}
+{"t":1795130887285,"white":"kyleMorton","black":"sarahMitchell","wv":"037f409598","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130888066,"white":"hannahLewis","black":"sarahMitchell","wv":"c62d92809e","bv":"1ba0c192d7","result":"draw","reason":"move limit"}
+{"t":1795130889345,"white":"sarahMitchell","black":"kyleMorton","wv":"1ba0c192d7","bv":"037f409598","result":"white","reason":"checkmate"}
+{"t":1795130889794,"white":"kyleMorton","black":"sarahMitchell","wv":"037f409598","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130890126,"white":"sarahMitchell","black":"kyleMorton","wv":"1ba0c192d7","bv":"037f409598","result":"draw","reason":"move limit"}
+{"t":1795130890850,"white":"kyleMorton","black":"sarahMitchell","wv":"037f409598","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130890871,"white":"sarahMitchell","black":"kyleMorton","wv":"1ba0c192d7","bv":"037f409598","result":"draw","reason":"move limit"}
+{"t":1795130891121,"white":"kyleMorton","black":"sarahMitchell","wv":"037f409598","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130891175,"white":"sarahMitchell","black":"miloPruitt","wv":"1ba0c192d7","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130891469,"white":"miloPruitt","black":"sarahMitchell","wv":"3d0c388350","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130891585,"white":"miloPruitt","black":"sarahMitchell","wv":"3d0c388350","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130892312,"white":"sarahMitchell","black":"miloPruitt","wv":"1ba0c192d7","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130892387,"white":"miloPruitt","black":"sarahMitchell","wv":"3d0c388350","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130892983,"white":"sarahMitchell","black":"miloPruitt","wv":"1ba0c192d7","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130893228,"white":"kyleMorton","black":"sarahMitchell","wv":"037f409598","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130893437,"white":"miloPruitt","black":"sarahMitchell","wv":"3d0c388350","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130894023,"white":"sarahMitchell","black":"miloPruitt","wv":"1ba0c192d7","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130894042,"white":"sarahMitchell","black":"luciaMoreno","wv":"1ba0c192d7","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130894050,"white":"luciaMoreno","black":"sarahMitchell","wv":"aa1df1d7a0","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130894167,"white":"miloPruitt","black":"sarahMitchell","wv":"3d0c388350","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130894221,"white":"sarahMitchell","black":"luciaMoreno","wv":"1ba0c192d7","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130894592,"white":"sarahMitchell","black":"miloPruitt","wv":"1ba0c192d7","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130894981,"white":"sarahMitchell","black":"luciaMoreno","wv":"1ba0c192d7","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130895007,"white":"luciaMoreno","black":"sarahMitchell","wv":"aa1df1d7a0","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130895143,"white":"luciaMoreno","black":"sarahMitchell","wv":"aa1df1d7a0","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130895184,"white":"luciaMoreno","black":"sarahMitchell","wv":"aa1df1d7a0","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130895227,"white":"sarahMitchell","black":"luciaMoreno","wv":"1ba0c192d7","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130895394,"white":"sarahMitchell","black":"luciaMoreno","wv":"1ba0c192d7","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130895575,"white":"sarahMitchell","black":"owenFairbanks","wv":"1ba0c192d7","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130895718,"white":"sarahMitchell","black":"owenFairbanks","wv":"1ba0c192d7","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130896055,"white":"owenFairbanks","black":"sarahMitchell","wv":"3a730bae20","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130896087,"white":"luciaMoreno","black":"sarahMitchell","wv":"aa1df1d7a0","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130896158,"white":"owenFairbanks","black":"sarahMitchell","wv":"3a730bae20","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130896199,"white":"sarahMitchell","black":"owenFairbanks","wv":"1ba0c192d7","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130896204,"white":"owenFairbanks","black":"sarahMitchell","wv":"3a730bae20","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130896656,"white":"sarahMitchell","black":"owenFairbanks","wv":"1ba0c192d7","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130896808,"white":"samuelReyes","black":"sarahMitchell","wv":"68a2140fca","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130896908,"white":"owenFairbanks","black":"sarahMitchell","wv":"3a730bae20","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130897130,"white":"owenFairbanks","black":"sarahMitchell","wv":"3a730bae20","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130897384,"white":"sarahMitchell","black":"samuelReyes","wv":"1ba0c192d7","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130897422,"white":"samuelReyes","black":"sarahMitchell","wv":"68a2140fca","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130897580,"white":"sarahMitchell","black":"owenFairbanks","wv":"1ba0c192d7","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130897607,"white":"sarahMitchell","black":"samuelReyes","wv":"1ba0c192d7","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130897684,"white":"sarahMitchell","black":"samuelReyes","wv":"1ba0c192d7","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130897719,"white":"samuelReyes","black":"sarahMitchell","wv":"68a2140fca","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130898234,"white":"samuelReyes","black":"sarahMitchell","wv":"68a2140fca","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130898271,"white":"samuelReyes","black":"sarahMitchell","wv":"68a2140fca","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130898695,"white":"priyaNandakumar","black":"sarahMitchell","wv":"f3c1733cfe","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130898772,"white":"sarahMitchell","black":"samuelReyes","wv":"1ba0c192d7","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130898818,"white":"sarahMitchell","black":"samuelReyes","wv":"1ba0c192d7","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130899190,"white":"sarahMitchell","black":"priyaNandakumar","wv":"1ba0c192d7","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130899461,"white":"sarahMitchell","black":"priyaNandakumar","wv":"1ba0c192d7","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130899560,"white":"priyaNandakumar","black":"sarahMitchell","wv":"f3c1733cfe","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130900029,"white":"sarahMitchell","black":"priyaNandakumar","wv":"1ba0c192d7","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130900086,"white":"sarahMitchell","black":"priyaNandakumar","wv":"1ba0c192d7","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130900485,"white":"priyaNandakumar","black":"sarahMitchell","wv":"f3c1733cfe","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130900726,"white":"priyaNandakumar","black":"sarahMitchell","wv":"f3c1733cfe","bv":"1ba0c192d7","result":"white","reason":"stalemate"}
+{"t":1795130900751,"white":"sarahMitchell","black":"priyaNandakumar","wv":"1ba0c192d7","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130900864,"white":"derekSanders","black":"sarahMitchell","wv":"335c6fbb2f","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130901080,"white":"priyaNandakumar","black":"sarahMitchell","wv":"f3c1733cfe","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130901112,"white":"sarahMitchell","black":"derekSanders","wv":"1ba0c192d7","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130901387,"white":"derekSanders","black":"sarahMitchell","wv":"335c6fbb2f","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130901542,"white":"derekSanders","black":"sarahMitchell","wv":"335c6fbb2f","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130901585,"white":"sarahMitchell","black":"derekSanders","wv":"1ba0c192d7","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130901875,"white":"sarahMitchell","black":"derekSanders","wv":"1ba0c192d7","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130902020,"white":"derekSanders","black":"sarahMitchell","wv":"335c6fbb2f","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130902088,"white":"sarahMitchell","black":"derekSanders","wv":"1ba0c192d7","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130902292,"white":"derekSanders","black":"sarahMitchell","wv":"335c6fbb2f","bv":"1ba0c192d7","result":"white","reason":"checkmate"}
+{"t":1795130902428,"white":"sarahMitchell","black":"derekSanders","wv":"1ba0c192d7","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130903950,"white":"hannahLewis","black":"alexHarper","wv":"c62d92809e","bv":"8393172b30","result":"black","reason":"checkmate"}
+{"t":1795130903969,"white":"alexHarper","black":"hannahLewis","wv":"8393172b30","bv":"c62d92809e","result":"draw","reason":"50-move rule"}
+{"t":1795130904033,"white":"alexHarper","black":"hannahLewis","wv":"8393172b30","bv":"c62d92809e","result":"draw","reason":"insufficient material"}
+{"t":1795130905364,"white":"alexHarper","black":"hannahLewis","wv":"8393172b30","bv":"c62d92809e","result":"draw","reason":"move limit"}
+{"t":1795130905433,"white":"hannahLewis","black":"alexHarper","wv":"c62d92809e","bv":"8393172b30","result":"draw","reason":"move limit"}
+{"t":1795130905457,"white":"hannahLewis","black":"alexHarper","wv":"c62d92809e","bv":"8393172b30","result":"draw","reason":"move limit"}
+{"t":1795130906383,"white":"hannahLewis","black":"alexHarper","wv":"c62d92809e","bv":"8393172b30","result":"black","reason":"checkmate"}
+{"t":1795130906638,"white":"alexHarper","black":"hannahLewis","wv":"8393172b30","bv":"c62d92809e","result":"draw","reason":"move limit"}
+{"t":1795130907254,"white":"alexHarper","black":"hannahLewis","wv":"8393172b30","bv":"c62d92809e","result":"draw","reason":"move limit"}
+{"t":1795130907608,"white":"kyleMorton","black":"alexHarper","wv":"037f409598","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130908215,"white":"alexHarper","black":"kyleMorton","wv":"8393172b30","bv":"037f409598","result":"black","reason":"checkmate"}
+{"t":1795130908297,"white":"kyleMorton","black":"alexHarper","wv":"037f409598","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130908567,"white":"alexHarper","black":"kyleMorton","wv":"8393172b30","bv":"037f409598","result":"draw","reason":"insufficient material"}
+{"t":1795130908868,"white":"hannahLewis","black":"alexHarper","wv":"c62d92809e","bv":"8393172b30","result":"white","reason":"stalemate"}
+{"t":1795130909938,"white":"alexHarper","black":"kyleMorton","wv":"8393172b30","bv":"037f409598","result":"black","reason":"checkmate"}
+{"t":1795130910680,"white":"kyleMorton","black":"alexHarper","wv":"037f409598","bv":"8393172b30","result":"draw","reason":"insufficient material"}
+{"t":1795130910969,"white":"kyleMorton","black":"alexHarper","wv":"037f409598","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130911175,"white":"alexHarper","black":"kyleMorton","wv":"8393172b30","bv":"037f409598","result":"draw","reason":"insufficient material"}
+{"t":1795130911385,"white":"alexHarper","black":"miloPruitt","wv":"8393172b30","bv":"3d0c388350","result":"black","reason":"stalemate"}
+{"t":1795130911600,"white":"miloPruitt","black":"alexHarper","wv":"3d0c388350","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130911720,"white":"alexHarper","black":"kyleMorton","wv":"8393172b30","bv":"037f409598","result":"draw","reason":"move limit"}
+{"t":1795130911895,"white":"kyleMorton","black":"alexHarper","wv":"037f409598","bv":"8393172b30","result":"draw","reason":"move limit"}
+{"t":1795130912034,"white":"alexHarper","black":"miloPruitt","wv":"8393172b30","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130912668,"white":"miloPruitt","black":"alexHarper","wv":"3d0c388350","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130912977,"white":"alexHarper","black":"miloPruitt","wv":"8393172b30","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130913026,"white":"miloPruitt","black":"alexHarper","wv":"3d0c388350","bv":"8393172b30","result":"white","reason":"stalemate"}
+{"t":1795130913169,"white":"miloPruitt","black":"alexHarper","wv":"3d0c388350","bv":"8393172b30","result":"white","reason":"stalemate"}
+{"t":1795130913184,"white":"alexHarper","black":"miloPruitt","wv":"8393172b30","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130913522,"white":"miloPruitt","black":"alexHarper","wv":"3d0c388350","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130914208,"white":"luciaMoreno","black":"alexHarper","wv":"aa1df1d7a0","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130914247,"white":"alexHarper","black":"luciaMoreno","wv":"8393172b30","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130914280,"white":"luciaMoreno","black":"alexHarper","wv":"aa1df1d7a0","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130914461,"white":"alexHarper","black":"luciaMoreno","wv":"8393172b30","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130914845,"white":"alexHarper","black":"miloPruitt","wv":"8393172b30","bv":"3d0c388350","result":"draw","reason":"move limit"}
+{"t":1795130914914,"white":"alexHarper","black":"luciaMoreno","wv":"8393172b30","bv":"aa1df1d7a0","result":"draw","reason":"insufficient material"}
+{"t":1795130915045,"white":"luciaMoreno","black":"alexHarper","wv":"aa1df1d7a0","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130915302,"white":"luciaMoreno","black":"alexHarper","wv":"aa1df1d7a0","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130915512,"white":"alexHarper","black":"luciaMoreno","wv":"8393172b30","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130915610,"white":"luciaMoreno","black":"alexHarper","wv":"aa1df1d7a0","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130915825,"white":"alexHarper","black":"owenFairbanks","wv":"8393172b30","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130916009,"white":"alexHarper","black":"luciaMoreno","wv":"8393172b30","bv":"aa1df1d7a0","result":"draw","reason":"insufficient material"}
+{"t":1795130916542,"white":"owenFairbanks","black":"alexHarper","wv":"3a730bae20","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130916960,"white":"owenFairbanks","black":"alexHarper","wv":"3a730bae20","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130917085,"white":"owenFairbanks","black":"alexHarper","wv":"3a730bae20","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130917147,"white":"alexHarper","black":"owenFairbanks","wv":"8393172b30","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130917202,"white":"alexHarper","black":"owenFairbanks","wv":"8393172b30","bv":"3a730bae20","result":"draw","reason":"move limit"}
+{"t":1795130917489,"white":"alexHarper","black":"owenFairbanks","wv":"8393172b30","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130917593,"white":"owenFairbanks","black":"alexHarper","wv":"3a730bae20","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130918032,"white":"owenFairbanks","black":"alexHarper","wv":"3a730bae20","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130918377,"white":"samuelReyes","black":"alexHarper","wv":"68a2140fca","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130918451,"white":"alexHarper","black":"samuelReyes","wv":"8393172b30","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130918562,"white":"alexHarper","black":"samuelReyes","wv":"8393172b30","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130918965,"white":"alexHarper","black":"owenFairbanks","wv":"8393172b30","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130919030,"white":"alexHarper","black":"samuelReyes","wv":"8393172b30","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130919308,"white":"samuelReyes","black":"alexHarper","wv":"68a2140fca","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130919530,"white":"alexHarper","black":"samuelReyes","wv":"8393172b30","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130919607,"white":"samuelReyes","black":"alexHarper","wv":"68a2140fca","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130919821,"white":"samuelReyes","black":"alexHarper","wv":"68a2140fca","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130919943,"white":"samuelReyes","black":"alexHarper","wv":"68a2140fca","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130920370,"white":"alexHarper","black":"samuelReyes","wv":"8393172b30","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130920402,"white":"alexHarper","black":"priyaNandakumar","wv":"8393172b30","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130920510,"white":"priyaNandakumar","black":"alexHarper","wv":"f3c1733cfe","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130921068,"white":"alexHarper","black":"priyaNandakumar","wv":"8393172b30","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130921150,"white":"priyaNandakumar","black":"alexHarper","wv":"f3c1733cfe","bv":"8393172b30","result":"black","reason":"checkmate"}
+{"t":1795130921350,"white":"alexHarper","black":"priyaNandakumar","wv":"8393172b30","bv":"f3c1733cfe","result":"black","reason":"stalemate"}
+{"t":1795130921446,"white":"priyaNandakumar","black":"alexHarper","wv":"f3c1733cfe","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130921593,"white":"alexHarper","black":"priyaNandakumar","wv":"8393172b30","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130921930,"white":"priyaNandakumar","black":"alexHarper","wv":"f3c1733cfe","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130922276,"white":"alexHarper","black":"derekSanders","wv":"8393172b30","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130922337,"white":"priyaNandakumar","black":"alexHarper","wv":"f3c1733cfe","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130922508,"white":"alexHarper","black":"derekSanders","wv":"8393172b30","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130922549,"white":"alexHarper","black":"priyaNandakumar","wv":"8393172b30","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130922550,"white":"derekSanders","black":"alexHarper","wv":"335c6fbb2f","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130922633,"white":"derekSanders","black":"alexHarper","wv":"335c6fbb2f","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130923359,"white":"alexHarper","black":"derekSanders","wv":"8393172b30","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130923555,"white":"alexHarper","black":"derekSanders","wv":"8393172b30","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130923610,"white":"alexHarper","black":"derekSanders","wv":"8393172b30","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130923638,"white":"derekSanders","black":"alexHarper","wv":"335c6fbb2f","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130923697,"white":"derekSanders","black":"alexHarper","wv":"335c6fbb2f","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130923764,"white":"derekSanders","black":"alexHarper","wv":"335c6fbb2f","bv":"8393172b30","result":"white","reason":"checkmate"}
+{"t":1795130925010,"white":"kyleMorton","black":"hannahLewis","wv":"037f409598","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130926640,"white":"hannahLewis","black":"kyleMorton","wv":"c62d92809e","bv":"037f409598","result":"draw","reason":"move limit"}
+{"t":1795130926832,"white":"hannahLewis","black":"kyleMorton","wv":"c62d92809e","bv":"037f409598","result":"draw","reason":"move limit"}
+{"t":1795130927458,"white":"hannahLewis","black":"kyleMorton","wv":"c62d92809e","bv":"037f409598","result":"draw","reason":"insufficient material"}
+{"t":1795130927758,"white":"kyleMorton","black":"hannahLewis","wv":"037f409598","bv":"c62d92809e","result":"draw","reason":"50-move rule"}
+{"t":1795130927908,"white":"hannahLewis","black":"kyleMorton","wv":"c62d92809e","bv":"037f409598","result":"black","reason":"checkmate"}
+{"t":1795130928017,"white":"kyleMorton","black":"hannahLewis","wv":"037f409598","bv":"c62d92809e","result":"draw","reason":"move limit"}
+{"t":1795130928967,"white":"hannahLewis","black":"kyleMorton","wv":"c62d92809e","bv":"037f409598","result":"black","reason":"checkmate"}
+{"t":1795130929514,"white":"hannahLewis","black":"miloPruitt","wv":"c62d92809e","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130929548,"white":"miloPruitt","black":"hannahLewis","wv":"3d0c388350","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130929677,"white":"hannahLewis","black":"miloPruitt","wv":"c62d92809e","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130929788,"white":"kyleMorton","black":"hannahLewis","wv":"037f409598","bv":"c62d92809e","result":"draw","reason":"move limit"}
+{"t":1795130930286,"white":"miloPruitt","black":"hannahLewis","wv":"3d0c388350","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130930831,"white":"hannahLewis","black":"miloPruitt","wv":"c62d92809e","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130930836,"white":"miloPruitt","black":"hannahLewis","wv":"3d0c388350","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130930898,"white":"kyleMorton","black":"hannahLewis","wv":"037f409598","bv":"c62d92809e","result":"draw","reason":"50-move rule"}
+{"t":1795130931039,"white":"miloPruitt","black":"hannahLewis","wv":"3d0c388350","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130931474,"white":"hannahLewis","black":"miloPruitt","wv":"c62d92809e","bv":"3d0c388350","result":"black","reason":"stalemate"}
+{"t":1795130931795,"white":"hannahLewis","black":"miloPruitt","wv":"c62d92809e","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130931940,"white":"hannahLewis","black":"luciaMoreno","wv":"c62d92809e","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130932098,"white":"luciaMoreno","black":"hannahLewis","wv":"aa1df1d7a0","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130932245,"white":"luciaMoreno","black":"hannahLewis","wv":"aa1df1d7a0","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130932400,"white":"hannahLewis","black":"luciaMoreno","wv":"c62d92809e","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130932416,"white":"miloPruitt","black":"hannahLewis","wv":"3d0c388350","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130932891,"white":"hannahLewis","black":"luciaMoreno","wv":"c62d92809e","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130932901,"white":"luciaMoreno","black":"hannahLewis","wv":"aa1df1d7a0","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130933020,"white":"hannahLewis","black":"luciaMoreno","wv":"c62d92809e","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130933244,"white":"luciaMoreno","black":"hannahLewis","wv":"aa1df1d7a0","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130933597,"white":"luciaMoreno","black":"hannahLewis","wv":"aa1df1d7a0","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130933726,"white":"owenFairbanks","black":"hannahLewis","wv":"3a730bae20","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130933729,"white":"hannahLewis","black":"luciaMoreno","wv":"c62d92809e","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130934044,"white":"hannahLewis","black":"owenFairbanks","wv":"c62d92809e","bv":"3a730bae20","result":"black","reason":"stalemate"}
+{"t":1795130934351,"white":"owenFairbanks","black":"hannahLewis","wv":"3a730bae20","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130934428,"white":"owenFairbanks","black":"hannahLewis","wv":"3a730bae20","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130934438,"white":"hannahLewis","black":"owenFairbanks","wv":"c62d92809e","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130934997,"white":"hannahLewis","black":"owenFairbanks","wv":"c62d92809e","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130935110,"white":"hannahLewis","black":"owenFairbanks","wv":"c62d92809e","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130935243,"white":"hannahLewis","black":"owenFairbanks","wv":"c62d92809e","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130935356,"white":"owenFairbanks","black":"hannahLewis","wv":"3a730bae20","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130935575,"white":"owenFairbanks","black":"hannahLewis","wv":"3a730bae20","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130935630,"white":"hannahLewis","black":"samuelReyes","wv":"c62d92809e","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130935836,"white":"hannahLewis","black":"samuelReyes","wv":"c62d92809e","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130935965,"white":"samuelReyes","black":"hannahLewis","wv":"68a2140fca","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130936674,"white":"hannahLewis","black":"samuelReyes","wv":"c62d92809e","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130936679,"white":"samuelReyes","black":"hannahLewis","wv":"68a2140fca","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130936837,"white":"samuelReyes","black":"hannahLewis","wv":"68a2140fca","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130936927,"white":"samuelReyes","black":"hannahLewis","wv":"68a2140fca","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130936968,"white":"hannahLewis","black":"samuelReyes","wv":"c62d92809e","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130937360,"white":"hannahLewis","black":"samuelReyes","wv":"c62d92809e","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130937809,"white":"samuelReyes","black":"hannahLewis","wv":"68a2140fca","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130938025,"white":"hannahLewis","black":"priyaNandakumar","wv":"c62d92809e","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130938104,"white":"priyaNandakumar","black":"hannahLewis","wv":"f3c1733cfe","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130938144,"white":"priyaNandakumar","black":"hannahLewis","wv":"f3c1733cfe","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130938806,"white":"hannahLewis","black":"priyaNandakumar","wv":"c62d92809e","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130938853,"white":"hannahLewis","black":"priyaNandakumar","wv":"c62d92809e","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130938893,"white":"priyaNandakumar","black":"hannahLewis","wv":"f3c1733cfe","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130939223,"white":"priyaNandakumar","black":"hannahLewis","wv":"f3c1733cfe","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130939291,"white":"hannahLewis","black":"priyaNandakumar","wv":"c62d92809e","bv":"f3c1733cfe","result":"black","reason":"stalemate"}
+{"t":1795130939575,"white":"hannahLewis","black":"priyaNandakumar","wv":"c62d92809e","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130939830,"white":"hannahLewis","black":"derekSanders","wv":"c62d92809e","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130940085,"white":"derekSanders","black":"hannahLewis","wv":"335c6fbb2f","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130940458,"white":"priyaNandakumar","black":"hannahLewis","wv":"f3c1733cfe","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130940497,"white":"hannahLewis","black":"derekSanders","wv":"c62d92809e","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130940568,"white":"hannahLewis","black":"derekSanders","wv":"c62d92809e","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130940815,"white":"derekSanders","black":"hannahLewis","wv":"335c6fbb2f","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130940969,"white":"derekSanders","black":"hannahLewis","wv":"335c6fbb2f","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130941676,"white":"hannahLewis","black":"derekSanders","wv":"c62d92809e","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130941760,"white":"hannahLewis","black":"derekSanders","wv":"c62d92809e","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130941830,"white":"derekSanders","black":"hannahLewis","wv":"335c6fbb2f","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130942427,"white":"derekSanders","black":"hannahLewis","wv":"335c6fbb2f","bv":"c62d92809e","result":"white","reason":"checkmate"}
+{"t":1795130942705,"white":"kyleMorton","black":"miloPruitt","wv":"037f409598","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130943009,"white":"miloPruitt","black":"kyleMorton","wv":"3d0c388350","bv":"037f409598","result":"white","reason":"stalemate"}
+{"t":1795130943174,"white":"kyleMorton","black":"miloPruitt","wv":"037f409598","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130943258,"white":"miloPruitt","black":"kyleMorton","wv":"3d0c388350","bv":"037f409598","result":"white","reason":"checkmate"}
+{"t":1795130943637,"white":"kyleMorton","black":"miloPruitt","wv":"037f409598","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130944360,"white":"miloPruitt","black":"kyleMorton","wv":"3d0c388350","bv":"037f409598","result":"white","reason":"checkmate"}
+{"t":1795130944572,"white":"miloPruitt","black":"kyleMorton","wv":"3d0c388350","bv":"037f409598","result":"white","reason":"checkmate"}
+{"t":1795130944588,"white":"miloPruitt","black":"kyleMorton","wv":"3d0c388350","bv":"037f409598","result":"white","reason":"checkmate"}
+{"t":1795130944685,"white":"kyleMorton","black":"miloPruitt","wv":"037f409598","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130944694,"white":"kyleMorton","black":"luciaMoreno","wv":"037f409598","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130944992,"white":"kyleMorton","black":"miloPruitt","wv":"037f409598","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130945521,"white":"luciaMoreno","black":"kyleMorton","wv":"aa1df1d7a0","bv":"037f409598","result":"white","reason":"checkmate"}
+{"t":1795130945569,"white":"kyleMorton","black":"luciaMoreno","wv":"037f409598","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130945643,"white":"luciaMoreno","black":"kyleMorton","wv":"aa1df1d7a0","bv":"037f409598","result":"white","reason":"checkmate"}
+{"t":1795130946056,"white":"kyleMorton","black":"luciaMoreno","wv":"037f409598","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130946226,"white":"kyleMorton","black":"luciaMoreno","wv":"037f409598","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130946238,"white":"luciaMoreno","black":"kyleMorton","wv":"aa1df1d7a0","bv":"037f409598","result":"white","reason":"checkmate"}
+{"t":1795130947033,"white":"luciaMoreno","black":"kyleMorton","wv":"aa1df1d7a0","bv":"037f409598","result":"white","reason":"checkmate"}
+{"t":1795130947043,"white":"luciaMoreno","black":"kyleMorton","wv":"aa1df1d7a0","bv":"037f409598","result":"white","reason":"checkmate"}
+{"t":1795130947209,"white":"owenFairbanks","black":"kyleMorton","wv":"3a730bae20","bv":"037f409598","result":"white","reason":"checkmate"}
+{"t":1795130947234,"white":"kyleMorton","black":"luciaMoreno","wv":"037f409598","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130947513,"white":"kyleMorton","black":"owenFairbanks","wv":"037f409598","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130947930,"white":"kyleMorton","black":"owenFairbanks","wv":"037f409598","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130948215,"white":"owenFairbanks","black":"kyleMorton","wv":"3a730bae20","bv":"037f409598","result":"white","reason":"checkmate"}
+{"t":1795130948285,"white":"kyleMorton","black":"owenFairbanks","wv":"037f409598","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130948733,"white":"owenFairbanks","black":"kyleMorton","wv":"3a730bae20","bv":"037f409598","result":"white","reason":"checkmate"}
+{"t":1795130948773,"white":"kyleMorton","black":"owenFairbanks","wv":"037f409598","bv":"3a730bae20","result":"draw","reason":"insufficient material"}
+{"t":1795130948938,"white":"kyleMorton","black":"owenFairbanks","wv":"037f409598","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130948953,"white":"kyleMorton","black":"samuelReyes","wv":"037f409598","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130949053,"white":"owenFairbanks","black":"kyleMorton","wv":"3a730bae20","bv":"037f409598","result":"white","reason":"checkmate"}
+{"t":1795130949666,"white":"owenFairbanks","black":"kyleMorton","wv":"3a730bae20","bv":"037f409598","result":"white","reason":"checkmate"}
+{"t":1795130949746,"white":"kyleMorton","black":"samuelReyes","wv":"037f409598","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130949788,"white":"samuelReyes","black":"kyleMorton","wv":"68a2140fca","bv":"037f409598","result":"white","reason":"checkmate"}
+{"t":1795130950083,"white":"samuelReyes","black":"kyleMorton","wv":"68a2140fca","bv":"037f409598","result":"white","reason":"checkmate"}
+{"t":1795130950144,"white":"samuelReyes","black":"kyleMorton","wv":"68a2140fca","bv":"037f409598","result":"white","reason":"checkmate"}
+{"t":1795130950439,"white":"kyleMorton","black":"samuelReyes","wv":"037f409598","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130950553,"white":"samuelReyes","black":"kyleMorton","wv":"68a2140fca","bv":"037f409598","result":"white","reason":"checkmate"}
+{"t":1795130950766,"white":"kyleMorton","black":"samuelReyes","wv":"037f409598","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130951134,"white":"kyleMorton","black":"samuelReyes","wv":"037f409598","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130951278,"white":"samuelReyes","black":"kyleMorton","wv":"68a2140fca","bv":"037f409598","result":"white","reason":"checkmate"}
+{"t":1795130951639,"white":"priyaNandakumar","black":"kyleMorton","wv":"f3c1733cfe","bv":"037f409598","result":"white","reason":"checkmate"}
+{"t":1795130951784,"white":"kyleMorton","black":"priyaNandakumar","wv":"037f409598","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130951864,"white":"priyaNandakumar","black":"kyleMorton","wv":"f3c1733cfe","bv":"037f409598","result":"white","reason":"stalemate"}
+{"t":1795130951946,"white":"kyleMorton","black":"priyaNandakumar","wv":"037f409598","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130952614,"white":"priyaNandakumar","black":"kyleMorton","wv":"f3c1733cfe","bv":"037f409598","result":"white","reason":"checkmate"}
+{"t":1795130952942,"white":"priyaNandakumar","black":"kyleMorton","wv":"f3c1733cfe","bv":"037f409598","result":"white","reason":"checkmate"}
+{"t":1795130953036,"white":"kyleMorton","black":"priyaNandakumar","wv":"037f409598","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130953323,"white":"kyleMorton","black":"priyaNandakumar","wv":"037f409598","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130953362,"white":"kyleMorton","black":"priyaNandakumar","wv":"037f409598","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130953711,"white":"kyleMorton","black":"derekSanders","wv":"037f409598","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130953928,"white":"derekSanders","black":"kyleMorton","wv":"335c6fbb2f","bv":"037f409598","result":"white","reason":"checkmate"}
+{"t":1795130954028,"white":"priyaNandakumar","black":"kyleMorton","wv":"f3c1733cfe","bv":"037f409598","result":"white","reason":"checkmate"}
+{"t":1795130954188,"white":"kyleMorton","black":"derekSanders","wv":"037f409598","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130954197,"white":"derekSanders","black":"kyleMorton","wv":"335c6fbb2f","bv":"037f409598","result":"white","reason":"checkmate"}
+{"t":1795130954569,"white":"derekSanders","black":"kyleMorton","wv":"335c6fbb2f","bv":"037f409598","result":"white","reason":"checkmate"}
+{"t":1795130954672,"white":"kyleMorton","black":"derekSanders","wv":"037f409598","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130954832,"white":"miloPruitt","black":"luciaMoreno","wv":"3d0c388350","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130954862,"white":"luciaMoreno","black":"miloPruitt","wv":"aa1df1d7a0","bv":"3d0c388350","result":"white","reason":"checkmate"}
+{"t":1795130954926,"white":"kyleMorton","black":"derekSanders","wv":"037f409598","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130954939,"white":"kyleMorton","black":"derekSanders","wv":"037f409598","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130954972,"white":"luciaMoreno","black":"miloPruitt","wv":"aa1df1d7a0","bv":"3d0c388350","result":"white","reason":"checkmate"}
+{"t":1795130955017,"white":"miloPruitt","black":"luciaMoreno","wv":"3d0c388350","bv":"aa1df1d7a0","result":"white","reason":"checkmate"}
+{"t":1795130955050,"white":"miloPruitt","black":"luciaMoreno","wv":"3d0c388350","bv":"aa1df1d7a0","result":"white","reason":"checkmate"}
+{"t":1795130955070,"white":"luciaMoreno","black":"miloPruitt","wv":"aa1df1d7a0","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130955153,"white":"luciaMoreno","black":"miloPruitt","wv":"aa1df1d7a0","bv":"3d0c388350","result":"white","reason":"checkmate"}
+{"t":1795130955154,"white":"luciaMoreno","black":"miloPruitt","wv":"aa1df1d7a0","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130955171,"white":"miloPruitt","black":"luciaMoreno","wv":"3d0c388350","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130955239,"white":"derekSanders","black":"kyleMorton","wv":"335c6fbb2f","bv":"037f409598","result":"white","reason":"checkmate"}
+{"t":1795130955276,"white":"miloPruitt","black":"luciaMoreno","wv":"3d0c388350","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130955348,"white":"miloPruitt","black":"owenFairbanks","wv":"3d0c388350","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130955367,"white":"derekSanders","black":"kyleMorton","wv":"335c6fbb2f","bv":"037f409598","result":"white","reason":"checkmate"}
+{"t":1795130955425,"white":"miloPruitt","black":"owenFairbanks","wv":"3d0c388350","bv":"3a730bae20","result":"white","reason":"stalemate"}
+{"t":1795130955436,"white":"owenFairbanks","black":"miloPruitt","wv":"3a730bae20","bv":"3d0c388350","result":"black","reason":"stalemate"}
+{"t":1795130955480,"white":"owenFairbanks","black":"miloPruitt","wv":"3a730bae20","bv":"3d0c388350","result":"white","reason":"checkmate"}
+{"t":1795130955541,"white":"owenFairbanks","black":"miloPruitt","wv":"3a730bae20","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130955589,"white":"miloPruitt","black":"owenFairbanks","wv":"3d0c388350","bv":"3a730bae20","result":"white","reason":"checkmate"}
+{"t":1795130955684,"white":"miloPruitt","black":"owenFairbanks","wv":"3d0c388350","bv":"3a730bae20","result":"draw","reason":"insufficient material"}
+{"t":1795130955702,"white":"miloPruitt","black":"owenFairbanks","wv":"3d0c388350","bv":"3a730bae20","result":"draw","reason":"insufficient material"}
+{"t":1795130955760,"white":"miloPruitt","black":"samuelReyes","wv":"3d0c388350","bv":"68a2140fca","result":"white","reason":"stalemate"}
+{"t":1795130955798,"white":"owenFairbanks","black":"miloPruitt","wv":"3a730bae20","bv":"3d0c388350","result":"draw","reason":"50-move rule"}
+{"t":1795130955803,"white":"samuelReyes","black":"miloPruitt","wv":"68a2140fca","bv":"3d0c388350","result":"white","reason":"stalemate"}
+{"t":1795130955817,"white":"owenFairbanks","black":"miloPruitt","wv":"3a730bae20","bv":"3d0c388350","result":"white","reason":"checkmate"}
+{"t":1795130955891,"white":"samuelReyes","black":"miloPruitt","wv":"68a2140fca","bv":"3d0c388350","result":"white","reason":"checkmate"}
+{"t":1795130955971,"white":"miloPruitt","black":"samuelReyes","wv":"3d0c388350","bv":"68a2140fca","result":"draw","reason":"insufficient material"}
+{"t":1795130955999,"white":"samuelReyes","black":"miloPruitt","wv":"68a2140fca","bv":"3d0c388350","result":"black","reason":"stalemate"}
+{"t":1795130956052,"white":"miloPruitt","black":"samuelReyes","wv":"3d0c388350","bv":"68a2140fca","result":"draw","reason":"insufficient material"}
+{"t":1795130956052,"white":"samuelReyes","black":"miloPruitt","wv":"68a2140fca","bv":"3d0c388350","result":"black","reason":"stalemate"}
+{"t":1795130956053,"white":"miloPruitt","black":"samuelReyes","wv":"3d0c388350","bv":"68a2140fca","result":"draw","reason":"50-move rule"}
+{"t":1795130956150,"white":"samuelReyes","black":"miloPruitt","wv":"68a2140fca","bv":"3d0c388350","result":"white","reason":"checkmate"}
+{"t":1795130956192,"white":"miloPruitt","black":"priyaNandakumar","wv":"3d0c388350","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130956193,"white":"miloPruitt","black":"priyaNandakumar","wv":"3d0c388350","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130956197,"white":"miloPruitt","black":"samuelReyes","wv":"3d0c388350","bv":"68a2140fca","result":"white","reason":"checkmate"}
+{"t":1795130956200,"white":"priyaNandakumar","black":"miloPruitt","wv":"f3c1733cfe","bv":"3d0c388350","result":"white","reason":"checkmate"}
+{"t":1795130956223,"white":"priyaNandakumar","black":"miloPruitt","wv":"f3c1733cfe","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130956272,"white":"miloPruitt","black":"priyaNandakumar","wv":"3d0c388350","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130956326,"white":"priyaNandakumar","black":"miloPruitt","wv":"f3c1733cfe","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130956327,"white":"priyaNandakumar","black":"miloPruitt","wv":"f3c1733cfe","bv":"3d0c388350","result":"white","reason":"stalemate"}
+{"t":1795130956368,"white":"miloPruitt","black":"priyaNandakumar","wv":"3d0c388350","bv":"f3c1733cfe","result":"black","reason":"stalemate"}
+{"t":1795130956377,"white":"priyaNandakumar","black":"miloPruitt","wv":"f3c1733cfe","bv":"3d0c388350","result":"white","reason":"checkmate"}
+{"t":1795130956450,"white":"miloPruitt","black":"derekSanders","wv":"3d0c388350","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130956454,"white":"miloPruitt","black":"priyaNandakumar","wv":"3d0c388350","bv":"f3c1733cfe","result":"draw","reason":"move limit"}
+{"t":1795130956507,"white":"derekSanders","black":"miloPruitt","wv":"335c6fbb2f","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130956583,"white":"derekSanders","black":"miloPruitt","wv":"335c6fbb2f","bv":"3d0c388350","result":"white","reason":"checkmate"}
+{"t":1795130956584,"white":"miloPruitt","black":"derekSanders","wv":"3d0c388350","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130956588,"white":"derekSanders","black":"miloPruitt","wv":"335c6fbb2f","bv":"3d0c388350","result":"white","reason":"checkmate"}
+{"t":1795130956592,"white":"miloPruitt","black":"derekSanders","wv":"3d0c388350","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130956611,"white":"miloPruitt","black":"derekSanders","wv":"3d0c388350","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130956680,"white":"derekSanders","black":"miloPruitt","wv":"335c6fbb2f","bv":"3d0c388350","result":"black","reason":"checkmate"}
+{"t":1795130956766,"white":"derekSanders","black":"miloPruitt","wv":"335c6fbb2f","bv":"3d0c388350","result":"white","reason":"checkmate"}
+{"t":1795130956778,"white":"miloPruitt","black":"derekSanders","wv":"3d0c388350","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130956814,"white":"owenFairbanks","black":"luciaMoreno","wv":"3a730bae20","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130956894,"white":"owenFairbanks","black":"luciaMoreno","wv":"3a730bae20","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130956908,"white":"luciaMoreno","black":"owenFairbanks","wv":"aa1df1d7a0","bv":"3a730bae20","result":"draw","reason":"insufficient material"}
+{"t":1795130956918,"white":"luciaMoreno","black":"owenFairbanks","wv":"aa1df1d7a0","bv":"3a730bae20","result":"white","reason":"checkmate"}
+{"t":1795130956978,"white":"luciaMoreno","black":"owenFairbanks","wv":"aa1df1d7a0","bv":"3a730bae20","result":"white","reason":"checkmate"}
+{"t":1795130957022,"white":"owenFairbanks","black":"luciaMoreno","wv":"3a730bae20","bv":"aa1df1d7a0","result":"draw","reason":"insufficient material"}
+{"t":1795130957135,"white":"luciaMoreno","black":"owenFairbanks","wv":"aa1df1d7a0","bv":"3a730bae20","result":"white","reason":"checkmate"}
+{"t":1795130957156,"white":"owenFairbanks","black":"luciaMoreno","wv":"3a730bae20","bv":"aa1df1d7a0","result":"draw","reason":"insufficient material"}
+{"t":1795130957160,"white":"luciaMoreno","black":"owenFairbanks","wv":"aa1df1d7a0","bv":"3a730bae20","result":"draw","reason":"50-move rule"}
+{"t":1795130957190,"white":"owenFairbanks","black":"luciaMoreno","wv":"3a730bae20","bv":"aa1df1d7a0","result":"draw","reason":"insufficient material"}
+{"t":1795130957237,"white":"luciaMoreno","black":"samuelReyes","wv":"aa1df1d7a0","bv":"68a2140fca","result":"draw","reason":"insufficient material"}
+{"t":1795130957282,"white":"samuelReyes","black":"luciaMoreno","wv":"68a2140fca","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130957296,"white":"luciaMoreno","black":"samuelReyes","wv":"aa1df1d7a0","bv":"68a2140fca","result":"white","reason":"checkmate"}
+{"t":1795130957394,"white":"samuelReyes","black":"luciaMoreno","wv":"68a2140fca","bv":"aa1df1d7a0","result":"white","reason":"checkmate"}
+{"t":1795130957413,"white":"samuelReyes","black":"luciaMoreno","wv":"68a2140fca","bv":"aa1df1d7a0","result":"white","reason":"checkmate"}
+{"t":1795130957457,"white":"luciaMoreno","black":"samuelReyes","wv":"aa1df1d7a0","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130957496,"white":"luciaMoreno","black":"samuelReyes","wv":"aa1df1d7a0","bv":"68a2140fca","result":"white","reason":"checkmate"}
+{"t":1795130957517,"white":"luciaMoreno","black":"samuelReyes","wv":"aa1df1d7a0","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130957541,"white":"samuelReyes","black":"luciaMoreno","wv":"68a2140fca","bv":"aa1df1d7a0","result":"white","reason":"checkmate"}
+{"t":1795130957579,"white":"luciaMoreno","black":"priyaNandakumar","wv":"aa1df1d7a0","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130957593,"white":"priyaNandakumar","black":"luciaMoreno","wv":"f3c1733cfe","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130957616,"white":"samuelReyes","black":"luciaMoreno","wv":"68a2140fca","bv":"aa1df1d7a0","result":"white","reason":"checkmate"}
+{"t":1795130957702,"white":"priyaNandakumar","black":"luciaMoreno","wv":"f3c1733cfe","bv":"aa1df1d7a0","result":"black","reason":"stalemate"}
+{"t":1795130957714,"white":"luciaMoreno","black":"priyaNandakumar","wv":"aa1df1d7a0","bv":"f3c1733cfe","result":"black","reason":"stalemate"}
+{"t":1795130957717,"white":"luciaMoreno","black":"priyaNandakumar","wv":"aa1df1d7a0","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130957732,"white":"luciaMoreno","black":"priyaNandakumar","wv":"aa1df1d7a0","bv":"f3c1733cfe","result":"draw","reason":"insufficient material"}
+{"t":1795130957769,"white":"priyaNandakumar","black":"luciaMoreno","wv":"f3c1733cfe","bv":"aa1df1d7a0","result":"white","reason":"checkmate"}
+{"t":1795130957850,"white":"luciaMoreno","black":"priyaNandakumar","wv":"aa1df1d7a0","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130957855,"white":"priyaNandakumar","black":"luciaMoreno","wv":"f3c1733cfe","bv":"aa1df1d7a0","result":"draw","reason":"move limit"}
+{"t":1795130957897,"white":"priyaNandakumar","black":"luciaMoreno","wv":"f3c1733cfe","bv":"aa1df1d7a0","result":"white","reason":"stalemate"}
+{"t":1795130957911,"white":"luciaMoreno","black":"derekSanders","wv":"aa1df1d7a0","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130957951,"white":"luciaMoreno","black":"derekSanders","wv":"aa1df1d7a0","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130957972,"white":"derekSanders","black":"luciaMoreno","wv":"335c6fbb2f","bv":"aa1df1d7a0","result":"draw","reason":"insufficient material"}
+{"t":1795130958105,"white":"derekSanders","black":"luciaMoreno","wv":"335c6fbb2f","bv":"aa1df1d7a0","result":"draw","reason":"insufficient material"}
+{"t":1795130958109,"white":"luciaMoreno","black":"derekSanders","wv":"aa1df1d7a0","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130958132,"white":"luciaMoreno","black":"derekSanders","wv":"aa1df1d7a0","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130958178,"white":"luciaMoreno","black":"derekSanders","wv":"aa1df1d7a0","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130958221,"white":"derekSanders","black":"luciaMoreno","wv":"335c6fbb2f","bv":"aa1df1d7a0","result":"white","reason":"checkmate"}
+{"t":1795130958222,"white":"derekSanders","black":"luciaMoreno","wv":"335c6fbb2f","bv":"aa1df1d7a0","result":"white","reason":"checkmate"}
+{"t":1795130958341,"white":"owenFairbanks","black":"samuelReyes","wv":"3a730bae20","bv":"68a2140fca","result":"draw","reason":"insufficient material"}
+{"t":1795130958388,"white":"derekSanders","black":"luciaMoreno","wv":"335c6fbb2f","bv":"aa1df1d7a0","result":"black","reason":"checkmate"}
+{"t":1795130958394,"white":"samuelReyes","black":"owenFairbanks","wv":"68a2140fca","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130958406,"white":"samuelReyes","black":"owenFairbanks","wv":"68a2140fca","bv":"3a730bae20","result":"draw","reason":"insufficient material"}
+{"t":1795130958431,"white":"owenFairbanks","black":"samuelReyes","wv":"3a730bae20","bv":"68a2140fca","result":"draw","reason":"insufficient material"}
+{"t":1795130958473,"white":"owenFairbanks","black":"samuelReyes","wv":"3a730bae20","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130958618,"white":"samuelReyes","black":"owenFairbanks","wv":"68a2140fca","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130958634,"white":"owenFairbanks","black":"samuelReyes","wv":"3a730bae20","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130958636,"white":"samuelReyes","black":"owenFairbanks","wv":"68a2140fca","bv":"3a730bae20","result":"draw","reason":"insufficient material"}
+{"t":1795130958637,"white":"samuelReyes","black":"owenFairbanks","wv":"68a2140fca","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130958644,"white":"owenFairbanks","black":"priyaNandakumar","wv":"3a730bae20","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130958698,"white":"owenFairbanks","black":"samuelReyes","wv":"3a730bae20","bv":"68a2140fca","result":"draw","reason":"insufficient material"}
+{"t":1795130958758,"white":"priyaNandakumar","black":"owenFairbanks","wv":"f3c1733cfe","bv":"3a730bae20","result":"black","reason":"checkmate"}
+{"t":1795130958850,"white":"priyaNandakumar","black":"owenFairbanks","wv":"f3c1733cfe","bv":"3a730bae20","result":"white","reason":"checkmate"}
+{"t":1795130958883,"white":"priyaNandakumar","black":"owenFairbanks","wv":"f3c1733cfe","bv":"3a730bae20","result":"white","reason":"stalemate"}
+{"t":1795130958892,"white":"owenFairbanks","black":"priyaNandakumar","wv":"3a730bae20","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130958894,"white":"owenFairbanks","black":"priyaNandakumar","wv":"3a730bae20","bv":"f3c1733cfe","result":"black","reason":"stalemate"}
+{"t":1795130958989,"white":"owenFairbanks","black":"priyaNandakumar","wv":"3a730bae20","bv":"f3c1733cfe","result":"black","reason":"stalemate"}
+{"t":1795130958993,"white":"priyaNandakumar","black":"owenFairbanks","wv":"f3c1733cfe","bv":"3a730bae20","result":"white","reason":"checkmate"}
+{"t":1795130959066,"white":"owenFairbanks","black":"priyaNandakumar","wv":"3a730bae20","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130959087,"white":"derekSanders","black":"owenFairbanks","wv":"335c6fbb2f","bv":"3a730bae20","result":"white","reason":"checkmate"}
+{"t":1795130959124,"white":"owenFairbanks","black":"derekSanders","wv":"3a730bae20","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130959186,"white":"priyaNandakumar","black":"owenFairbanks","wv":"f3c1733cfe","bv":"3a730bae20","result":"white","reason":"checkmate"}
+{"t":1795130959243,"white":"derekSanders","black":"owenFairbanks","wv":"335c6fbb2f","bv":"3a730bae20","result":"white","reason":"checkmate"}
+{"t":1795130959280,"white":"owenFairbanks","black":"derekSanders","wv":"3a730bae20","bv":"335c6fbb2f","result":"draw","reason":"insufficient material"}
+{"t":1795130959378,"white":"derekSanders","black":"owenFairbanks","wv":"335c6fbb2f","bv":"3a730bae20","result":"white","reason":"checkmate"}
+{"t":1795130959431,"white":"owenFairbanks","black":"derekSanders","wv":"3a730bae20","bv":"335c6fbb2f","result":"draw","reason":"insufficient material"}
+{"t":1795130959454,"white":"derekSanders","black":"owenFairbanks","wv":"335c6fbb2f","bv":"3a730bae20","result":"white","reason":"checkmate"}
+{"t":1795130959484,"white":"priyaNandakumar","black":"samuelReyes","wv":"f3c1733cfe","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130959495,"white":"derekSanders","black":"owenFairbanks","wv":"335c6fbb2f","bv":"3a730bae20","result":"white","reason":"checkmate"}
+{"t":1795130959556,"white":"owenFairbanks","black":"derekSanders","wv":"3a730bae20","bv":"335c6fbb2f","result":"draw","reason":"move limit"}
+{"t":1795130959605,"white":"owenFairbanks","black":"derekSanders","wv":"3a730bae20","bv":"335c6fbb2f","result":"draw","reason":"50-move rule"}
+{"t":1795130959652,"white":"samuelReyes","black":"priyaNandakumar","wv":"68a2140fca","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130959708,"white":"samuelReyes","black":"priyaNandakumar","wv":"68a2140fca","bv":"f3c1733cfe","result":"white","reason":"checkmate"}
+{"t":1795130959711,"white":"priyaNandakumar","black":"samuelReyes","wv":"f3c1733cfe","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130959720,"white":"samuelReyes","black":"priyaNandakumar","wv":"68a2140fca","bv":"f3c1733cfe","result":"white","reason":"checkmate"}
+{"t":1795130959763,"white":"priyaNandakumar","black":"samuelReyes","wv":"f3c1733cfe","bv":"68a2140fca","result":"black","reason":"checkmate"}
+{"t":1795130959862,"white":"samuelReyes","black":"priyaNandakumar","wv":"68a2140fca","bv":"f3c1733cfe","result":"black","reason":"stalemate"}
+{"t":1795130959901,"white":"derekSanders","black":"samuelReyes","wv":"335c6fbb2f","bv":"68a2140fca","result":"white","reason":"checkmate"}
+{"t":1795130959927,"white":"priyaNandakumar","black":"samuelReyes","wv":"f3c1733cfe","bv":"68a2140fca","result":"white","reason":"stalemate"}
+{"t":1795130959960,"white":"priyaNandakumar","black":"samuelReyes","wv":"f3c1733cfe","bv":"68a2140fca","result":"white","reason":"stalemate"}
+{"t":1795130959974,"white":"samuelReyes","black":"priyaNandakumar","wv":"68a2140fca","bv":"f3c1733cfe","result":"white","reason":"checkmate"}
+{"t":1795130960026,"white":"samuelReyes","black":"derekSanders","wv":"68a2140fca","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130960083,"white":"derekSanders","black":"samuelReyes","wv":"335c6fbb2f","bv":"68a2140fca","result":"draw","reason":"insufficient material"}
+{"t":1795130960113,"white":"samuelReyes","black":"derekSanders","wv":"68a2140fca","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130960189,"white":"samuelReyes","black":"derekSanders","wv":"68a2140fca","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130960220,"white":"samuelReyes","black":"derekSanders","wv":"68a2140fca","bv":"335c6fbb2f","result":"white","reason":"checkmate"}
+{"t":1795130960239,"white":"derekSanders","black":"samuelReyes","wv":"335c6fbb2f","bv":"68a2140fca","result":"white","reason":"checkmate"}
+{"t":1795130960320,"white":"derekSanders","black":"samuelReyes","wv":"335c6fbb2f","bv":"68a2140fca","result":"white","reason":"checkmate"}
+{"t":1795130960322,"white":"derekSanders","black":"priyaNandakumar","wv":"335c6fbb2f","bv":"f3c1733cfe","result":"white","reason":"checkmate"}
+{"t":1795130960335,"white":"samuelReyes","black":"derekSanders","wv":"68a2140fca","bv":"335c6fbb2f","result":"white","reason":"checkmate"}
+{"t":1795130960379,"white":"priyaNandakumar","black":"derekSanders","wv":"f3c1733cfe","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130960431,"white":"priyaNandakumar","black":"derekSanders","wv":"f3c1733cfe","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130960444,"white":"derekSanders","black":"samuelReyes","wv":"335c6fbb2f","bv":"68a2140fca","result":"white","reason":"checkmate"}
+{"t":1795130960528,"white":"derekSanders","black":"priyaNandakumar","wv":"335c6fbb2f","bv":"f3c1733cfe","result":"white","reason":"checkmate"}
+{"t":1795130960561,"white":"priyaNandakumar","black":"derekSanders","wv":"f3c1733cfe","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130960587,"white":"derekSanders","black":"priyaNandakumar","wv":"335c6fbb2f","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795130960602,"white":"priyaNandakumar","black":"derekSanders","wv":"f3c1733cfe","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795130960664,"white":"derekSanders","black":"priyaNandakumar","wv":"335c6fbb2f","bv":"f3c1733cfe","result":"draw","reason":"50-move rule"}
+{"t":1795130960686,"white":"priyaNandakumar","black":"derekSanders","wv":"f3c1733cfe","bv":"335c6fbb2f","result":"draw","reason":"insufficient material"}
+{"t":1795130960691,"white":"derekSanders","black":"priyaNandakumar","wv":"335c6fbb2f","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795131216585,"white":"graceOkafor","black":"miloPruitt","wv":"04fdd65435","bv":"3d0c388350","result":"white","reason":"checkmate"}
+{"t":1795131216750,"white":"miloPruitt","black":"graceOkafor","wv":"3d0c388350","bv":"04fdd65435","result":"black","reason":"checkmate"}
+{"t":1795131216760,"white":"owenFairbanks","black":"graceOkafor","wv":"3a730bae20","bv":"04fdd65435","result":"black","reason":"checkmate"}
+{"t":1795131216835,"white":"graceOkafor","black":"owenFairbanks","wv":"04fdd65435","bv":"3a730bae20","result":"draw","reason":"insufficient material"}
+{"t":1795131216848,"white":"owenFairbanks","black":"graceOkafor","wv":"3a730bae20","bv":"04fdd65435","result":"draw","reason":"insufficient material"}
+{"t":1795131216859,"white":"graceOkafor","black":"owenFairbanks","wv":"04fdd65435","bv":"3a730bae20","result":"draw","reason":"insufficient material"}
+{"t":1795131216910,"white":"miloPruitt","black":"theoLindqvist","wv":"3d0c388350","bv":"e5fe56a40d","result":"black","reason":"checkmate"}
+{"t":1795131216918,"white":"miloPruitt","black":"graceOkafor","wv":"3d0c388350","bv":"04fdd65435","result":"white","reason":"stalemate"}
+{"t":1795131217058,"white":"graceOkafor","black":"miloPruitt","wv":"04fdd65435","bv":"3d0c388350","result":"white","reason":"checkmate"}
+{"t":1795131217061,"white":"theoLindqvist","black":"miloPruitt","wv":"e5fe56a40d","bv":"3d0c388350","result":"white","reason":"checkmate"}
+{"t":1795131217093,"white":"theoLindqvist","black":"miloPruitt","wv":"e5fe56a40d","bv":"3d0c388350","result":"white","reason":"checkmate"}
+{"t":1795131217141,"white":"miloPruitt","black":"theoLindqvist","wv":"3d0c388350","bv":"e5fe56a40d","result":"black","reason":"checkmate"}
+{"t":1795131217188,"white":"graceOkafor","black":"luciaMoreno","wv":"04fdd65435","bv":"aa1df1d7a0","result":"white","reason":"checkmate"}
+{"t":1795131217202,"white":"luciaMoreno","black":"graceOkafor","wv":"aa1df1d7a0","bv":"04fdd65435","result":"black","reason":"checkmate"}
+{"t":1795131217205,"white":"graceOkafor","black":"luciaMoreno","wv":"04fdd65435","bv":"aa1df1d7a0","result":"white","reason":"checkmate"}
+{"t":1795131217222,"white":"luciaMoreno","black":"theoLindqvist","wv":"aa1df1d7a0","bv":"e5fe56a40d","result":"black","reason":"checkmate"}
+{"t":1795131217250,"white":"luciaMoreno","black":"graceOkafor","wv":"aa1df1d7a0","bv":"04fdd65435","result":"white","reason":"checkmate"}
+{"t":1795131217354,"white":"luciaMoreno","black":"ninaWhitfield","wv":"aa1df1d7a0","bv":"21cb310d1d","result":"black","reason":"checkmate"}
+{"t":1795131217360,"white":"ninaWhitfield","black":"luciaMoreno","wv":"21cb310d1d","bv":"aa1df1d7a0","result":"white","reason":"checkmate"}
+{"t":1795131217383,"white":"theoLindqvist","black":"luciaMoreno","wv":"e5fe56a40d","bv":"aa1df1d7a0","result":"white","reason":"checkmate"}
+{"t":1795131217417,"white":"theoLindqvist","black":"luciaMoreno","wv":"e5fe56a40d","bv":"aa1df1d7a0","result":"white","reason":"checkmate"}
+{"t":1795131217417,"white":"luciaMoreno","black":"theoLindqvist","wv":"aa1df1d7a0","bv":"e5fe56a40d","result":"black","reason":"checkmate"}
+{"t":1795131217489,"white":"luciaMoreno","black":"ninaWhitfield","wv":"aa1df1d7a0","bv":"21cb310d1d","result":"black","reason":"checkmate"}
+{"t":1795131217522,"white":"ninaWhitfield","black":"luciaMoreno","wv":"21cb310d1d","bv":"aa1df1d7a0","result":"white","reason":"checkmate"}
+{"t":1795131217618,"white":"samuelReyes","black":"graceOkafor","wv":"68a2140fca","bv":"04fdd65435","result":"draw","reason":"insufficient material"}
+{"t":1795131217637,"white":"samuelReyes","black":"graceOkafor","wv":"68a2140fca","bv":"04fdd65435","result":"black","reason":"checkmate"}
+{"t":1795131217653,"white":"graceOkafor","black":"samuelReyes","wv":"04fdd65435","bv":"68a2140fca","result":"white","reason":"checkmate"}
+{"t":1795131217723,"white":"graceOkafor","black":"samuelReyes","wv":"04fdd65435","bv":"68a2140fca","result":"white","reason":"checkmate"}
+{"t":1795131217808,"white":"samuelReyes","black":"theoLindqvist","wv":"68a2140fca","bv":"e5fe56a40d","result":"black","reason":"checkmate"}
+{"t":1795131217814,"white":"theoLindqvist","black":"samuelReyes","wv":"e5fe56a40d","bv":"68a2140fca","result":"draw","reason":"insufficient material"}
+{"t":1795131217829,"white":"theoLindqvist","black":"samuelReyes","wv":"e5fe56a40d","bv":"68a2140fca","result":"white","reason":"checkmate"}
+{"t":1795131217844,"white":"samuelReyes","black":"theoLindqvist","wv":"68a2140fca","bv":"e5fe56a40d","result":"black","reason":"checkmate"}
+{"t":1795131217929,"white":"ninaWhitfield","black":"samuelReyes","wv":"21cb310d1d","bv":"68a2140fca","result":"white","reason":"checkmate"}
+{"t":1795131218010,"white":"samuelReyes","black":"ninaWhitfield","wv":"68a2140fca","bv":"21cb310d1d","result":"black","reason":"checkmate"}
+{"t":1795131218045,"white":"samuelReyes","black":"ninaWhitfield","wv":"68a2140fca","bv":"21cb310d1d","result":"black","reason":"checkmate"}
+{"t":1795131218162,"white":"ninaWhitfield","black":"samuelReyes","wv":"21cb310d1d","bv":"68a2140fca","result":"draw","reason":"insufficient material"}
+{"t":1795131218332,"white":"priyaNandakumar","black":"graceOkafor","wv":"f3c1733cfe","bv":"04fdd65435","result":"black","reason":"checkmate"}
+{"t":1795131218425,"white":"graceOkafor","black":"priyaNandakumar","wv":"04fdd65435","bv":"f3c1733cfe","result":"draw","reason":"insufficient material"}
+{"t":1795131218625,"white":"graceOkafor","black":"priyaNandakumar","wv":"04fdd65435","bv":"f3c1733cfe","result":"white","reason":"checkmate"}
+{"t":1795131218637,"white":"priyaNandakumar","black":"graceOkafor","wv":"f3c1733cfe","bv":"04fdd65435","result":"black","reason":"checkmate"}
+{"t":1795131218829,"white":"priyaNandakumar","black":"theoLindqvist","wv":"f3c1733cfe","bv":"e5fe56a40d","result":"white","reason":"stalemate"}
+{"t":1795131218847,"white":"theoLindqvist","black":"priyaNandakumar","wv":"e5fe56a40d","bv":"f3c1733cfe","result":"white","reason":"checkmate"}
+{"t":1795131218992,"white":"rafaelCosta","black":"samuelReyes","wv":"dc04fdc670","bv":"68a2140fca","result":"white","reason":"checkmate"}
+{"t":1795131219039,"white":"theoLindqvist","black":"priyaNandakumar","wv":"e5fe56a40d","bv":"f3c1733cfe","result":"black","reason":"checkmate"}
+{"t":1795131219103,"white":"rafaelCosta","black":"samuelReyes","wv":"dc04fdc670","bv":"68a2140fca","result":"white","reason":"checkmate"}
+{"t":1795131219105,"white":"priyaNandakumar","black":"theoLindqvist","wv":"f3c1733cfe","bv":"e5fe56a40d","result":"white","reason":"stalemate"}
+{"t":1795131219195,"white":"samuelReyes","black":"rafaelCosta","wv":"68a2140fca","bv":"dc04fdc670","result":"black","reason":"checkmate"}
+{"t":1795131219230,"white":"ninaWhitfield","black":"priyaNandakumar","wv":"21cb310d1d","bv":"f3c1733cfe","result":"white","reason":"checkmate"}
+{"t":1795131219255,"white":"priyaNandakumar","black":"ninaWhitfield","wv":"f3c1733cfe","bv":"21cb310d1d","result":"black","reason":"checkmate"}
+{"t":1795131219264,"white":"priyaNandakumar","black":"ninaWhitfield","wv":"f3c1733cfe","bv":"21cb310d1d","result":"black","reason":"checkmate"}
+{"t":1795131219326,"white":"samuelReyes","black":"rafaelCosta","wv":"68a2140fca","bv":"dc04fdc670","result":"black","reason":"checkmate"}
+{"t":1795131219350,"white":"ninaWhitfield","black":"priyaNandakumar","wv":"21cb310d1d","bv":"f3c1733cfe","result":"white","reason":"checkmate"}
+{"t":1795131219800,"white":"rafaelCosta","black":"priyaNandakumar","wv":"dc04fdc670","bv":"f3c1733cfe","result":"white","reason":"checkmate"}
+{"t":1795131220273,"white":"priyaNandakumar","black":"rafaelCosta","wv":"f3c1733cfe","bv":"dc04fdc670","result":"black","reason":"checkmate"}
+{"t":1795131220610,"white":"priyaNandakumar","black":"marcusWebb","wv":"f3c1733cfe","bv":"4740b9c532","result":"black","reason":"checkmate"}
+{"t":1795131220894,"white":"derekSanders","black":"graceOkafor","wv":"335c6fbb2f","bv":"04fdd65435","result":"black","reason":"checkmate"}
+{"t":1795131220980,"white":"priyaNandakumar","black":"rafaelCosta","wv":"f3c1733cfe","bv":"dc04fdc670","result":"black","reason":"checkmate"}
+{"t":1795131221017,"white":"marcusWebb","black":"priyaNandakumar","wv":"4740b9c532","bv":"f3c1733cfe","result":"white","reason":"checkmate"}
+{"t":1795131221133,"white":"graceOkafor","black":"derekSanders","wv":"04fdd65435","bv":"335c6fbb2f","result":"draw","reason":"insufficient material"}
+{"t":1795131221210,"white":"rafaelCosta","black":"priyaNandakumar","wv":"dc04fdc670","bv":"f3c1733cfe","result":"white","reason":"checkmate"}
+{"t":1795131221213,"white":"derekSanders","black":"graceOkafor","wv":"335c6fbb2f","bv":"04fdd65435","result":"black","reason":"checkmate"}
+{"t":1795131221301,"white":"graceOkafor","black":"derekSanders","wv":"04fdd65435","bv":"335c6fbb2f","result":"draw","reason":"insufficient material"}
+{"t":1795131221306,"white":"derekSanders","black":"theoLindqvist","wv":"335c6fbb2f","bv":"e5fe56a40d","result":"draw","reason":"insufficient material"}
+{"t":1795131221417,"white":"derekSanders","black":"theoLindqvist","wv":"335c6fbb2f","bv":"e5fe56a40d","result":"black","reason":"checkmate"}
+{"t":1795131221441,"white":"theoLindqvist","black":"derekSanders","wv":"e5fe56a40d","bv":"335c6fbb2f","result":"black","reason":"checkmate"}
+{"t":1795131221452,"white":"marcusWebb","black":"priyaNandakumar","wv":"4740b9c532","bv":"f3c1733cfe","result":"white","reason":"checkmate"}
+{"t":1795131221565,"white":"theoLindqvist","black":"derekSanders","wv":"e5fe56a40d","bv":"335c6fbb2f","result":"white","reason":"checkmate"}
+{"t":1795131221595,"white":"derekSanders","black":"ninaWhitfield","wv":"335c6fbb2f","bv":"21cb310d1d","result":"white","reason":"checkmate"}
+{"t":1795131221639,"white":"derekSanders","black":"ninaWhitfield","wv":"335c6fbb2f","bv":"21cb310d1d","result":"black","reason":"checkmate"}
+{"t":1795131221696,"white":"priyaNandakumar","black":"marcusWebb","wv":"f3c1733cfe","bv":"4740b9c532","result":"black","reason":"checkmate"}
+{"t":1795131221710,"white":"ninaWhitfield","black":"derekSanders","wv":"21cb310d1d","bv":"335c6fbb2f","result":"draw","reason":"insufficient material"}
+{"t":1795131221753,"white":"ninaWhitfield","black":"derekSanders","wv":"21cb310d1d","bv":"335c6fbb2f","result":"white","reason":"checkmate"}
+{"t":1795131222486,"white":"derekSanders","black":"marcusWebb","wv":"335c6fbb2f","bv":"4740b9c532","result":"black","reason":"checkmate"}
+{"t":1795131222788,"white":"derekSanders","black":"rafaelCosta","wv":"335c6fbb2f","bv":"dc04fdc670","result":"black","reason":"checkmate"}
+{"t":1795131222860,"white":"rafaelCosta","black":"derekSanders","wv":"dc04fdc670","bv":"335c6fbb2f","result":"white","reason":"checkmate"}
+{"t":1795131223188,"white":"marcusWebb","black":"derekSanders","wv":"4740b9c532","bv":"335c6fbb2f","result":"white","reason":"checkmate"}
+{"t":1795131223392,"white":"derekSanders","black":"rafaelCosta","wv":"335c6fbb2f","bv":"dc04fdc670","result":"white","reason":"checkmate"}
+{"t":1795131223724,"white":"rafaelCosta","black":"derekSanders","wv":"dc04fdc670","bv":"335c6fbb2f","result":"white","reason":"checkmate"}
+{"t":1795131223825,"white":"derekSanders","black":"marcusWebb","wv":"335c6fbb2f","bv":"4740b9c532","result":"black","reason":"checkmate"}
+{"t":1795131224085,"white":"graceOkafor","black":"theoLindqvist","wv":"04fdd65435","bv":"e5fe56a40d","result":"draw","reason":"insufficient material"}
+{"t":1795131224312,"white":"derekSanders","black":"ingridHalvorsen","wv":"335c6fbb2f","bv":"d65716fba1","result":"black","reason":"checkmate"}
+{"t":1795131224343,"white":"theoLindqvist","black":"graceOkafor","wv":"e5fe56a40d","bv":"04fdd65435","result":"white","reason":"checkmate"}
+{"t":1795131224540,"white":"graceOkafor","black":"theoLindqvist","wv":"04fdd65435","bv":"e5fe56a40d","result":"black","reason":"checkmate"}
+{"t":1795131224607,"white":"theoLindqvist","black":"graceOkafor","wv":"e5fe56a40d","bv":"04fdd65435","result":"black","reason":"checkmate"}
+{"t":1795131224749,"white":"ingridHalvorsen","black":"derekSanders","wv":"d65716fba1","bv":"335c6fbb2f","result":"white","reason":"checkmate"}
+{"t":1795131224869,"white":"graceOkafor","black":"ninaWhitfield","wv":"04fdd65435","bv":"21cb310d1d","result":"white","reason":"checkmate"}
+{"t":1795131224903,"white":"ninaWhitfield","black":"graceOkafor","wv":"21cb310d1d","bv":"04fdd65435","result":"black","reason":"checkmate"}
+{"t":1795131224917,"white":"marcusWebb","black":"derekSanders","wv":"4740b9c532","bv":"335c6fbb2f","result":"white","reason":"checkmate"}
+{"t":1795131224984,"white":"graceOkafor","black":"ninaWhitfield","wv":"04fdd65435","bv":"21cb310d1d","result":"black","reason":"checkmate"}
+{"t":1795131225018,"white":"derekSanders","black":"ingridHalvorsen","wv":"335c6fbb2f","bv":"d65716fba1","result":"black","reason":"checkmate"}
+{"t":1795131225168,"white":"ninaWhitfield","black":"graceOkafor","wv":"21cb310d1d","bv":"04fdd65435","result":"white","reason":"checkmate"}
+{"t":1795131225351,"white":"ingridHalvorsen","black":"derekSanders","wv":"d65716fba1","bv":"335c6fbb2f","result":"white","reason":"checkmate"}
+{"t":1795131226339,"white":"graceOkafor","black":"rafaelCosta","wv":"04fdd65435","bv":"dc04fdc670","result":"black","reason":"checkmate"}
+{"t":1795131226347,"white":"graceOkafor","black":"marcusWebb","wv":"04fdd65435","bv":"4740b9c532","result":"black","reason":"checkmate"}
+{"t":1795131226652,"white":"graceOkafor","black":"rafaelCosta","wv":"04fdd65435","bv":"dc04fdc670","result":"black","reason":"checkmate"}
+{"t":1795131226847,"white":"marcusWebb","black":"graceOkafor","wv":"4740b9c532","bv":"04fdd65435","result":"white","reason":"checkmate"}
+{"t":1795131226859,"white":"rafaelCosta","black":"graceOkafor","wv":"dc04fdc670","bv":"04fdd65435","result":"white","reason":"checkmate"}
+{"t":1795131226929,"white":"rafaelCosta","black":"graceOkafor","wv":"dc04fdc670","bv":"04fdd65435","result":"white","reason":"checkmate"}
+{"t":1795131227531,"white":"graceOkafor","black":"marcusWebb","wv":"04fdd65435","bv":"4740b9c532","result":"black","reason":"checkmate"}
+{"t":1795131227769,"white":"marcusWebb","black":"graceOkafor","wv":"4740b9c532","bv":"04fdd65435","result":"white","reason":"checkmate"}
+{"t":1795131228267,"white":"graceOkafor","black":"ingridHalvorsen","wv":"04fdd65435","bv":"d65716fba1","result":"black","reason":"checkmate"}
+{"t":1795131228384,"white":"graceOkafor","black":"ingridHalvorsen","wv":"04fdd65435","bv":"d65716fba1","result":"black","reason":"checkmate"}
+{"t":1795131228790,"white":"ingridHalvorsen","black":"graceOkafor","wv":"d65716fba1","bv":"04fdd65435","result":"white","reason":"checkmate"}
+{"t":1795131228919,"white":"graceOkafor","black":"felixMarsh","wv":"04fdd65435","bv":"bef06bdffa","result":"white","reason":"checkmate"}
+{"t":1795131228999,"white":"ingridHalvorsen","black":"graceOkafor","wv":"d65716fba1","bv":"04fdd65435","result":"white","reason":"checkmate"}
+{"t":1795131229152,"white":"theoLindqvist","black":"ninaWhitfield","wv":"e5fe56a40d","bv":"21cb310d1d","result":"white","reason":"checkmate"}
+{"t":1795131229202,"white":"ninaWhitfield","black":"theoLindqvist","wv":"21cb310d1d","bv":"e5fe56a40d","result":"draw","reason":"50-move rule"}
+{"t":1795131229204,"white":"theoLindqvist","black":"ninaWhitfield","wv":"e5fe56a40d","bv":"21cb310d1d","result":"draw","reason":"insufficient material"}
+{"t":1795131229374,"white":"ninaWhitfield","black":"theoLindqvist","wv":"21cb310d1d","bv":"e5fe56a40d","result":"white","reason":"checkmate"}
+{"t":1795131229559,"white":"felixMarsh","black":"graceOkafor","wv":"bef06bdffa","bv":"04fdd65435","result":"white","reason":"checkmate"}
+{"t":1795131229851,"white":"felixMarsh","black":"graceOkafor","wv":"bef06bdffa","bv":"04fdd65435","result":"white","reason":"checkmate"}
+{"t":1795131230002,"white":"graceOkafor","black":"felixMarsh","wv":"04fdd65435","bv":"bef06bdffa","result":"black","reason":"checkmate"}
+{"t":1795131230385,"white":"rafaelCosta","black":"theoLindqvist","wv":"dc04fdc670","bv":"e5fe56a40d","result":"white","reason":"checkmate"}
+{"t":1795131230579,"white":"theoLindqvist","black":"rafaelCosta","wv":"e5fe56a40d","bv":"dc04fdc670","result":"black","reason":"checkmate"}
+{"t":1795131230732,"white":"theoLindqvist","black":"rafaelCosta","wv":"e5fe56a40d","bv":"dc04fdc670","result":"black","reason":"checkmate"}
+{"t":1795131230956,"white":"rafaelCosta","black":"theoLindqvist","wv":"dc04fdc670","bv":"e5fe56a40d","result":"white","reason":"checkmate"}
+{"t":1795131230965,"white":"theoLindqvist","black":"marcusWebb","wv":"e5fe56a40d","bv":"4740b9c532","result":"black","reason":"checkmate"}
+{"t":1795131231508,"white":"marcusWebb","black":"theoLindqvist","wv":"4740b9c532","bv":"e5fe56a40d","result":"black","reason":"checkmate"}
+{"t":1795131231605,"white":"marcusWebb","black":"theoLindqvist","wv":"4740b9c532","bv":"e5fe56a40d","result":"white","reason":"checkmate"}
+{"t":1795131231790,"white":"theoLindqvist","black":"ingridHalvorsen","wv":"e5fe56a40d","bv":"d65716fba1","result":"black","reason":"checkmate"}
+{"t":1795131232121,"white":"theoLindqvist","black":"ingridHalvorsen","wv":"e5fe56a40d","bv":"d65716fba1","result":"black","reason":"checkmate"}
+{"t":1795131232144,"white":"theoLindqvist","black":"marcusWebb","wv":"e5fe56a40d","bv":"4740b9c532","result":"black","reason":"checkmate"}
+{"t":1795131232538,"white":"ingridHalvorsen","black":"theoLindqvist","wv":"d65716fba1","bv":"e5fe56a40d","result":"white","reason":"checkmate"}
+{"t":1795131232905,"white":"felixMarsh","black":"theoLindqvist","wv":"bef06bdffa","bv":"e5fe56a40d","result":"white","reason":"checkmate"}
+{"t":1795131232955,"white":"ingridHalvorsen","black":"theoLindqvist","wv":"d65716fba1","bv":"e5fe56a40d","result":"white","reason":"checkmate"}
+{"t":1795131233471,"white":"theoLindqvist","black":"felixMarsh","wv":"e5fe56a40d","bv":"bef06bdffa","result":"black","reason":"checkmate"}
+{"t":1795131233717,"white":"theoLindqvist","black":"felixMarsh","wv":"e5fe56a40d","bv":"bef06bdffa","result":"black","reason":"checkmate"}
+{"t":1795131234416,"white":"felixMarsh","black":"theoLindqvist","wv":"bef06bdffa","bv":"e5fe56a40d","result":"white","reason":"checkmate"}
+{"t":1795131234819,"white":"ninaWhitfield","black":"rafaelCosta","wv":"21cb310d1d","bv":"dc04fdc670","result":"black","reason":"checkmate"}
+{"t":1795131234886,"white":"theoLindqvist","black":"yukiTanaka","wv":"e5fe56a40d","bv":"29292c23f4","result":"black","reason":"checkmate"}
+{"t":1795131235321,"white":"theoLindqvist","black":"yukiTanaka","wv":"e5fe56a40d","bv":"29292c23f4","result":"black","reason":"checkmate"}
+{"t":1795131235469,"white":"rafaelCosta","black":"ninaWhitfield","wv":"dc04fdc670","bv":"21cb310d1d","result":"white","reason":"checkmate"}
+{"t":1795131235800,"white":"yukiTanaka","black":"theoLindqvist","wv":"29292c23f4","bv":"e5fe56a40d","result":"white","reason":"checkmate"}
+{"t":1795131236115,"white":"yukiTanaka","black":"theoLindqvist","wv":"29292c23f4","bv":"e5fe56a40d","result":"white","reason":"checkmate"}
+{"t":1795131236162,"white":"ninaWhitfield","black":"rafaelCosta","wv":"21cb310d1d","bv":"dc04fdc670","result":"draw","reason":"50-move rule"}
+{"t":1795131236711,"white":"marcusWebb","black":"ninaWhitfield","wv":"4740b9c532","bv":"21cb310d1d","result":"white","reason":"checkmate"}
+{"t":1795131236785,"white":"rafaelCosta","black":"ninaWhitfield","wv":"dc04fdc670","bv":"21cb310d1d","result":"white","reason":"checkmate"}
+{"t":1795131236841,"white":"ninaWhitfield","black":"marcusWebb","wv":"21cb310d1d","bv":"4740b9c532","result":"black","reason":"checkmate"}
+{"t":1795131237434,"white":"ninaWhitfield","black":"marcusWebb","wv":"21cb310d1d","bv":"4740b9c532","result":"black","reason":"checkmate"}
+{"t":1795131237832,"white":"marcusWebb","black":"ninaWhitfield","wv":"4740b9c532","bv":"21cb310d1d","result":"white","reason":"checkmate"}
+{"t":1795131238017,"white":"ingridHalvorsen","black":"ninaWhitfield","wv":"d65716fba1","bv":"21cb310d1d","result":"white","reason":"checkmate"}
+{"t":1795131238076,"white":"ninaWhitfield","black":"ingridHalvorsen","wv":"21cb310d1d","bv":"d65716fba1","result":"black","reason":"checkmate"}
+{"t":1795131238118,"white":"ingridHalvorsen","black":"ninaWhitfield","wv":"d65716fba1","bv":"21cb310d1d","result":"white","reason":"checkmate"}
+{"t":1795131238744,"white":"ninaWhitfield","black":"felixMarsh","wv":"21cb310d1d","bv":"bef06bdffa","result":"black","reason":"checkmate"}
+{"t":1795131239150,"white":"ninaWhitfield","black":"ingridHalvorsen","wv":"21cb310d1d","bv":"d65716fba1","result":"black","reason":"checkmate"}
+{"t":1795131240158,"white":"ninaWhitfield","black":"felixMarsh","wv":"21cb310d1d","bv":"bef06bdffa","result":"black","reason":"checkmate"}
+{"t":1795131240857,"white":"ninaWhitfield","black":"yukiTanaka","wv":"21cb310d1d","bv":"29292c23f4","result":"black","reason":"checkmate"}
+{"t":1795131241384,"white":"felixMarsh","black":"ninaWhitfield","wv":"bef06bdffa","bv":"21cb310d1d","result":"white","reason":"checkmate"}
+{"t":1795131241585,"white":"felixMarsh","black":"ninaWhitfield","wv":"bef06bdffa","bv":"21cb310d1d","result":"white","reason":"checkmate"}
+{"t":1795131242116,"white":"ninaWhitfield","black":"yukiTanaka","wv":"21cb310d1d","bv":"29292c23f4","result":"black","reason":"checkmate"}
+{"t":1795131242448,"white":"yukiTanaka","black":"ninaWhitfield","wv":"29292c23f4","bv":"21cb310d1d","result":"white","reason":"checkmate"}
+{"t":1795131242487,"white":"yukiTanaka","black":"ninaWhitfield","wv":"29292c23f4","bv":"21cb310d1d","result":"white","reason":"checkmate"}
+{"t":1795131245942,"white":"rafaelCosta","black":"marcusWebb","wv":"dc04fdc670","bv":"4740b9c532","result":"draw","reason":"50-move rule"}
+{"t":1795131247327,"white":"marcusWebb","black":"rafaelCosta","wv":"4740b9c532","bv":"dc04fdc670","result":"white","reason":"checkmate"}
+{"t":1795131248932,"white":"rafaelCosta","black":"marcusWebb","wv":"dc04fdc670","bv":"4740b9c532","result":"black","reason":"checkmate"}
+{"t":1795131249692,"white":"marcusWebb","black":"rafaelCosta","wv":"4740b9c532","bv":"dc04fdc670","result":"white","reason":"checkmate"}
+{"t":1795131250952,"white":"rafaelCosta","black":"ingridHalvorsen","wv":"dc04fdc670","bv":"d65716fba1","result":"black","reason":"checkmate"}
+{"t":1795131252014,"white":"ingridHalvorsen","black":"rafaelCosta","wv":"d65716fba1","bv":"dc04fdc670","result":"white","reason":"checkmate"}
+{"t":1795131252446,"white":"ninaWhitfield","black":"miraCastellanos","wv":"21cb310d1d","bv":"107ca4d3fe","result":"black","reason":"checkmate"}
+{"t":1795131253178,"white":"rafaelCosta","black":"ingridHalvorsen","wv":"dc04fdc670","bv":"d65716fba1","result":"white","reason":"checkmate"}
+{"t":1795131254089,"white":"ingridHalvorsen","black":"rafaelCosta","wv":"d65716fba1","bv":"dc04fdc670","result":"white","reason":"checkmate"}
+{"t":1795131254869,"white":"rafaelCosta","black":"felixMarsh","wv":"dc04fdc670","bv":"bef06bdffa","result":"black","reason":"checkmate"}
+{"t":1795131256317,"white":"felixMarsh","black":"rafaelCosta","wv":"bef06bdffa","bv":"dc04fdc670","result":"black","reason":"checkmate"}
+{"t":1795131256404,"white":"ninaWhitfield","black":"miraCastellanos","wv":"21cb310d1d","bv":"107ca4d3fe","result":"black","reason":"checkmate"}
+{"t":1795131257599,"white":"rafaelCosta","black":"felixMarsh","wv":"dc04fdc670","bv":"bef06bdffa","result":"black","reason":"checkmate"}
+{"t":1795131257782,"white":"felixMarsh","black":"rafaelCosta","wv":"bef06bdffa","bv":"dc04fdc670","result":"white","reason":"checkmate"}
+{"t":1795131259315,"white":"miraCastellanos","black":"ninaWhitfield","wv":"107ca4d3fe","bv":"21cb310d1d","result":"white","reason":"checkmate"}
+{"t":1795131260198,"white":"rafaelCosta","black":"yukiTanaka","wv":"dc04fdc670","bv":"29292c23f4","result":"black","reason":"checkmate"}
+{"t":1795131260957,"white":"yukiTanaka","black":"rafaelCosta","wv":"29292c23f4","bv":"dc04fdc670","result":"white","reason":"checkmate"}
+{"t":1795131261776,"white":"rafaelCosta","black":"yukiTanaka","wv":"dc04fdc670","bv":"29292c23f4","result":"black","reason":"checkmate"}
+{"t":1795131262146,"white":"yukiTanaka","black":"rafaelCosta","wv":"29292c23f4","bv":"dc04fdc670","result":"white","reason":"checkmate"}
+{"t":1795131265661,"white":"rafaelCosta","black":"danaWhitlock","wv":"dc04fdc670","bv":"f626dacd1c","result":"black","reason":"checkmate"}
+{"t":1795131268987,"white":"danaWhitlock","black":"rafaelCosta","wv":"f626dacd1c","bv":"dc04fdc670","result":"white","reason":"checkmate"}
+{"t":1795131271902,"white":"rafaelCosta","black":"miraCastellanos","wv":"dc04fdc670","bv":"107ca4d3fe","result":"black","reason":"checkmate"}
+{"t":1795131271933,"white":"rafaelCosta","black":"danaWhitlock","wv":"dc04fdc670","bv":"f626dacd1c","result":"draw","reason":"insufficient material"}
+{"t":1795131275005,"white":"marcusWebb","black":"ingridHalvorsen","wv":"4740b9c532","bv":"d65716fba1","result":"white","reason":"checkmate"}
+{"t":1795131275811,"white":"danaWhitlock","black":"rafaelCosta","wv":"f626dacd1c","bv":"dc04fdc670","result":"white","reason":"checkmate"}
+{"t":1795131277076,"white":"ingridHalvorsen","black":"marcusWebb","wv":"d65716fba1","bv":"4740b9c532","result":"black","reason":"checkmate"}
+{"t":1795131278015,"white":"marcusWebb","black":"ingridHalvorsen","wv":"4740b9c532","bv":"d65716fba1","result":"white","reason":"checkmate"}
+{"t":1795131278953,"white":"ingridHalvorsen","black":"marcusWebb","wv":"d65716fba1","bv":"4740b9c532","result":"white","reason":"checkmate"}
+{"t":1795131280823,"white":"marcusWebb","black":"felixMarsh","wv":"4740b9c532","bv":"bef06bdffa","result":"white","reason":"checkmate"}
+{"t":1795131282975,"white":"felixMarsh","black":"marcusWebb","wv":"bef06bdffa","bv":"4740b9c532","result":"white","reason":"checkmate"}
+{"t":1795131283952,"white":"marcusWebb","black":"felixMarsh","wv":"4740b9c532","bv":"bef06bdffa","result":"black","reason":"checkmate"}
+{"t":1795131285435,"white":"felixMarsh","black":"marcusWebb","wv":"bef06bdffa","bv":"4740b9c532","result":"black","reason":"checkmate"}
+{"t":1795131287286,"white":"marcusWebb","black":"yukiTanaka","wv":"4740b9c532","bv":"29292c23f4","result":"black","reason":"checkmate"}
+{"t":1795131289600,"white":"miraCastellanos","black":"rafaelCosta","wv":"107ca4d3fe","bv":"dc04fdc670","result":"white","reason":"checkmate"}
+{"t":1795131289965,"white":"yukiTanaka","black":"marcusWebb","wv":"29292c23f4","bv":"4740b9c532","result":"white","reason":"checkmate"}
+{"t":1795131290286,"white":"marcusWebb","black":"yukiTanaka","wv":"4740b9c532","bv":"29292c23f4","result":"black","reason":"checkmate"}
+{"t":1795131296047,"white":"yukiTanaka","black":"marcusWebb","wv":"29292c23f4","bv":"4740b9c532","result":"white","reason":"checkmate"}
+{"t":1795131298207,"white":"miraCastellanos","black":"ninaWhitfield","wv":"107ca4d3fe","bv":"21cb310d1d","result":"white","reason":"checkmate"}
+{"t":1795131306529,"white":"miraCastellanos","black":"rafaelCosta","wv":"107ca4d3fe","bv":"dc04fdc670","result":"white","reason":"checkmate"}
+{"t":1795131308957,"white":"marcusWebb","black":"danaWhitlock","wv":"4740b9c532","bv":"f626dacd1c","result":"black","reason":"checkmate"}
+{"t":1795131312263,"white":"danaWhitlock","black":"marcusWebb","wv":"f626dacd1c","bv":"4740b9c532","result":"white","reason":"checkmate"}
+{"t":1795131317169,"white":"marcusWebb","black":"danaWhitlock","wv":"4740b9c532","bv":"f626dacd1c","result":"black","reason":"checkmate"}
+{"t":1795131320555,"white":"marcusWebb","black":"miraCastellanos","wv":"4740b9c532","bv":"107ca4d3fe","result":"black","reason":"checkmate"}
+{"t":1795131320998,"white":"danaWhitlock","black":"marcusWebb","wv":"f626dacd1c","bv":"4740b9c532","result":"white","reason":"checkmate"}
+{"t":1795131338970,"white":"rafaelCosta","black":"miraCastellanos","wv":"dc04fdc670","bv":"107ca4d3fe","result":"black","reason":"checkmate"}
+{"t":1795131352239,"white":"marcusWebb","black":"elenaVoss","wv":"4740b9c532","bv":"6eb08dc8a8","result":"black","reason":"checkmate"}
+{"t":1795131357218,"white":"miraCastellanos","black":"marcusWebb","wv":"107ca4d3fe","bv":"4740b9c532","result":"white","reason":"checkmate"}
+{"t":1795131359932,"white":"ingridHalvorsen","black":"felixMarsh","wv":"d65716fba1","bv":"bef06bdffa","result":"black","reason":"checkmate"}
+{"t":1795131362101,"white":"miraCastellanos","black":"marcusWebb","wv":"107ca4d3fe","bv":"4740b9c532","result":"white","reason":"checkmate"}
+{"t":1795131363082,"white":"felixMarsh","black":"ingridHalvorsen","wv":"bef06bdffa","bv":"d65716fba1","result":"white","reason":"checkmate"}
+{"t":1795131365294,"white":"felixMarsh","black":"ingridHalvorsen","wv":"bef06bdffa","bv":"d65716fba1","result":"white","reason":"checkmate"}
+{"t":1795131365349,"white":"ingridHalvorsen","black":"felixMarsh","wv":"d65716fba1","bv":"bef06bdffa","result":"black","reason":"checkmate"}
+{"t":1795131368140,"white":"ingridHalvorsen","black":"yukiTanaka","wv":"d65716fba1","bv":"29292c23f4","result":"black","reason":"checkmate"}
+{"t":1795131371163,"white":"yukiTanaka","black":"ingridHalvorsen","wv":"29292c23f4","bv":"d65716fba1","result":"white","reason":"checkmate"}
+{"t":1795131372748,"white":"ingridHalvorsen","black":"yukiTanaka","wv":"d65716fba1","bv":"29292c23f4","result":"black","reason":"checkmate"}
+{"t":1795131373179,"white":"marcusWebb","black":"miraCastellanos","wv":"4740b9c532","bv":"107ca4d3fe","result":"black","reason":"checkmate"}
+{"t":1795131374391,"white":"yukiTanaka","black":"ingridHalvorsen","wv":"29292c23f4","bv":"d65716fba1","result":"white","reason":"checkmate"}
+{"t":1795131391503,"white":"elenaVoss","black":"marcusWebb","wv":"6eb08dc8a8","bv":"4740b9c532","result":"white","reason":"checkmate"}
+{"t":1795131410144,"white":"ingridHalvorsen","black":"miraCastellanos","wv":"d65716fba1","bv":"107ca4d3fe","result":"black","reason":"checkmate"}
+{"t":1795131412659,"white":"ingridHalvorsen","black":"danaWhitlock","wv":"d65716fba1","bv":"f626dacd1c","result":"black","reason":"checkmate"}
+{"t":1795131415798,"white":"danaWhitlock","black":"ingridHalvorsen","wv":"f626dacd1c","bv":"d65716fba1","result":"white","reason":"checkmate"}
+{"t":1795131418854,"white":"ingridHalvorsen","black":"danaWhitlock","wv":"d65716fba1","bv":"f626dacd1c","result":"white","reason":"checkmate"}
+{"t":1795131422206,"white":"danaWhitlock","black":"ingridHalvorsen","wv":"f626dacd1c","bv":"d65716fba1","result":"draw","reason":"50-move rule"}
+{"t":1795131443906,"white":"marcusWebb","black":"elenaVoss","wv":"4740b9c532","bv":"6eb08dc8a8","result":"black","reason":"checkmate"}
+{"t":1795131445945,"white":"ingridHalvorsen","black":"miraCastellanos","wv":"d65716fba1","bv":"107ca4d3fe","result":"black","reason":"checkmate"}
+{"t":1795131462665,"white":"miraCastellanos","black":"ingridHalvorsen","wv":"107ca4d3fe","bv":"d65716fba1","result":"white","reason":"checkmate"}
+{"t":1795131476028,"white":"ingridHalvorsen","black":"elenaVoss","wv":"d65716fba1","bv":"6eb08dc8a8","result":"black","reason":"checkmate"}
+{"t":1795131483703,"white":"miraCastellanos","black":"ingridHalvorsen","wv":"107ca4d3fe","bv":"d65716fba1","result":"white","reason":"checkmate"}
+{"t":1795131489018,"white":"ingridHalvorsen","black":"elenaVoss","wv":"d65716fba1","bv":"6eb08dc8a8","result":"black","reason":"checkmate"}
+{"t":1795131492331,"white":"elenaVoss","black":"marcusWebb","wv":"6eb08dc8a8","bv":"4740b9c532","result":"white","reason":"checkmate"}
+{"t":1795131503128,"white":"elenaVoss","black":"ingridHalvorsen","wv":"6eb08dc8a8","bv":"d65716fba1","result":"white","reason":"checkmate"}
+{"t":1795131507313,"white":"felixMarsh","black":"yukiTanaka","wv":"bef06bdffa","bv":"29292c23f4","result":"black","reason":"checkmate"}
+{"t":1795131512497,"white":"yukiTanaka","black":"felixMarsh","wv":"29292c23f4","bv":"bef06bdffa","result":"white","reason":"checkmate"}
+{"t":1795131517710,"white":"felixMarsh","black":"yukiTanaka","wv":"bef06bdffa","bv":"29292c23f4","result":"black","reason":"checkmate"}
+{"t":1795131520976,"white":"yukiTanaka","black":"felixMarsh","wv":"29292c23f4","bv":"bef06bdffa","result":"white","reason":"checkmate"}
+{"t":1795131530050,"white":"elenaVoss","black":"ingridHalvorsen","wv":"6eb08dc8a8","bv":"d65716fba1","result":"white","reason":"checkmate"}
+{"t":1795131548523,"white":"ingridHalvorsen","black":"henrikSolberg","wv":"d65716fba1","bv":"e42ecb7edb","result":"black","reason":"checkmate"}
+{"t":1795131550021,"white":"felixMarsh","black":"miraCastellanos","wv":"bef06bdffa","bv":"107ca4d3fe","result":"black","reason":"checkmate"}
+{"t":1795131559488,"white":"henrikSolberg","black":"ingridHalvorsen","wv":"e42ecb7edb","bv":"d65716fba1","result":"white","reason":"checkmate"}
+{"t":1795131567364,"white":"felixMarsh","black":"danaWhitlock","wv":"bef06bdffa","bv":"f626dacd1c","result":"black","reason":"checkmate"}
+{"t":1795131569929,"white":"danaWhitlock","black":"felixMarsh","wv":"f626dacd1c","bv":"bef06bdffa","result":"white","reason":"checkmate"}
+{"t":1795131573692,"white":"felixMarsh","black":"danaWhitlock","wv":"bef06bdffa","bv":"f626dacd1c","result":"black","reason":"checkmate"}
+{"t":1795131577887,"white":"danaWhitlock","black":"felixMarsh","wv":"f626dacd1c","bv":"bef06bdffa","result":"white","reason":"checkmate"}
+{"t":1795131588429,"white":"henrikSolberg","black":"ingridHalvorsen","wv":"e42ecb7edb","bv":"d65716fba1","result":"white","reason":"checkmate"}
+{"t":1795131602548,"white":"miraCastellanos","black":"felixMarsh","wv":"107ca4d3fe","bv":"bef06bdffa","result":"white","reason":"checkmate"}
+{"t":1795131611189,"white":"elenaVoss","black":"felixMarsh","wv":"6eb08dc8a8","bv":"bef06bdffa","result":"white","reason":"checkmate"}
+{"t":1795131616509,"white":"ingridHalvorsen","black":"henrikSolberg","wv":"d65716fba1","bv":"e42ecb7edb","result":"black","reason":"checkmate"}
+{"t":1795131622318,"white":"felixMarsh","black":"elenaVoss","wv":"bef06bdffa","bv":"6eb08dc8a8","result":"black","reason":"checkmate"}
+{"t":1795131635299,"white":"miraCastellanos","black":"felixMarsh","wv":"107ca4d3fe","bv":"bef06bdffa","result":"white","reason":"checkmate"}
+{"t":1795131637446,"white":"elenaVoss","black":"felixMarsh","wv":"6eb08dc8a8","bv":"bef06bdffa","result":"white","reason":"checkmate"}
+{"t":1795131678636,"white":"felixMarsh","black":"miraCastellanos","wv":"bef06bdffa","bv":"107ca4d3fe","result":"black","reason":"checkmate"}
+{"t":1795131695210,"white":"henrikSolberg","black":"felixMarsh","wv":"e42ecb7edb","bv":"bef06bdffa","result":"white","reason":"checkmate"}
+{"t":1795131700751,"white":"felixMarsh","black":"elenaVoss","wv":"bef06bdffa","bv":"6eb08dc8a8","result":"black","reason":"checkmate"}
+{"t":1795131716577,"white":"felixMarsh","black":"henrikSolberg","wv":"bef06bdffa","bv":"e42ecb7edb","result":"black","reason":"checkmate"}
+{"t":1795131720815,"white":"felixMarsh","black":"antonVarga","wv":"bef06bdffa","bv":"bf8eaf9bf3","result":"black","reason":"checkmate"}
+{"t":1795131722765,"white":"felixMarsh","black":"henrikSolberg","wv":"bef06bdffa","bv":"e42ecb7edb","result":"black","reason":"checkmate"}
+{"t":1795131733316,"white":"henrikSolberg","black":"felixMarsh","wv":"e42ecb7edb","bv":"bef06bdffa","result":"white","reason":"checkmate"}
+{"t":1795131763778,"white":"yukiTanaka","black":"miraCastellanos","wv":"29292c23f4","bv":"107ca4d3fe","result":"black","reason":"checkmate"}
+{"t":1795131772640,"white":"antonVarga","black":"felixMarsh","wv":"bf8eaf9bf3","bv":"bef06bdffa","result":"white","reason":"checkmate"}
+{"t":1795131773569,"white":"miraCastellanos","black":"yukiTanaka","wv":"107ca4d3fe","bv":"29292c23f4","result":"black","reason":"checkmate"}
+{"t":1795131780771,"white":"danaWhitlock","black":"yukiTanaka","wv":"f626dacd1c","bv":"29292c23f4","result":"white","reason":"checkmate"}
+{"t":1795131783731,"white":"yukiTanaka","black":"danaWhitlock","wv":"29292c23f4","bv":"f626dacd1c","result":"black","reason":"checkmate"}
+{"t":1795131785455,"white":"yukiTanaka","black":"danaWhitlock","wv":"29292c23f4","bv":"f626dacd1c","result":"white","reason":"checkmate"}
+{"t":1795131789160,"white":"danaWhitlock","black":"yukiTanaka","wv":"f626dacd1c","bv":"29292c23f4","result":"white","reason":"checkmate"}
+{"t":1795131789304,"white":"antonVarga","black":"felixMarsh","wv":"bf8eaf9bf3","bv":"bef06bdffa","result":"white","reason":"checkmate"}
+{"t":1795131811578,"white":"miraCastellanos","black":"yukiTanaka","wv":"107ca4d3fe","bv":"29292c23f4","result":"white","reason":"checkmate"}
+{"t":1795131831447,"white":"felixMarsh","black":"antonVarga","wv":"bef06bdffa","bv":"bf8eaf9bf3","result":"black","reason":"checkmate"}
+{"t":1795131838976,"white":"yukiTanaka","black":"elenaVoss","wv":"29292c23f4","bv":"6eb08dc8a8","result":"black","reason":"checkmate"}
+{"t":1795131867533,"white":"elenaVoss","black":"yukiTanaka","wv":"6eb08dc8a8","bv":"29292c23f4","result":"white","reason":"checkmate"}
+{"t":1795131896558,"white":"elenaVoss","black":"yukiTanaka","wv":"6eb08dc8a8","bv":"29292c23f4","result":"white","reason":"checkmate"}
+{"t":1795131904984,"white":"yukiTanaka","black":"henrikSolberg","wv":"29292c23f4","bv":"e42ecb7edb","result":"black","reason":"checkmate"}
+{"t":1795131912715,"white":"yukiTanaka","black":"elenaVoss","wv":"29292c23f4","bv":"6eb08dc8a8","result":"black","reason":"checkmate"}
+{"t":1795131913031,"white":"yukiTanaka","black":"miraCastellanos","wv":"29292c23f4","bv":"107ca4d3fe","result":"white","reason":"checkmate"}
+{"t":1795131930080,"white":"yukiTanaka","black":"antonVarga","wv":"29292c23f4","bv":"bf8eaf9bf3","result":"black","reason":"checkmate"}
+{"t":1795131953576,"white":"yukiTanaka","black":"henrikSolberg","wv":"29292c23f4","bv":"e42ecb7edb","result":"black","reason":"checkmate"}
+{"t":1795131956205,"white":"antonVarga","black":"yukiTanaka","wv":"bf8eaf9bf3","bv":"29292c23f4","result":"white","reason":"checkmate"}
+{"t":1795131957401,"white":"antonVarga","black":"yukiTanaka","wv":"bf8eaf9bf3","bv":"29292c23f4","result":"white","reason":"checkmate"}
+{"t":1795131966330,"white":"henrikSolberg","black":"yukiTanaka","wv":"e42ecb7edb","bv":"29292c23f4","result":"white","reason":"checkmate"}
+{"t":1795132005987,"white":"henrikSolberg","black":"yukiTanaka","wv":"e42ecb7edb","bv":"29292c23f4","result":"white","reason":"checkmate"}
+{"t":1795132017500,"white":"yukiTanaka","black":"antonVarga","wv":"29292c23f4","bv":"bf8eaf9bf3","result":"black","reason":"checkmate"}
+{"t":1795132065267,"white":"danaWhitlock","black":"miraCastellanos","wv":"f626dacd1c","bv":"107ca4d3fe","result":"black","reason":"checkmate"}
+{"t":1795132073122,"white":"yukiTanaka","black":"victorKane","wv":"29292c23f4","bv":"4ef0de0db5","result":"black","reason":"checkmate"}
+{"t":1795132108633,"white":"miraCastellanos","black":"danaWhitlock","wv":"107ca4d3fe","bv":"f626dacd1c","result":"black","reason":"checkmate"}
+{"t":1795132162203,"white":"danaWhitlock","black":"miraCastellanos","wv":"f626dacd1c","bv":"107ca4d3fe","result":"black","reason":"checkmate"}
+{"t":1795132186117,"white":"miraCastellanos","black":"elenaVoss","wv":"107ca4d3fe","bv":"6eb08dc8a8","result":"black","reason":"checkmate"}
+{"t":1795132201551,"white":"victorKane","black":"yukiTanaka","wv":"4ef0de0db5","bv":"29292c23f4","result":"white","reason":"checkmate"}
+{"t":1795132205715,"white":"yukiTanaka","black":"victorKane","wv":"29292c23f4","bv":"4ef0de0db5","result":"black","reason":"checkmate"}
+{"t":1795132244780,"white":"elenaVoss","black":"miraCastellanos","wv":"6eb08dc8a8","bv":"107ca4d3fe","result":"white","reason":"checkmate"}
+{"t":1795132274997,"white":"miraCastellanos","black":"danaWhitlock","wv":"107ca4d3fe","bv":"f626dacd1c","result":"white","reason":"checkmate"}
+{"t":1795132283212,"white":"miraCastellanos","black":"elenaVoss","wv":"107ca4d3fe","bv":"6eb08dc8a8","result":"black","reason":"checkmate"}
+{"t":1795132323364,"white":"henrikSolberg","black":"miraCastellanos","wv":"e42ecb7edb","bv":"107ca4d3fe","result":"white","reason":"checkmate"}
+{"t":1795132348825,"white":"elenaVoss","black":"miraCastellanos","wv":"6eb08dc8a8","bv":"107ca4d3fe","result":"white","reason":"checkmate"}
+{"t":1795132359339,"white":"victorKane","black":"yukiTanaka","wv":"4ef0de0db5","bv":"29292c23f4","result":"white","reason":"checkmate"}
+{"t":1795132369816,"white":"miraCastellanos","black":"henrikSolberg","wv":"107ca4d3fe","bv":"e42ecb7edb","result":"black","reason":"checkmate"}
+{"t":1795132380145,"white":"miraCastellanos","black":"antonVarga","wv":"107ca4d3fe","bv":"bf8eaf9bf3","result":"black","reason":"checkmate"}
+{"t":1795132411678,"white":"henrikSolberg","black":"miraCastellanos","wv":"e42ecb7edb","bv":"107ca4d3fe","result":"white","reason":"checkmate"}
+{"t":1795132422766,"white":"antonVarga","black":"miraCastellanos","wv":"bf8eaf9bf3","bv":"107ca4d3fe","result":"white","reason":"checkmate"}
+{"t":1795132429477,"white":"antonVarga","black":"miraCastellanos","wv":"bf8eaf9bf3","bv":"107ca4d3fe","result":"white","reason":"checkmate"}
+{"t":1795132438766,"white":"miraCastellanos","black":"henrikSolberg","wv":"107ca4d3fe","bv":"e42ecb7edb","result":"black","reason":"checkmate"}
+{"t":1795132479251,"white":"miraCastellanos","black":"antonVarga","wv":"107ca4d3fe","bv":"bf8eaf9bf3","result":"black","reason":"checkmate"}
+{"t":1795132604338,"white":"miraCastellanos","black":"victorKane","wv":"107ca4d3fe","bv":"4ef0de0db5","result":"black","reason":"checkmate"}
+{"t":1795132665182,"white":"victorKane","black":"miraCastellanos","wv":"4ef0de0db5","bv":"107ca4d3fe","result":"white","reason":"checkmate"}
+{"t":1795132708374,"white":"miraCastellanos","black":"victorKane","wv":"107ca4d3fe","bv":"4ef0de0db5","result":"black","reason":"checkmate"}
+{"t":1795132727722,"white":"corneliusAshby","black":"miraCastellanos","wv":"aa89eb72db","bv":"107ca4d3fe","result":"white","reason":"checkmate"}
+{"t":1795132787411,"white":"victorKane","black":"miraCastellanos","wv":"4ef0de0db5","bv":"107ca4d3fe","result":"white","reason":"checkmate"}
+{"t":1795132788261,"white":"danaWhitlock","black":"elenaVoss","wv":"f626dacd1c","bv":"6eb08dc8a8","result":"black","reason":"checkmate"}
+{"t":1795132798204,"white":"miraCastellanos","black":"corneliusAshby","wv":"107ca4d3fe","bv":"aa89eb72db","result":"black","reason":"checkmate"}
+{"t":1795132798548,"white":"elenaVoss","black":"danaWhitlock","wv":"6eb08dc8a8","bv":"f626dacd1c","result":"white","reason":"checkmate"}
+{"t":1795132828718,"white":"elenaVoss","black":"danaWhitlock","wv":"6eb08dc8a8","bv":"f626dacd1c","result":"white","reason":"checkmate"}
+{"t":1795132861244,"white":"danaWhitlock","black":"henrikSolberg","wv":"f626dacd1c","bv":"e42ecb7edb","result":"black","reason":"checkmate"}
+{"t":1795132868261,"white":"corneliusAshby","black":"miraCastellanos","wv":"aa89eb72db","bv":"107ca4d3fe","result":"white","reason":"checkmate"}
+{"t":1795132895325,"white":"danaWhitlock","black":"elenaVoss","wv":"f626dacd1c","bv":"6eb08dc8a8","result":"black","reason":"checkmate"}
+{"t":1795132909967,"white":"danaWhitlock","black":"antonVarga","wv":"f626dacd1c","bv":"bf8eaf9bf3","result":"black","reason":"checkmate"}
+{"t":1795132931345,"white":"henrikSolberg","black":"danaWhitlock","wv":"e42ecb7edb","bv":"f626dacd1c","result":"white","reason":"checkmate"}
+{"t":1795132935934,"white":"antonVarga","black":"danaWhitlock","wv":"bf8eaf9bf3","bv":"f626dacd1c","result":"white","reason":"checkmate"}
+{"t":1795132959043,"white":"antonVarga","black":"danaWhitlock","wv":"bf8eaf9bf3","bv":"f626dacd1c","result":"white","reason":"checkmate"}
+{"t":1795132969121,"white":"danaWhitlock","black":"henrikSolberg","wv":"f626dacd1c","bv":"e42ecb7edb","result":"black","reason":"checkmate"}
+{"t":1795132978597,"white":"miraCastellanos","black":"corneliusAshby","wv":"107ca4d3fe","bv":"aa89eb72db","result":"black","reason":"checkmate"}
+{"t":1795133016025,"white":"henrikSolberg","black":"danaWhitlock","wv":"e42ecb7edb","bv":"f626dacd1c","result":"white","reason":"checkmate"}
+{"t":1795133021072,"white":"danaWhitlock","black":"antonVarga","wv":"f626dacd1c","bv":"bf8eaf9bf3","result":"black","reason":"checkmate"}
+{"t":1795133084783,"white":"danaWhitlock","black":"victorKane","wv":"f626dacd1c","bv":"4ef0de0db5","result":"black","reason":"checkmate"}
+{"t":1795133119920,"white":"victorKane","black":"danaWhitlock","wv":"4ef0de0db5","bv":"f626dacd1c","result":"white","reason":"checkmate"}
+{"t":1795133216606,"white":"danaWhitlock","black":"victorKane","wv":"f626dacd1c","bv":"4ef0de0db5","result":"black","reason":"checkmate"}
+{"t":1795133272718,"white":"victorKane","black":"danaWhitlock","wv":"4ef0de0db5","bv":"f626dacd1c","result":"white","reason":"checkmate"}
+{"t":1795133316959,"white":"danaWhitlock","black":"isadoraQuinn","wv":"f626dacd1c","bv":"8224a74d26","result":"black","reason":"checkmate"}
+{"t":1795133324776,"white":"corneliusAshby","black":"danaWhitlock","wv":"aa89eb72db","bv":"f626dacd1c","result":"white","reason":"checkmate"}
+{"t":1795133358329,"white":"danaWhitlock","black":"corneliusAshby","wv":"f626dacd1c","bv":"aa89eb72db","result":"black","reason":"checkmate"}
+{"t":1795133368621,"white":"isadoraQuinn","black":"danaWhitlock","wv":"8224a74d26","bv":"f626dacd1c","result":"white","reason":"checkmate"}
+{"t":1795133400447,"white":"danaWhitlock","black":"isadoraQuinn","wv":"f626dacd1c","bv":"8224a74d26","result":"black","reason":"checkmate"}
+{"t":1795133404716,"white":"corneliusAshby","black":"danaWhitlock","wv":"aa89eb72db","bv":"f626dacd1c","result":"white","reason":"checkmate"}
+{"t":1795133491821,"white":"isadoraQuinn","black":"danaWhitlock","wv":"8224a74d26","bv":"f626dacd1c","result":"white","reason":"checkmate"}
+{"t":1795133493127,"white":"henrikSolberg","black":"elenaVoss","wv":"e42ecb7edb","bv":"6eb08dc8a8","result":"white","reason":"checkmate"}
+{"t":1795133543752,"white":"danaWhitlock","black":"corneliusAshby","wv":"f626dacd1c","bv":"aa89eb72db","result":"black","reason":"checkmate"}
+{"t":1795133673987,"white":"henrikSolberg","black":"elenaVoss","wv":"e42ecb7edb","bv":"6eb08dc8a8","result":"black","reason":"checkmate"}
+{"t":1795133708970,"white":"elenaVoss","black":"henrikSolberg","wv":"6eb08dc8a8","bv":"e42ecb7edb","result":"black","reason":"checkmate"}
+{"t":1795133731423,"white":"elenaVoss","black":"antonVarga","wv":"6eb08dc8a8","bv":"bf8eaf9bf3","result":"black","reason":"checkmate"}
+{"t":1795133765287,"white":"antonVarga","black":"elenaVoss","wv":"bf8eaf9bf3","bv":"6eb08dc8a8","result":"white","reason":"checkmate"}
+{"t":1795133854111,"white":"antonVarga","black":"elenaVoss","wv":"bf8eaf9bf3","bv":"6eb08dc8a8","result":"black","reason":"checkmate"}
+{"t":1795133854268,"white":"elenaVoss","black":"antonVarga","wv":"6eb08dc8a8","bv":"bf8eaf9bf3","result":"black","reason":"checkmate"}
+{"t":1795133907328,"white":"elenaVoss","black":"henrikSolberg","wv":"6eb08dc8a8","bv":"e42ecb7edb","result":"black","reason":"checkmate"}
+{"t":1795134128602,"white":"elenaVoss","black":"victorKane","wv":"6eb08dc8a8","bv":"4ef0de0db5","result":"black","reason":"checkmate"}
+{"t":1795134199057,"white":"corneliusAshby","black":"elenaVoss","wv":"aa89eb72db","bv":"6eb08dc8a8","result":"white","reason":"checkmate"}
+{"t":1795134224776,"white":"elenaVoss","black":"corneliusAshby","wv":"6eb08dc8a8","bv":"aa89eb72db","result":"white","reason":"checkmate"}
+{"t":1795134232588,"white":"elenaVoss","black":"victorKane","wv":"6eb08dc8a8","bv":"4ef0de0db5","result":"black","reason":"checkmate"}
+{"t":1795134267262,"white":"elenaVoss","black":"corneliusAshby","wv":"6eb08dc8a8","bv":"aa89eb72db","result":"black","reason":"checkmate"}
+{"t":1795134289523,"white":"victorKane","black":"elenaVoss","wv":"4ef0de0db5","bv":"6eb08dc8a8","result":"black","reason":"checkmate"}
+{"t":1795134343213,"white":"victorKane","black":"elenaVoss","wv":"4ef0de0db5","bv":"6eb08dc8a8","result":"black","reason":"checkmate"}
+{"t":1795134396063,"white":"isadoraQuinn","black":"elenaVoss","wv":"8224a74d26","bv":"6eb08dc8a8","result":"white","reason":"checkmate"}
+{"t":1795134417663,"white":"isadoraQuinn","black":"elenaVoss","wv":"8224a74d26","bv":"6eb08dc8a8","result":"white","reason":"checkmate"}
+{"t":1795134596433,"white":"elenaVoss","black":"isadoraQuinn","wv":"6eb08dc8a8","bv":"8224a74d26","result":"white","reason":"checkmate"}
+{"t":1795134615004,"white":"elenaVoss","black":"isadoraQuinn","wv":"6eb08dc8a8","bv":"8224a74d26","result":"draw","reason":"insufficient material"}
+{"t":1795134671460,"white":"elenaVoss","black":"adaKessler","wv":"6eb08dc8a8","bv":"78a05f209c","result":"black","reason":"checkmate"}
+{"t":1795134700725,"white":"adaKessler","black":"elenaVoss","wv":"78a05f209c","bv":"6eb08dc8a8","result":"white","reason":"checkmate"}
+{"t":1795134792186,"white":"henrikSolberg","black":"antonVarga","wv":"e42ecb7edb","bv":"bf8eaf9bf3","result":"black","reason":"checkmate"}
+{"t":1795134796290,"white":"elenaVoss","black":"adaKessler","wv":"6eb08dc8a8","bv":"78a05f209c","result":"black","reason":"checkmate"}
+{"t":1795134901926,"white":"corneliusAshby","black":"elenaVoss","wv":"aa89eb72db","bv":"6eb08dc8a8","result":"black","reason":"checkmate"}
+{"t":1795134916636,"white":"henrikSolberg","black":"antonVarga","wv":"e42ecb7edb","bv":"bf8eaf9bf3","result":"black","reason":"checkmate"}
+{"t":1795134942123,"white":"henrikSolberg","black":"victorKane","wv":"e42ecb7edb","bv":"4ef0de0db5","result":"black","reason":"checkmate"}
+{"t":1795134989931,"white":"adaKessler","black":"elenaVoss","wv":"78a05f209c","bv":"6eb08dc8a8","result":"white","reason":"checkmate"}
+{"t":1795135011996,"white":"antonVarga","black":"henrikSolberg","wv":"bf8eaf9bf3","bv":"e42ecb7edb","result":"black","reason":"checkmate"}
+{"t":1795135188137,"white":"victorKane","black":"henrikSolberg","wv":"4ef0de0db5","bv":"e42ecb7edb","result":"black","reason":"checkmate"}
+{"t":1795135423794,"white":"henrikSolberg","black":"victorKane","wv":"e42ecb7edb","bv":"4ef0de0db5","result":"black","reason":"checkmate"}
+{"t":1795135500219,"white":"henrikSolberg","black":"corneliusAshby","wv":"e42ecb7edb","bv":"aa89eb72db","result":"black","reason":"checkmate"}
+{"t":1795135692158,"white":"antonVarga","black":"henrikSolberg","wv":"bf8eaf9bf3","bv":"e42ecb7edb","result":"white","reason":"checkmate"}
+{"t":1795135717045,"white":"victorKane","black":"henrikSolberg","wv":"4ef0de0db5","bv":"e42ecb7edb","result":"white","reason":"checkmate"}
+{"t":1795135823544,"white":"corneliusAshby","black":"henrikSolberg","wv":"aa89eb72db","bv":"e42ecb7edb","result":"white","reason":"checkmate"}
+{"t":1795135931065,"white":"henrikSolberg","black":"isadoraQuinn","wv":"e42ecb7edb","bv":"8224a74d26","result":"white","reason":"checkmate"}
+{"t":1795136049040,"white":"corneliusAshby","black":"henrikSolberg","wv":"aa89eb72db","bv":"e42ecb7edb","result":"black","reason":"checkmate"}
+{"t":1795136155449,"white":"isadoraQuinn","black":"henrikSolberg","wv":"8224a74d26","bv":"e42ecb7edb","result":"white","reason":"checkmate"}
+{"t":1795136201405,"white":"henrikSolberg","black":"isadoraQuinn","wv":"e42ecb7edb","bv":"8224a74d26","result":"black","reason":"checkmate"}
+{"t":1795136216419,"white":"henrikSolberg","black":"corneliusAshby","wv":"e42ecb7edb","bv":"aa89eb72db","result":"black","reason":"checkmate"}
+{"t":1795136295576,"white":"henrikSolberg","black":"adaKessler","wv":"e42ecb7edb","bv":"78a05f209c","result":"white","reason":"checkmate"}
+{"t":1795136441839,"white":"isadoraQuinn","black":"henrikSolberg","wv":"8224a74d26","bv":"e42ecb7edb","result":"white","reason":"checkmate"}
+{"t":1795136594984,"white":"antonVarga","black":"victorKane","wv":"bf8eaf9bf3","bv":"4ef0de0db5","result":"black","reason":"checkmate"}
+{"t":1795136672517,"white":"victorKane","black":"antonVarga","wv":"4ef0de0db5","bv":"bf8eaf9bf3","result":"black","reason":"checkmate"}
+{"t":1795136768468,"white":"adaKessler","black":"henrikSolberg","wv":"78a05f209c","bv":"e42ecb7edb","result":"white","reason":"checkmate"}
+{"t":1795136821006,"white":"antonVarga","black":"victorKane","wv":"bf8eaf9bf3","bv":"4ef0de0db5","result":"black","reason":"checkmate"}
+{"t":1795136922179,"white":"henrikSolberg","black":"adaKessler","wv":"e42ecb7edb","bv":"78a05f209c","result":"black","reason":"checkmate"}
+{"t":1795137106518,"white":"antonVarga","black":"corneliusAshby","wv":"bf8eaf9bf3","bv":"aa89eb72db","result":"black","reason":"checkmate"}
+{"t":1795137113617,"white":"corneliusAshby","black":"antonVarga","wv":"aa89eb72db","bv":"bf8eaf9bf3","result":"black","reason":"checkmate"}
+{"t":1795137137607,"white":"victorKane","black":"antonVarga","wv":"4ef0de0db5","bv":"bf8eaf9bf3","result":"white","reason":"checkmate"}
+{"t":1795137223785,"white":"adaKessler","black":"henrikSolberg","wv":"78a05f209c","bv":"e42ecb7edb","result":"draw","reason":"50-move rule"}
+{"t":1795137356848,"white":"antonVarga","black":"corneliusAshby","wv":"bf8eaf9bf3","bv":"aa89eb72db","result":"white","reason":"checkmate"}
+{"t":1795137381162,"white":"antonVarga","black":"isadoraQuinn","wv":"bf8eaf9bf3","bv":"8224a74d26","result":"black","reason":"checkmate"}
+{"t":1795137402489,"white":"isadoraQuinn","black":"antonVarga","wv":"8224a74d26","bv":"bf8eaf9bf3","result":"white","reason":"checkmate"}
+{"t":1795137411247,"white":"isadoraQuinn","black":"antonVarga","wv":"8224a74d26","bv":"bf8eaf9bf3","result":"white","reason":"checkmate"}
+{"t":1795137537261,"white":"antonVarga","black":"isadoraQuinn","wv":"bf8eaf9bf3","bv":"8224a74d26","result":"white","reason":"checkmate"}
+{"t":1795137627195,"white":"adaKessler","black":"antonVarga","wv":"78a05f209c","bv":"bf8eaf9bf3","result":"white","reason":"checkmate"}
+{"t":1795137643190,"white":"antonVarga","black":"adaKessler","wv":"bf8eaf9bf3","bv":"78a05f209c","result":"black","reason":"checkmate"}
+{"t":1795137775614,"white":"adaKessler","black":"antonVarga","wv":"78a05f209c","bv":"bf8eaf9bf3","result":"white","reason":"checkmate"}
+{"t":1795137778538,"white":"antonVarga","black":"adaKessler","wv":"bf8eaf9bf3","bv":"78a05f209c","result":"white","reason":"checkmate"}
+{"t":1795137833752,"white":"corneliusAshby","black":"antonVarga","wv":"aa89eb72db","bv":"bf8eaf9bf3","result":"black","reason":"checkmate"}
+{"t":1795138472130,"white":"corneliusAshby","black":"victorKane","wv":"aa89eb72db","bv":"4ef0de0db5","result":"white","reason":"checkmate"}
+{"t":1795138669956,"white":"isadoraQuinn","black":"victorKane","wv":"8224a74d26","bv":"4ef0de0db5","result":"black","reason":"checkmate"}
+{"t":1795138749992,"white":"victorKane","black":"isadoraQuinn","wv":"4ef0de0db5","bv":"8224a74d26","result":"draw","reason":"50-move rule"}
+{"t":1795138853168,"white":"corneliusAshby","black":"victorKane","wv":"aa89eb72db","bv":"4ef0de0db5","result":"white","reason":"checkmate"}
+{"t":1795138857173,"white":"victorKane","black":"corneliusAshby","wv":"4ef0de0db5","bv":"aa89eb72db","result":"draw","reason":"insufficient material"}
+{"t":1795138936138,"white":"victorKane","black":"corneliusAshby","wv":"4ef0de0db5","bv":"aa89eb72db","result":"white","reason":"checkmate"}
+{"t":1795138977062,"white":"isadoraQuinn","black":"victorKane","wv":"8224a74d26","bv":"4ef0de0db5","result":"white","reason":"checkmate"}
+{"t":1795139022022,"white":"victorKane","black":"isadoraQuinn","wv":"4ef0de0db5","bv":"8224a74d26","result":"white","reason":"checkmate"}
+{"t":1795139173911,"white":"victorKane","black":"adaKessler","wv":"4ef0de0db5","bv":"78a05f209c","result":"black","reason":"checkmate"}
+{"t":1795139225554,"white":"victorKane","black":"adaKessler","wv":"4ef0de0db5","bv":"78a05f209c","result":"draw","reason":"threefold repetition"}
+{"t":1795139315607,"white":"adaKessler","black":"victorKane","wv":"78a05f209c","bv":"4ef0de0db5","result":"black","reason":"checkmate"}
+{"t":1795139514815,"white":"corneliusAshby","black":"isadoraQuinn","wv":"aa89eb72db","bv":"8224a74d26","result":"black","reason":"checkmate"}
+{"t":1795139580056,"white":"adaKessler","black":"victorKane","wv":"78a05f209c","bv":"4ef0de0db5","result":"white","reason":"checkmate"}
+{"t":1795139664450,"white":"isadoraQuinn","black":"corneliusAshby","wv":"8224a74d26","bv":"aa89eb72db","result":"white","reason":"checkmate"}
+{"t":1795139677099,"white":"corneliusAshby","black":"adaKessler","wv":"aa89eb72db","bv":"78a05f209c","result":"white","reason":"checkmate"}
+{"t":1795139832816,"white":"isadoraQuinn","black":"corneliusAshby","wv":"8224a74d26","bv":"aa89eb72db","result":"white","reason":"checkmate"}
+{"t":1795139905950,"white":"corneliusAshby","black":"isadoraQuinn","wv":"aa89eb72db","bv":"8224a74d26","result":"white","reason":"checkmate"}
+{"t":1795140111575,"white":"corneliusAshby","black":"adaKessler","wv":"aa89eb72db","bv":"78a05f209c","result":"black","reason":"checkmate"}
+{"t":1795140182583,"white":"isadoraQuinn","black":"adaKessler","wv":"8224a74d26","bv":"78a05f209c","result":"black","reason":"checkmate"}
+{"t":1795140259506,"white":"adaKessler","black":"isadoraQuinn","wv":"78a05f209c","bv":"8224a74d26","result":"white","reason":"checkmate"}
+{"t":1795140261375,"white":"isadoraQuinn","black":"adaKessler","wv":"8224a74d26","bv":"78a05f209c","result":"black","reason":"checkmate"}
+{"t":1795140385208,"white":"adaKessler","black":"corneliusAshby","wv":"78a05f209c","bv":"aa89eb72db","result":"white","reason":"checkmate"}
+{"t":1795140746590,"white":"adaKessler","black":"corneliusAshby","wv":"78a05f209c","bv":"aa89eb72db","result":"white","reason":"checkmate"}
+{"t":1795140878007,"white":"adaKessler","black":"isadoraQuinn","wv":"78a05f209c","bv":"8224a74d26","result":"white","reason":"checkmate"}

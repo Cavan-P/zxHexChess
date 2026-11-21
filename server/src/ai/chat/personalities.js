@@ -116,6 +116,29 @@ const BOTS = {
         }
     },
 
+    miloPruitt: {
+        chattiness: 0.6,
+        awareness: 0.3,
+        lines: {
+            greeting: ['Hi! I learned what checkmate is last week. I\'m on the lookout.', 'Hello! I\'m going to find a checkmate this game. Probably.'],
+            idle: ['Is that a checkmate? No... no, it isn\'t.', 'I\'m pretty sure there\'s a mate somewhere on this board.', 'Hmm. Hmmmm.'],
+            playerHangs: ['Wait, is that {piece} just... free? I\'m taking it before I change my mind.'],
+            botBlunder: ['Oh. I didn\'t know you could do that.', 'Hang on, where did my {piece} go?'],
+            brilliantSac: ['You gave that away? Is this a trap? It feels like a trap.'],
+            playerChecks: ['Uh oh. Is this checkmate? Let me count my moves...', 'Not mate! I checked!'],
+            botChecks: ['Check! ...is it mate? Ugh, no.', 'Check! I\'m getting closer, I can feel it.'],
+            botCaptures: ['Got your {piece}!', 'That {piece} is mine now.'],
+            winning: ['I think I\'m winning? I\'m not sure what to do with that.'],
+            losing: ['I keep missing stuff, don\'t I.'],
+            win: ['Checkmate! I SAW it! Good game!'],
+            loss: ['There was probably a mate I missed in there somewhere. GG!'],
+            draw: ['A draw! That\'s like half a checkmate, right?'],
+            replyHello: ['Hi! Watch out, I know what checkmate is now.'],
+            replyGG: ['GG! I\'ll find the mate next time.'],
+            reply: ['Sorry, I\'m counting your king\'s escape squares.', 'Uh-huh! Wait, was that check?']
+        }
+    },
+
     hannahLewis: {
         chattiness: 0.75,
         awareness: 0.3,

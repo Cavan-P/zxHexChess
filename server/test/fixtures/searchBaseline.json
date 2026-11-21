@@ -1,0 +1,346 @@
+{
+ "positions": [
+  {
+   "fen": "bqknbnr2rp1b1p1p2p2p1p3pp4p992PP4PP5P2P2P1P1B1PR2RNBNQKB",
+   "turn": "black",
+   "enPassant": null,
+   "source": "random"
+  },
+  {
+   "fen": "b1knbnrq1rp1b1p1p2p2p1p3pp2B1p992PP4PP5P2P2P1P1B1PR2RNBNQK1",
+   "turn": "black",
+   "enPassant": null,
+   "source": "random"
+  },
+  {
+   "fen": "b1knbnr2rp1b1p1B2p2p1p4p4p3pp91P4PP5P4RP2P2q1P1B1PR3NBNQK1",
+   "turn": "black",
+   "enPassant": null,
+   "source": "random"
+  },
+  {
+   "fen": "bbk1bnr2rp3p1B2p2pnp4p4p3Np91P4PP5P4RP2P2q1P1B1PR4BNQK1",
+   "turn": "black",
+   "enPassant": null,
+   "source": "random"
+  },
+  {
+   "fen": "bbk1bnr2r4p1p2p2pnp4p4p3Np91P4PP5P4RP2P2q1P1B1PR4BNQ1K",
+   "turn": "black",
+   "enPassant": null,
+   "source": "random"
+  },
+  {
+   "fen": "bbk2nr2r4p1p1bp2p1p9N4p3Q6Pp3PP5P4nP2P4P3PRK3Bq1B1",
+   "turn": "white",
+   "enPassant": null,
+   "source": "random"
+  },
+  {
+   "fen": "bbk2nr2r4p1p1bp2pQp9N4p91Pp3PP5P4nP2P4P3PRK3Bq1B1",
+   "turn": "black",
+   "enPassant": null,
+   "source": "random"
+  },
+  {
+   "fen": "bbk3r2r4p1p1bp2pnp9N4p91Pp3Pq5P4nP2P4PR2P1K3B2B1",
+   "turn": "white",
+   "enPassant": null,
+   "source": "random"
+  },
+  {
+   "fen": "bbk3r2r9p2p1pp1p1n4N4pn9Pp3PP6B4Pb1P4PR2P1K3B4",
+   "turn": "white",
+   "enPassant": null,
+   "source": "random"
+  },
+  {
+   "fen": "bbk6rr8p2p1pp1p2N2n5pn9Pp3PP4B4K1P2P4PR2P3bB5",
+   "turn": "white",
+   "enPassant": null,
+   "source": "random"
+  },
+  {
+   "fen": "bbk6rr8p2p1pp1p2N2n5pn9Pp3PP4B4K1P2P4P3P3bBR4",
+   "turn": "black",
+   "enPassant": null,
+   "source": "random"
+  },
+  {
+   "fen": "bbk2N3r9p2p2p1p5n1p3p9KPpb2PP4B1n4P2P1R2r3P4B5",
+   "turn": "white",
+   "enPassant": null,
+   "source": "random"
+  },
+  {
+   "fen": "93P92R3P7p4k3r3p5p97B9K8",
+   "turn": "black",
+   "enPassant": null,
+   "source": "game"
+  },
+  {
+   "fen": "7k2B3p1p2q2pn9P5PR91pp9P2P1NP5P2b4K8",
+   "turn": "black",
+   "enPassant": null,
+   "source": "game"
+  },
+  {
+   "fen": "4k1b2r7rb4n3p1pp1p3p1p91P6P3QRN3PBP5P1P3P8K1",
+   "turn": "black",
+   "enPassant": null,
+   "source": "game"
+  },
+  {
+   "fen": "bqk1b5p1b1r1pr1p2pnp3pp4p4P9Q6PNp3P3P1P2P2P1P1B1PR2R1B2KB",
+   "turn": "black",
+   "enPassant": null,
+   "source": "game"
+  },
+  {
+   "fen": "k9p1N1p1p5p1p4rp99P4P3P2p6n1B6K94",
+   "turn": "black",
+   "enPassant": null,
+   "source": "game"
+  },
+  {
+   "fen": "bk1n6p1b1p1p2p2p5p5p9P1pP2P3P1P3P2N4PB1qR5K1P1N3B4",
+   "turn": "white",
+   "enPassant": null,
+   "source": "game"
+  },
+  {
+   "fen": "97p5q6k2p3p2p1p2p5p1b4B3P4P4P1N2P2K92",
+   "turn": "black",
+   "enPassant": null,
+   "source": "game"
+  },
+  {
+   "fen": "8k4n4B4P999p3Qr8PP4rK1P97",
+   "turn": "black",
+   "enPassant": null,
+   "source": "game"
+  },
+  {
+   "fen": "94kp7p9pP1p4bp3K4B6PP4P999",
+   "turn": "white",
+   "enPassant": null,
+   "source": "game"
+  },
+  {
+   "fen": "bqk1b1r5b1p1p2p2prp2np3p1p5p9P5PP2N5P1P2P2P1P1B1PR2R2NQKB",
+   "turn": "black",
+   "enPassant": null,
+   "source": "game"
+  },
+  {
+   "fen": "5n2k1p1b1p1pr1p2p6n2N1r4Np3P6Pb3p9BRP2P2P1P3P2KR3B2",
+   "turn": "black",
+   "enPassant": null,
+   "source": "game"
+  },
+  {
+   "fen": "95p4p4k91b97n2R1N91P2PK1P5P91",
+   "turn": "black",
+   "enPassant": null,
+   "source": "game"
+  }
+ ],
+ "results": {
+  "ada": [
+   {
+    "move": "5-23",
+    "evals": 12465
+   },
+   {
+    "move": "28-39",
+    "evals": 23665
+   },
+   {
+    "move": "74-58",
+    "evals": 27568
+   },
+   {
+    "move": "74-58",
+    "evals": 32912
+   },
+   {
+    "move": "74-68",
+    "evals": 25446
+   },
+   {
+    "move": "43-47",
+    "evals": 46530
+   },
+   {
+    "move": "87-68",
+    "evals": 50402
+   },
+   {
+    "move": "89-47",
+    "evals": 13440
+   },
+   {
+    "move": "63-29",
+    "evals": 22914
+   },
+   {
+    "move": "61-60",
+    "evals": 35189
+   },
+   {
+    "move": "84-68",
+    "evals": 61857
+   },
+   {
+    "move": "61-60",
+    "evals": 58075
+   },
+   {
+    "move": "49-60",
+    "evals": 6810
+   },
+   {
+    "move": "77-29",
+    "evals": 16522
+   },
+   {
+    "move": "9-20",
+    "evals": 31972
+   },
+   {
+    "move": "22-44",
+    "evals": 75682
+   },
+   {
+    "move": "29-23",
+    "evals": 16747
+   },
+   {
+    "move": "86-41",
+    "evals": 43121
+   },
+   {
+    "move": "22-34",
+    "evals": 21914
+   },
+   {
+    "move": "71-27",
+    "evals": 17033
+   },
+   {
+    "move": "45-44",
+    "evals": 3388
+   },
+   {
+    "move": "27-54",
+    "evals": 22566
+   },
+   {
+    "move": "34-23",
+    "evals": 26378
+   },
+   {
+    "move": "24-41",
+    "evals": 5443
+   }
+  ],
+  "master": [
+   {
+    "move": "2-8",
+    "evals": 3415
+   },
+   {
+    "move": "2-8",
+    "evals": 6237
+   },
+   {
+    "move": "74-68",
+    "evals": 5855
+   },
+   {
+    "move": "74-68",
+    "evals": 6565
+   },
+   {
+    "move": "74-68",
+    "evals": 3957
+   },
+   {
+    "move": "43-1",
+    "evals": 4519
+   },
+   {
+    "move": "87-68",
+    "evals": 4655
+   },
+   {
+    "move": "89-47",
+    "evals": 2288
+   },
+   {
+    "move": "63-60",
+    "evals": 3352
+   },
+   {
+    "move": "61-13",
+    "evals": 5213
+   },
+   {
+    "move": "33-61",
+    "evals": 4226
+   },
+   {
+    "move": "5-1",
+    "evals": 2719
+   },
+   {
+    "move": "49-60",
+    "evals": 1025
+   },
+   {
+    "move": "77-29",
+    "evals": 2818
+   },
+   {
+    "move": "17-61",
+    "evals": 3683
+   },
+   {
+    "move": "17-7",
+    "evals": 10609
+   },
+   {
+    "move": "29-89",
+    "evals": 2558
+   },
+   {
+    "move": "72-61",
+    "evals": 2903
+   },
+   {
+    "move": "22-28",
+    "evals": 1847
+   },
+   {
+    "move": "71-27",
+    "evals": 2087
+   },
+   {
+    "move": "50-34",
+    "evals": 820
+   },
+   {
+    "move": "27-54",
+    "evals": 5049
+   },
+   {
+    "move": "34-23",
+    "evals": 5261
+   },
+   {
+    "move": "14-36",
+    "evals": 2283
+   }
+  ]
+ }
+}

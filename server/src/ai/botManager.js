@@ -4,10 +4,13 @@ const eloStore = require('./eloStore')
 const { titleFor } = require('../players/titles')
 
 const bots = {}
+// bot id -> its source file, so tournaments can tag each game with the exact bot version that played
+// it (see botVersion.js). Kept out of `meta`, which is sent to clients.
+const botFiles = {}
 const botFolder = path.join(__dirname, 'strategies')
 
 // Registers an already-`require`'d bot module (or freshly-loaded one) into the live registry.
-const registerBotModule = (bot, categoryOverride = null) => {
+const registerBotModule = (bot, categoryOverride = null, filePath = null) => {
     if(typeof bot.play != 'function'){
         console.warn(`[BotLoader] Skipping ${bot.id || bot.name || 'unknown bot'}: no play() function`)
         return
@@ -30,6 +33,7 @@ const registerBotModule = (bot, categoryOverride = null) => {
             category
         }
     }
+    if(filePath) botFiles[bot.id] = filePath
 }
 
 // Bots live one folder deep (strategies/<tier>/<bot>.js). Loose files directly in strategies/
@@ -45,7 +49,7 @@ const loadBots = _ => {
             // further training, not just brand new ones.
             const filePath = path.join(tierPath, file)
             delete require.cache[require.resolve(filePath)]
-            registerBotModule(require(filePath), tier.name)
+            registerBotModule(require(filePath), tier.name, filePath)
         }
     }
 }
@@ -58,6 +62,7 @@ module.exports = {
         return { ...b.meta, elo: record.elo, title: titleFor(record.elo, b.meta.titles), wins: record.wins, losses: record.losses, draws: record.draws, gamesPlayed: record.gamesPlayed }
     }),
     getBotByName: id => bots[id]?.play,
+    getBotFile: id => botFiles[id] || null,
     hasBot: id => typeof id == 'string' && Object.prototype.hasOwnProperty.call(bots, id),
     // Registers a bot in the live in-process registry immediately (used by evolve.js so a freshly
     // trained bot is playable right away, without waiting for a server restart to rescan the directory).

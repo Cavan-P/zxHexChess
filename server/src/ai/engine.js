@@ -1,5 +1,5 @@
 const { parseFen, boardToFen, generateFilteredLegals, isKingAttacked, promotionCells } = require('../game/moves')
-const { fastMoves, forEachCover, rookRays, bishopRays, knightJumps, kingSteps, pawnCaptures, pawnForward } = require('./fastMoves')
+const { fastMoves, collectCovers, rookRays, bishopRays, knightJumps, kingSteps, pawnCaptures, pawnForward } = require('./fastMoves')
 
 const pieceValues = {
     p: 1,
@@ -16,6 +16,11 @@ const HANG_PENALTY_MULT = 1.2
 const CENTER = 5 // hex board radius, cell [0,0,0] is the center
 
 const other = c => c == 'white' ? 'black' : 'white'
+
+// Piece letter -> lower case, as a lookup instead of a toLowerCase() call per piece per evaluation.
+const LOWER = { p: 'p', n: 'n', b: 'b', r: 'r', q: 'q', k: 'k', P: 'p', N: 'n', B: 'b', R: 'r', Q: 'q', K: 'k' }
+// Scratch space for collectCovers (a queen covers at most ~30 cells). Evaluation is never re-entered.
+const coverBuf = new Int16Array(128)
 
 // One pass over the board: for each side, which cells it covers (attacks or defends) and the
 // value of its cheapest piece covering each cell, plus how many moves it has. Moves are generated
@@ -38,13 +43,18 @@ const coverageMap = (board, enPassant, values) => {
         if(!cell?.piece) continue
 
         const color = cell.color
-        const value = cell.piece.toLowerCase() == 'k' ? 100 : (values[cell.piece.toLowerCase()] || 0)
+        const lower = LOWER[cell.piece]
+        const value = lower == 'k' ? 100 : (values[lower] || 0)
         const covers = cheapest[color]
 
-        forEachCover(board, i, color, enPassant, to => {
-            if(board[to].color != color) mobility[color]++
+        const n = collectCovers(board, i, lower, color, enPassant, coverBuf)
+        let moves = 0
+        for(let k = 0; k < n; k++){
+            const to = coverBuf[k]
+            if(board[to].color != color) moves++
             if(value < covers[to]) covers[to] = value
-        })
+        }
+        mobility[color] += moves
     }
 
     return { cheapest, mobility }
@@ -102,6 +112,10 @@ for(const c of ['white', 'black']){
     cellRank[c] = cellCoords.map(xy => pawnRank(xy, c))
 }
 const kingZone = [...Array(NUM).keys()].map(i => [i, ...kingSteps[i]])
+// Per-cell geometry, precomputed so the evaluation doesn't redo it for every piece of every position.
+const CENTRALITY = cellCoords.map(xy => CENTER - hexDistanceFromCenter(xy))
+const HEX_DIST = new Uint8Array(NUM * NUM)
+for(let i = 0; i < NUM; i++) for(let j = 0; j < NUM; j++) HEX_DIST[i * NUM + j] = hexDistance(cellCoords[i], cellCoords[j])
 const ATTACK_UNITS = { p: 1, n: 2, b: 2, r: 3, q: 5, k: 0 }
 const KING_DANGER_CAP = 20
 // Officer material at the start (per side: Q, 2R, 3B, 2N at standard values), for the game phase.
@@ -113,7 +127,7 @@ const gamePhase = board => {
     let officers = 0
     for(let i = 0; i < board.length; i++){
         const p = board[i].piece
-        if(p) officers += PHASE_VALUES[p.toLowerCase()] || 0
+        if(p) officers += PHASE_VALUES[LOWER[p]] || 0
     }
     return Math.min(1, officers / START_OFFICERS)
 }
@@ -142,19 +156,23 @@ const coverageMapExtended = (board, enPassant, values) => {
         if(!cell?.piece) continue
 
         const color = cell.color
-        const lower = cell.piece.toLowerCase()
+        const lower = LOWER[cell.piece]
         const value = lower == 'k' ? 100 : (values[lower] || 0)
         const covers = cheapest[color]
         const enemyZone = color == 'white' ? 2 : 1
         const units = ATTACK_UNITS[lower]
-        const byType = mobByType[color]
         let zoneHits = 0
 
-        forEachCover(board, i, color, enPassant, to => {
-            if(board[to].color != color){ mobility[color]++; byType[lower]++ }
+        const n = collectCovers(board, i, lower, color, enPassant, coverBuf)
+        let moves = 0
+        for(let k = 0; k < n; k++){
+            const to = coverBuf[k]
+            if(board[to].color != color) moves++
             if(value < covers[to]) covers[to] = value
             if(zoneMarks[to] & enemyZone) zoneHits++
-        })
+        }
+        mobility[color] += moves
+        mobByType[color][lower] += moves
         // Pawn pushes aren't attacks: count only the two capture cells for pawns.
         if(lower == 'p'){
             zoneHits = 0
@@ -256,7 +274,7 @@ const evaluateWeighted = (board, maximizingColor, enPassant, weights, toMove = o
         const cell = board[i]
         if(!cell?.piece) continue
 
-        const lower = cell.piece.toLowerCase()
+        const lower = LOWER[cell.piece]
         const friendly = cell.color == maximizingColor
         const sign = friendly ? 1 : -1
 
@@ -269,7 +287,7 @@ const evaluateWeighted = (board, maximizingColor, enPassant, weights, toMove = o
         // Pawns are worth a little more the closer they get to promoting, so bots have a reason
         // to push them (and a plan in endgames) instead of shuffling pieces around.
         if(lower == 'p'){
-            const rank = pawnRank(cell.coords, cell.color)
+            const rank = cellRank[cell.color][i]
             score += sign * ((rank - 1) * pawnAdvance + (rank >= 9 ? 0.25 : 0))
         }
 
@@ -279,11 +297,11 @@ const evaluateWeighted = (board, maximizingColor, enPassant, weights, toMove = o
         }
 
         if(weights.centralityWeight && lower != 'k' && lower != 'p'){
-            score += sign * (CENTER - hexDistanceFromCenter(cell.coords)) * weights.centralityWeight
+            score += sign * CENTRALITY[i] * weights.centralityWeight
         }
 
         if(ext && cw.centralityBonus && lower != 'k' && lower != 'p'){
-            score += sign * (CENTER - hexDistanceFromCenter(cell.coords)) * (cw.centralityBonus[lower] || 0)
+            score += sign * CENTRALITY[i] * (cw.centralityBonus[lower] || 0)
         }
 
     }
@@ -321,11 +339,11 @@ const evaluateWeighted = (board, maximizingColor, enPassant, weights, toMove = o
         const k = kings[maximizingColor]
         if(k){
             let defenders = 0
+            const kc = kingCells[maximizingColor]
             for(let i = 0; i < board.length; i++){
                 const cell = board[i]
-                if(!cell.piece || cell.color != maximizingColor || i == kingCells[maximizingColor]) continue
-                const [q, r, s] = cell.coords
-                if(Math.max(Math.abs(q - k[0]), Math.abs(r - k[1]), Math.abs(s - k[2])) <= 2) defenders++
+                if(!cell.piece || cell.color != maximizingColor || i == kc) continue
+                if(HEX_DIST[i * NUM + kc] <= 2) defenders++
             }
             score += defenders * weights.kingSafetyWeight
         }
@@ -391,7 +409,7 @@ const extendedTerms = (board, me, toMove, cw, { phase, pv, passedW, cheapest, mo
         const cell = board[i]
         if(!cell.piece) continue
         const c = cell.color, e = other(c), s = side(c)
-        const lower = cell.piece.toLowerCase()
+        const lower = LOWER[cell.piece]
 
         if(cw.threatWeight && lower != 'k'){
             const v = pv[lower] || 0
@@ -483,23 +501,30 @@ const kingAttacked = (board, color) => {
     }
     if(kingCell < 0) return false
 
-    const enemyIs = (j, letters) => {
-        const t = board[j]
-        return t.piece && t.color != color && letters.includes(t.piece.toLowerCase())
+    // First piece along each ray: an enemy slider of the right kind there attacks the king.
+    const slideHits = (rays, a, b) => {
+        for(let r = 0; r < rays.length; r++){
+            const ray = rays[r]
+            for(let k = 0; k < ray.length; k++){
+                const t = board[ray[k]]
+                if(!t.piece) continue
+                if(t.color != color){ const l = LOWER[t.piece]; if(l == a || l == b) return true }
+                break
+            }
+        }
+        return false
     }
-    const slideHits = (rays, letters) => {
-        for(const r of rays) for(const j of r){
-            if(!board[j].piece) continue
-            if(enemyIs(j, letters)) return true
-            break
+    const jumpHits = (cells, letter) => {
+        for(let k = 0; k < cells.length; k++){
+            const t = board[cells[k]]
+            if(t.piece && t.color != color && LOWER[t.piece] == letter) return true
         }
         return false
     }
 
-    return slideHits(rookRays[kingCell], 'rq') || slideHits(bishopRays[kingCell], 'bq') ||
-        knightJumps[kingCell].some(j => enemyIs(j, 'n')) ||
-        kingSteps[kingCell].some(j => enemyIs(j, 'k')) ||
-        pawnCaptures[color][kingCell].some(j => enemyIs(j, 'p'))
+    return slideHits(rookRays[kingCell], 'r', 'q') || slideHits(bishopRays[kingCell], 'b', 'q') ||
+        jumpHits(knightJumps[kingCell], 'n') || jumpHits(kingSteps[kingCell], 'k') ||
+        jumpHits(pawnCaptures[color][kingCell], 'p')
 }
 
 // Plays a move on a copy of the board, sharing every untouched cell with the original (search
@@ -533,6 +558,51 @@ const orderScore = (board, move) => {
 }
 
 const TT_EXACT = 0, TT_LOWER = 1, TT_UPPER = 2
+
+// ---- Zobrist hashing and the evaluation cache ----
+// A position's hash is the XOR of one random number per (piece, cell). Two independent 32-bit
+// hashes make a 64-bit key, so two different positions sharing a key is vanishingly unlikely.
+// The random numbers come from a fixed seed, so hashes are the same on every run. The generator must
+// be non-linear (mulberry32 multiplies): with a linear one like xorshift, every B number is a fixed
+// bit-mix of its A number, so hash B is just hash A scrambled and the "64-bit" key is really 32 bits -
+// enough positions per search for real collisions (found by test/searchBaseline.test.js).
+const PIECE_INDEX = { P: 0, N: 1, B: 2, R: 3, Q: 4, K: 5, p: 6, n: 7, b: 8, r: 9, q: 10, k: 11 }
+const ZOBRIST_A = new Int32Array(12 * 91), ZOBRIST_B = new Int32Array(12 * 91)
+{
+    let seed = 0x9e3779b9
+    const next = _ => {
+        seed = (seed + 0x6d2b79f5) | 0
+        let t = Math.imul(seed ^ (seed >>> 15), 1 | seed)
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+        return (t ^ (t >>> 14)) | 0
+    }
+    for(let i = 0; i < ZOBRIST_A.length; i++){ ZOBRIST_A[i] = next(); ZOBRIST_B[i] = next() }
+}
+const TURN_KEY_A = 0x2545f491, TURN_KEY_B = 0x6c078965
+let hashA = 0, hashB = 0     // results of the last hashBoard call (two return values without allocating)
+const hashBoard = (board, turn) => {
+    let a = turn == 'white' ? TURN_KEY_A : 0, b = turn == 'white' ? TURN_KEY_B : 0
+    for(let i = 0; i < board.length; i++){
+        const p = board[i].piece
+        if(!p) continue
+        const k = PIECE_INDEX[p] * 91 + i
+        a ^= ZOBRIST_A[k]; b ^= ZOBRIST_B[k]
+    }
+    hashA = a; hashB = b
+}
+
+// Evaluation cache: the search reaches the same position many times (different move orders, and
+// quiescence replaying the same captures), and scoring a position is most of the engine's work.
+// One shared table; each search gets a new generation number, so entries from an earlier search
+// (a different bot, weights or side) never count and nothing needs clearing.
+const EVAL_CACHE_SIZE = 1 << 17
+const evalCacheA = new Int32Array(EVAL_CACHE_SIZE), evalCacheB = new Int32Array(EVAL_CACHE_SIZE)
+const evalCacheGen = new Int32Array(EVAL_CACHE_SIZE), evalCacheScore = new Float64Array(EVAL_CACHE_SIZE)
+let evalGeneration = 0
+
+// Counters for benchmarks and tests: how many evaluations the search asked for, and how many the
+// cache answered.
+const searchStats = { evalRequests: 0, evalCacheHits: 0 }
 
 // Repeating an earlier position counts as a draw, scored just below level so a bot that's ahead
 // avoids it (no more shuffling the same piece back and forth) and a bot that's behind welcomes it.
@@ -582,7 +652,7 @@ const hasOfficers = (board, color) => {
 }
 const OPENING_PLIES = 16
 
-const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLimitMs, evaluate, seen = null, recentOwnMoves = [], quiescence = false, oversight = 0, { variety = 0, extendChecks = false, prune = false, checkBonus = CHECK_BONUS } = {}) => {
+const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLimitMs, evaluate, seen = null, recentOwnMoves = [], quiescence = false, oversight = 0, { variety = 0, extendChecks = false, prune = false, checkBonus = CHECK_BONUS, cacheEval = true } = {}) => {
     const nullMoves = prune === true || prune == 'null'
     // Reductions would cut short exactly the near-best alternatives opening variety picks from,
     // so they only start once the opening is over.
@@ -639,9 +709,24 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
         return Math.min(700, history[m.from * 91 + m.to])
     }
 
+    // Every caller passes enPassant = null, and maximizingColor is the same for the whole search,
+    // so board + side to move fully determine the score - which is what the cache is keyed on.
+    // Off for bots whose evaluation adds random noise (caching would freeze the noise per position).
+    const generation = ++evalGeneration
     const staticScore = (board, turn, maximizingColor, enPassant) => {
+        searchStats.evalRequests++
+        let slot = -1
+        if(cacheEval && enPassant == null){
+            hashBoard(board, turn)
+            slot = hashA & (EVAL_CACHE_SIZE - 1)
+            if(evalCacheGen[slot] == generation && evalCacheA[slot] == hashA && evalCacheB[slot] == hashB){
+                searchStats.evalCacheHits++
+                return evalCacheScore[slot]
+            }
+        }
         let s = evaluate(board, maximizingColor, enPassant, turn)
         if(kingAttacked(board, other(turn))) s += checkBonus
+        if(slot >= 0){ evalCacheGen[slot] = generation; evalCacheA[slot] = hashA; evalCacheB[slot] = hashB; evalCacheScore[slot] = s }
         return s
     }
 
@@ -708,6 +793,7 @@ const iterativeDeepening = (rootBoard, rootTurn, rootEnPassant, maxDepth, timeLi
             // (a stalemate at a leaf is rare enough to ignore).
             if(inCheck && !hasLegalMove(board, turn)) return { score: mateScore(), move: null }
 
+            searchStats.evalRequests++
             let s = evaluate(board, maximizingColor, enPassant, turn)
 
             const enemy = other(turn)
@@ -908,7 +994,7 @@ const searchBot = ({ fen, turn, enPassant, seen = null, recentOwnMoves = null, l
             : evaluate
         const seenSet = Array.isArray(seen) ? new Set(seen) : null
         const recent = recentOwnMoves || (lastOwnMove ? [lastOwnMove] : [])
-        move = iterativeDeepening(board, turn, enPassant, depthLimit, timeLimitMs, noisyEvaluate, seenSet, recent, quiescence, oversight, { variety, extendChecks: strong, prune: prune ?? (strong ? 'lmr' : false), checkBonus }) || legal[0]
+        move = iterativeDeepening(board, turn, enPassant, depthLimit, timeLimitMs, noisyEvaluate, seenSet, recent, quiescence, oversight, { variety, extendChecks: strong, prune: prune ?? (strong ? 'lmr' : false), checkBonus, cacheEval: !noise }) || legal[0]
     }
 
     const piece = board[move.from]
@@ -945,6 +1031,7 @@ module.exports = {
     generateAllMoves,
     iterativeDeepening,
     searchBot,
+    searchStats,
     makeEngineBot,
     evaluateWeighted,
     DEFAULT_WEIGHTS,

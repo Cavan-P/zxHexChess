@@ -1,57 +1,57 @@
 const { searchBot, evaluateWeighted } = require('../../engine')
 
-// Weights discovered via self-play evolutionary training (generations=210, population=16).
+// Weights discovered via self-play evolutionary training (generations=300, population=16).
 const weights = {
     "pieceValues": {
-        "p": 0.5,
-        "n": 3.5004622791007898,
-        "b": 4.306592151975555,
-        "r": 5.678345576691983,
-        "q": 12.7776075806359
+        "p": 0.673707622325641,
+        "n": 3.09234603075539,
+        "b": 3.0422071668665884,
+        "r": 5.2812539229028115,
+        "q": 11.24022188894761
     },
-    "hangingPenaltyMult": 0.5,
-    "centralityWeight": 0.03737198243922924,
+    "hangingPenaltyMult": 0.6162123841014702,
+    "centralityWeight": 0.0654173249821141,
     "mobilityWeight": 0,
-    "kingSafetyWeight": 0,
-    "pawnAdvanceWeight": 0.07491026165752479,
-    "mopUpWeight": 0.235049028136015,
-    "checkBonus": 3.673291693981894,
+    "kingSafetyWeight": 0.007559259786335715,
+    "pawnAdvanceWeight": 0.056574826701136546,
+    "mopUpWeight": 0.48879610313840904,
+    "checkBonus": 3.8789000379977465,
     "centralityBonus": {
-        "n": 0.060774676911427516,
-        "b": -0.010056493758833569,
-        "r": -0.04324492589286278,
-        "q": -0.03496042903811289
+        "n": 0.07563848831873099,
+        "b": 0.01942541172054535,
+        "r": 0.011998950100537002,
+        "q": -0.0457207999729487
     },
     "mobilityBonus": {
-        "n": -0.015522706924026589,
-        "b": 0.005000554851016628,
-        "r": 0.006821802597724699,
-        "q": -0.0069551850432102115
+        "n": -0.02,
+        "b": 0.011528984362953675,
+        "r": -0.003227145575433874,
+        "q": -0.011672288816045403
     },
-    "passedPawnWeight": 0.011616170166188421,
-    "isolatedPawnWeight": 0.03449436447022261,
-    "doubledPawnWeight": 0.15522879328294756,
-    "protectedPawnWeight": 0.04329282497378977,
-    "kingDangerWeight": 0.0008443267929588534,
-    "kingShieldWeight": 0.09461260716491157,
-    "kingCentralityEnd": 0.12197583006211765,
-    "bishopSetWeight": 0.17661577900580083,
-    "rookOpenWeight": 0.04151963806213956,
+    "passedPawnWeight": 0.014577949865196197,
+    "isolatedPawnWeight": 0,
+    "doubledPawnWeight": 0.25625783030487387,
+    "protectedPawnWeight": 0,
+    "kingDangerWeight": 0.002760666955622633,
+    "kingShieldWeight": 0,
+    "kingCentralityEnd": 0.09944857355271954,
+    "bishopSetWeight": 0.2889407287298482,
+    "rookOpenWeight": 0.007404648941725789,
     "rookHalfOpenWeight": 0,
-    "knightOutpostWeight": 0.02546049553289011,
-    "threatWeight": 0.18600131007443557,
-    "tempoWeight": 0.06529829128389514,
-    "tradeDownWeight": 0.04220776127138366,
+    "knightOutpostWeight": 0.07826285095399468,
+    "threatWeight": 0.11122450940282613,
+    "tempoWeight": 0.027948027272290638,
+    "tradeDownWeight": 0.12151627696819318,
     "end": {
         "pieceValues": {
-            "p": 1.838508332472622,
-            "n": 2.9560939623384352,
-            "b": 2.3367354131825318,
-            "r": 6.048527030974393,
-            "q": 10.069612605298492
+            "p": 1.4054259536086093,
+            "n": 3.052546415421925,
+            "b": 2.7884667146509345,
+            "r": 7.207631805619885,
+            "q": 9.55065313636394
         },
-        "pawnAdvanceWeight": 0.04666876852763979,
-        "passedPawnWeight": 0.01952986370903679
+        "pawnAdvanceWeight": 0.03192753189689943,
+        "passedPawnWeight": 0.039413616034705515
     }
 }
 

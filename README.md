@@ -36,4 +36,5 @@ Then open http://localhost:8000.
 
 - `npm test` runs the tests
 - `npm run lab` turns on bot tournaments and training (off by default since they're CPU-heavy and write files). "Train a bot" evolves a new bot by having slightly different versions of the engine play each other, and "Open live view" shows every game of the current generation as a grid you can click into. Do this on your own machine, then commit the new bot file in `server/src/ai/strategies/evolved/`
+- Bot ratings: every tournament game is appended to `server/data/botGames.jsonl`, and when a tournament ends all ratings are re-fitted from that whole log at once, with Milo Pruitt pinned at 400 as the anchor (don't edit his settings). `npm run rate` previews the fit (old vs new, with ± uncertainty) and `npm run rate -- --write` saves it to `eloRatings.json`. Games from an older version of a bot (its file or the engine code under it changed) are ignored, so re-run a tournament after reworking bots. Commit both files.
 - If you change Tailwind classes, rebuild the CSS with `cd client && npx tailwindcss -i css/style.css -o css/output.css`

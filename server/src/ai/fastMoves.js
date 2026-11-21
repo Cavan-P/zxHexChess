@@ -133,4 +133,39 @@ const forEachCover = (board, i, color, enPassant, visit) => {
     }
 }
 
-module.exports = { fastMoves, forEachCover, rookRays, bishopRays, knightJumps, kingSteps, pawnCaptures, pawnForward }
+// The same cells as forEachCover, written into `out` (a reusable typed array) instead of calling a
+// function per cell - the evaluation builds attack maps for every piece in every position it
+// scores, so this is one of the hottest loops in the engine. `lower` is the piece letter in lower
+// case. Returns how many cells were written.
+const collectCovers = (board, i, lower, color, enPassant, out) => {
+    let n = 0
+    switch(lower){
+        case 'p': {
+            const f = pawnForward[color][i]
+            if(f >= 0 && !board[f].piece){
+                out[n++] = f
+                const d = pawnDouble[color][i]
+                if(d >= 0 && !board[d].piece) out[n++] = d
+            }
+            const caps = pawnCaptures[color][i]
+            for(let k = 0; k < caps.length; k++) if(board[caps[k]].piece) out[n++] = caps[k]
+            if(enPassant && enPassant.color != color){
+                for(let k = 0; k < caps.length; k++) if(caps[k] == enPassant.captureCell) out[n++] = caps[k]
+            }
+            return n
+        }
+        case 'n': { const js = knightJumps[i]; for(let k = 0; k < js.length; k++) out[n++] = js[k]; return n }
+        case 'k': { const js = kingSteps[i]; for(let k = 0; k < js.length; k++) out[n++] = js[k]; return n }
+        case 'r': case 'b': case 'q': {
+            const rays = lower == 'r' ? rookRays[i] : lower == 'b' ? bishopRays[i] : queenRays[i]
+            for(let r = 0; r < rays.length; r++){
+                const ray = rays[r]
+                for(let k = 0; k < ray.length; k++){ const j = ray[k]; out[n++] = j; if(board[j].piece) break }
+            }
+            return n
+        }
+    }
+    return n
+}
+
+module.exports = { fastMoves, forEachCover, collectCovers, rookRays, bishopRays, knightJumps, kingSteps, pawnCaptures, pawnForward }

@@ -216,7 +216,7 @@ module.exports = {
     fs.writeFileSync(filePath, fileContents)
 
     delete require.cache[require.resolve(filePath)]
-    botManager.registerBot(require(filePath), 'evolved')
+    botManager.registerBot(require(filePath), 'evolved', filePath)
 
     return { id, name, filePath, generations: totalGenerations, updated: Boolean(meta.continueFrom) }
 }
@@ -245,7 +245,7 @@ const snapshotEvolvedBot = id => {
     fs.writeFileSync(filePath, source)
 
     delete require.cache[require.resolve(filePath)]
-    botManager.registerBot(require(filePath), 'evolved')
+    botManager.registerBot(require(filePath), 'evolved', filePath)
     return { id: snapId, name: snapName, filePath }
 }
 
